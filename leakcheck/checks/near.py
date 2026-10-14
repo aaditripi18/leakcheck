@@ -128,8 +128,9 @@ def check_near(split: Split, eps: float = EPS, sample: int = SAMPLE, seed: int =
     k, n = int(near.sum()), len(idx)
     rate = k / n if n else 0.0
 
-    curve = {str(e): float(((dist <= e) & ~exact).mean()) if n else 0.0 for e in EPS_GRID}
-    baseline = _train_baseline(split, min(sample, len(split.train) // 2), seed)
+    grid = sorted(set(EPS_GRID) | {eps})
+    curve = {str(e): float(((dist <= e) & ~exact).mean()) if n else 0.0 for e in grid}
+    baseline = _train_baseline(split, min(sample, len(split.train) // 2), seed, grid)
 
     ex = np.flatnonzero(near)[:N_EXAMPLES]
     return Finding(
@@ -147,6 +148,10 @@ def check_near(split: Split, eps: float = EPS, sample: int = SAMPLE, seed: int =
             "exact_or_near_rate": float(((dist <= eps) | exact).mean()) if n else 0.0,
             "curve": curve,
             "train_baseline_curve": baseline,
+            # > 1: test sits closer to training than training sits to itself.
+            # Read the severity together with this: clustered data (many
+            # near-identical flows) has a high baseline even under a random split.
+            "vs_train_baseline": (rate / baseline[str(eps)]) if baseline.get(str(eps)) else None,
             "numeric_features": len(numeric_columns(split)),
             "categorical_features": len(categorical_columns(split)),
         },
@@ -154,7 +159,7 @@ def check_near(split: Split, eps: float = EPS, sample: int = SAMPLE, seed: int =
     )
 
 
-def _train_baseline(split: Split, k: int, seed: int) -> dict[str, float]:
+def _train_baseline(split: Split, k: int, seed: int, grid=EPS_GRID) -> dict[str, float]:
     """The same curve for held-out training rows against the rest of training.
 
     Tells you what "near" looks like inside the training data itself, e.g. for
@@ -169,4 +174,4 @@ def _train_baseline(split: Split, k: int, seed: int) -> dict[str, float]:
                 time=split.time, group=split.group, ignore=list(split.ignore), text=split.text)
     dist, _ = nearest(sub)
     exact = np.isin(sub.test_hash, sub.train_hash)
-    return {str(e): float(((dist <= e) & ~exact).mean()) for e in EPS_GRID}
+    return {str(e): float(((dist <= e) & ~exact).mean()) for e in grid}

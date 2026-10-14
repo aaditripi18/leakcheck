@@ -1,0 +1,139 @@
+{
+  "kdd99": {
+    "description": "KDD Cup 1999 full training set, kddcup.data.gz (4,898,431 rows)",
+    "source": "Original UCI file as mirrored on figshare by scikit-learn (sklearn.datasets.fetch_kddcup99). The UCI host now answers 403 for the data files.",
+    "provenance": "SHA-256 pinned independently by scikit-learn (_kddcup99.py) and TensorFlow Datasets (datasets/kddcup99/checksums.tsv, for http://kdd.ics.uci.edu/databases/kddcup99/kddcup.data.gz, 18,115,902 bytes): byte-identical to the original.",
+    "licence": "CC BY 4.0 (UCI)",
+    "citation": "Stolfo et al., KDD Cup 1999 Data, UCI Machine Learning Repository, https://doi.org/10.24432/C51C7N",
+    "files": [
+      {
+        "path": "kdd99/kddcup.data.gz",
+        "url": "https://ndownloader.figshare.com/files/5976045",
+        "sha256": "3b6c942aa0356c0ca35b7b595a26c89d343652c9db428893e7494f837b274292"
+      }
+    ]
+  },
+  "kdd99_test": {
+    "description": "KDD Cup 1999 labelled test set ('corrected', 311,029 rows), as parquet",
+    "source": "Hugging Face akahana/kdd-cup-1999 at commit 44542fc. No byte-identical public copy of corrected.gz was reachable (UCI 403; IEEE DataPort needs a login).",
+    "provenance": "Not byte-verifiable against TFDS's corrected.gz hash (abd81655..., 1,409,035 bytes) because it was converted to parquet. Checked by content instead: the same upload's training split (kdd99_hf_train) must equal the verified kdd99 file row for row (scripts/check_sources.py).",
+    "licence": "CC BY 4.0 (UCI)",
+    "citation": "Stolfo et al., KDD Cup 1999 Data",
+    "files": [
+      {
+        "path": "kdd99_hf/test-00000-of-00002.parquet",
+        "url": "https://huggingface.co/datasets/akahana/kdd-cup-1999/resolve/44542fceec580b960327b9f68dc4a2e6f2f9d407/data/test-00000-of-00002.parquet",
+        "sha256": "5bf467cb018e1fc34f0b710ed46da31f52059581cc522090b3e55f7a3da5b90b"
+      },
+      {
+        "path": "kdd99_hf/test-00001-of-00002.parquet",
+        "url": "https://huggingface.co/datasets/akahana/kdd-cup-1999/resolve/44542fceec580b960327b9f68dc4a2e6f2f9d407/data/test-00001-of-00002.parquet",
+        "sha256": "0d8a6980462dfdda8193a11ec5923f32b1314a99728c43cd83d23facc5a0e60e"
+      }
+    ]
+  },
+  "kdd99_hf_train": {
+    "description": "Training split of the same Hugging Face upload; used only to validate the conversion",
+    "source": "Hugging Face akahana/kdd-cup-1999 at commit 44542fc",
+    "files": [
+      {
+        "path": "kdd99_hf/train-00000-of-00017.parquet",
+        "url": "https://huggingface.co/datasets/akahana/kdd-cup-1999/resolve/44542fceec580b960327b9f68dc4a2e6f2f9d407/data/train-00000-of-00017.parquet",
+        "sha256": "abed7805765a883a2d130445dae7372c764fc53cb87392fa2f95294c23204cb3"
+      },
+      {
+        "path": "kdd99_hf/train-00001-of-00017.parquet",
+        "url": "https://huggingface.co/datasets/akahana/kdd-cup-1999/resolve/44542fceec580b960327b9f68dc4a2e6f2f9d407/data/train-00001-of-00017.parquet",
+        "sha256": "9357e7db26ab49630961ed0eebe8c52e7e7780b90c972915712340cb8944b373"
+      },
+      {
+        "path": "kdd99_hf/train-00002-of-00017.parquet",
+        "url": "https://huggingface.co/datasets/akahana/kdd-cup-1999/resolve/44542fceec580b960327b9f68dc4a2e6f2f9d407/data/train-00002-of-00017.parquet",
+        "sha256": "e4bad85a3dd3ef3f233845805cc37f29b1d5058bc6974de15fbc6d3469976251"
+      },
+      {
+        "path": "kdd99_hf/train-00003-of-00017.parquet",
+        "url": "https://huggingface.co/datasets/akahana/kdd-cup-1999/resolve/44542fceec580b960327b9f68dc4a2e6f2f9d407/data/train-00003-of-00017.parquet",
+        "sha256": "0a20f286be5b327faa395384dcef26b3ed53ca30e111f23e4a582a65217570a8"
+      },
+      {
+        "path": "kdd99_hf/train-00004-of-00017.parquet",
+        "url": "https://huggingface.co/datasets/akahana/kdd-cup-1999/resolve/44542fceec580b960327b9f68dc4a2e6f2f9d407/data/train-00004-of-00017.parquet",
+        "sha256": "13ac30b9dc0c2790d7554a23869cf598f8e0c61c0989822da253345021e5a84c"
+      },
+      {
+        "path": "kdd99_hf/train-00005-of-00017.parquet",
+        "url": "https://huggingface.co/datasets/akahana/kdd-cup-1999/resolve/44542fceec580b960327b9f68dc4a2e6f2f9d407/data/train-00005-of-00017.parquet",
+        "sha256": "f591610c081da9b957529fa44a92a5474eb1fa8007c5d3e890c090296d160198"
+      },
+      {
+        "path": "kdd99_hf/train-00006-of-00017.parquet",
+        "url": "https://huggingface.co/datasets/akahana/kdd-cup-1999/resolve/44542fceec580b960327b9f68dc4a2e6f2f9d407/data/train-00006-of-00017.parquet",
+        "sha256": "b4d709ec67d4301fa2c794da2e827e655c18cc174fa053f9b5078c4e1a482958"
+      },
+      {
+        "path": "kdd99_hf/train-00007-of-00017.parquet",
+        "url": "https://huggingface.co/datasets/akahana/kdd-cup-1999/resolve/44542fceec580b960327b9f68dc4a2e6f2f9d407/data/train-00007-of-00017.parquet",
+        "sha256": "1b5e5326570a32d3373553bcc558d24d73ad1cc93154d98fff3f971755f59840"
+      },
+      {
+        "path": "kdd99_hf/train-00008-of-00017.parquet",
+        "url": "https://huggingface.co/datasets/akahana/kdd-cup-1999/resolve/44542fceec580b960327b9f68dc4a2e6f2f9d407/data/train-00008-of-00017.parquet",
+        "sha256": "c1f5049ead80f6a4d7fc607982b4bb018fa7b97bedf8417723080bdfc297ed9e"
+      },
+      {
+        "path": "kdd99_hf/train-00009-of-00017.parquet",
+        "url": "https://huggingface.co/datasets/akahana/kdd-cup-1999/resolve/44542fceec580b960327b9f68dc4a2e6f2f9d407/data/train-00009-of-00017.parquet",
+        "sha256": "032540b8a52eae2d617a8abc15759b5258eda2ea7bb6b19440c184dc340e237b"
+      },
+      {
+        "path": "kdd99_hf/train-00010-of-00017.parquet",
+        "url": "https://huggingface.co/datasets/akahana/kdd-cup-1999/resolve/44542fceec580b960327b9f68dc4a2e6f2f9d407/data/train-00010-of-00017.parquet",
+        "sha256": "9474e5c3c43ea7074eaec17e513a68755a3919740b2af285ebeaf8d868467738"
+      },
+      {
+        "path": "kdd99_hf/train-00011-of-00017.parquet",
+        "url": "https://huggingface.co/datasets/akahana/kdd-cup-1999/resolve/44542fceec580b960327b9f68dc4a2e6f2f9d407/data/train-00011-of-00017.parquet",
+        "sha256": "0b17ca0ac596058cdcce10ea3e7b2ba10c44e3c1c3af8e509b6f4bc399f7d437"
+      },
+      {
+        "path": "kdd99_hf/train-00012-of-00017.parquet",
+        "url": "https://huggingface.co/datasets/akahana/kdd-cup-1999/resolve/44542fceec580b960327b9f68dc4a2e6f2f9d407/data/train-00012-of-00017.parquet",
+        "sha256": "8886293a736dd7006da233032565197131d177f82e5dc4d3989e7328ece20aa6"
+      },
+      {
+        "path": "kdd99_hf/train-00013-of-00017.parquet",
+        "url": "https://huggingface.co/datasets/akahana/kdd-cup-1999/resolve/44542fceec580b960327b9f68dc4a2e6f2f9d407/data/train-00013-of-00017.parquet",
+        "sha256": "fc30c4386507908e3e72c5833b3a63b00b25ccc893967b353b81be6fd410b88b"
+      },
+      {
+        "path": "kdd99_hf/train-00014-of-00017.parquet",
+        "url": "https://huggingface.co/datasets/akahana/kdd-cup-1999/resolve/44542fceec580b960327b9f68dc4a2e6f2f9d407/data/train-00014-of-00017.parquet",
+        "sha256": "a5e31883d4d5f56dfc49913f4514128794ea76feec17ab160b46100aa207fdff"
+      },
+      {
+        "path": "kdd99_hf/train-00015-of-00017.parquet",
+        "url": "https://huggingface.co/datasets/akahana/kdd-cup-1999/resolve/44542fceec580b960327b9f68dc4a2e6f2f9d407/data/train-00015-of-00017.parquet",
+        "sha256": "c68b41699812d7d544957e065dd9a482254a9cb69f08ae6e087a9f55d27a7151"
+      },
+      {
+        "path": "kdd99_hf/train-00016-of-00017.parquet",
+        "url": "https://huggingface.co/datasets/akahana/kdd-cup-1999/resolve/44542fceec580b960327b9f68dc4a2e6f2f9d407/data/train-00016-of-00017.parquet",
+        "sha256": "9fbfe0362be06670e6a54df4e9c8f1cb01dc195d208089bb8c4534d7e18615d2"
+      }
+    ]
+  },
+  "nslkdd": {
+    "description": "NSL-KDD (KDDTrain+, KDDTest+): KDD99 with duplicates removed",
+    "source": "Original NSL-KDD zip, GitHub mirror Jehuty4949/NSL_KDD (formerly defcom17/NSL_KDD) pinned at commit 27bbbdf (2015-07-30). The official CIC download sits behind a registration form. Integrity is checked independently in E0b: every NSL-KDD row must occur in the official UCI KDD99 files.",
+    "licence": "Canadian Institute for Cybersecurity terms; cite Tavallaee et al. 2009",
+    "citation": "Tavallaee, Bagheri, Lu, Ghorbani. A Detailed Analysis of the KDD CUP 99 Data Set. IEEE CISDA 2009",
+    "files": [
+      {
+        "path": "nslkdd/NSL-KDD-original.zip",
+        "url": "https://raw.githubusercontent.com/Jehuty4949/NSL_KDD/27bbbdf5c5cccf9970b8b6037a0f19dc09c5a0a9/Original%20NSL%20KDD%20Zip.zip",
+        "sha256": "bfae9d0b76a745e566e8fcb55d37e1e9d730e9463a16c179cf5d6ef04aa4123b"
+      }
+    ]
+  }
+}
