@@ -15,8 +15,11 @@ from __future__ import annotations
 import datetime as dt
 import gzip
 import hashlib
+import http.client
 import json
 import os
+import time
+import urllib.error
 import urllib.request
 import zipfile
 from pathlib import Path
@@ -50,6 +53,51 @@ def _read_manifest(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
 
 
+RETRIES = 30
+
+
+def download(url: str, tmp: Path, retries: int = RETRIES, wait: float = 2.0) -> None:
+    """Stream `url` into `tmp`, resuming with HTTP Range after a dropped connection.
+
+    CDNs sometimes close the connection mid-file without an error, so the
+    file is only considered complete when its size reaches the total the
+    server announced. The SHA-256 check after this is still the final word.
+    """
+    total = None
+    for attempt in range(retries):
+        have = tmp.stat().st_size if tmp.exists() else 0
+        if total is not None and have >= total:
+            return
+        headers = {"User-Agent": "leakcheck-fetch"}
+        if have:
+            headers["Range"] = f"bytes={have}-"
+        try:
+            with urllib.request.urlopen(urllib.request.Request(url, headers=headers), timeout=120) as r:
+                status = getattr(r, "status", None) or 200
+                if status == 206:
+                    rng = r.headers.get("Content-Range", "")
+                    total = int(rng.rsplit("/", 1)[1]) if "/" in rng and not rng.endswith("*") else total
+                    mode = "ab"
+                else:  # 200: full body (server ignored Range, or first request)
+                    length = r.headers.get("Content-Length")
+                    total = int(length) if length else None
+                    mode = "wb"
+                with open(tmp, mode) as out:
+                    while chunk := r.read(1 << 20):
+                        out.write(chunk)
+            if total is None or tmp.stat().st_size >= total:
+                return
+        except urllib.error.HTTPError as e:
+            if e.code == 416 and have:  # range starts at the end: already complete
+                return
+            if e.code < 500:
+                raise
+        except (urllib.error.URLError, OSError, http.client.HTTPException):
+            pass
+        time.sleep(min(wait * 2**attempt, 60))
+    raise RuntimeError(f"download of {url} incomplete after {retries} attempts")
+
+
 def fetch(name: str, registry: dict | None = None, raw: Path = RAW, manifest: Path = MANIFEST,
           pin: bool = False) -> list[Path]:
     """Download every file of dataset `name`, verifying SHA-256.
@@ -71,10 +119,7 @@ def fetch(name: str, registry: dict | None = None, raw: Path = RAW, manifest: Pa
             continue
         dest.parent.mkdir(parents=True, exist_ok=True)
         tmp = dest.with_name(dest.name + ".part")
-        req = urllib.request.Request(f["url"], headers={"User-Agent": "leakcheck-fetch"})
-        with urllib.request.urlopen(req, timeout=120) as r, open(tmp, "wb") as out:
-            while chunk := r.read(1 << 20):
-                out.write(chunk)
+        download(f["url"], tmp)
         got = sha256_file(tmp)
         if expected and got != expected:
             tmp.unlink()
@@ -180,3 +225,87 @@ def load_nslkdd(part: str) -> pd.DataFrame:
     (path,) = verify_local("nslkdd")
     with zipfile.ZipFile(path) as zf, zf.open(_zip_member(zf, member)) as f:
         return _read_kdd(f, ["difficulty"])
+
+
+# --- Week 4 datasets ----------------------------------------------------------------
+
+
+def load_unsw(part: str) -> pd.DataFrame:
+    """part: 'train' (UNSW_NB15_training-set.csv, 175,341) or 'test' (testing-set, 82,332)."""
+    tr, te = verify_local("unsw_nb15")
+    df = pd.read_csv(tr if part == "train" else te, encoding="utf-8-sig")
+    for c in ("proto", "service", "state", "attack_cat"):
+        df[c] = df[c].astype("string").str.strip()
+    return df
+
+
+# Capture order of the CIC-IDS2017 MachineLearningCSV files (Mon 3 Jul - Fri 7 Jul 2017).
+CIC_FILES = [
+    "Monday-WorkingHours.pcap_ISCX.csv",
+    "Tuesday-WorkingHours.pcap_ISCX.csv",
+    "Wednesday-workingHours.pcap_ISCX.csv",
+    "Thursday-WorkingHours-Morning-WebAttacks.pcap_ISCX.csv",
+    "Thursday-WorkingHours-Afternoon-Infilteration.pcap_ISCX.csv",
+    "Friday-WorkingHours-Morning.pcap_ISCX.csv",
+    "Friday-WorkingHours-Afternoon-PortScan.pcap_ISCX.csv",
+    "Friday-WorkingHours-Afternoon-DDos.pcap_ISCX.csv",
+]
+
+
+def cic_members(zf: zipfile.ZipFile) -> dict[str, str]:
+    """File name -> archive member for the 8 CSVs (the zip nests them in a folder)."""
+    out = {}
+    for f in CIC_FILES:
+        hits = [n for n in zf.namelist() if n.rsplit("/", 1)[-1] == f and ".." not in n]
+        if len(hits) != 1:
+            raise KeyError(f"{f!r} not found exactly once in archive")
+        out[f] = hits[0]
+    return out
+
+
+def load_cicids2017() -> pd.DataFrame:
+    """All 8 files concatenated, column names stripped, plus `capture_order` (0-7)."""
+    (path,) = verify_local("cicids2017")
+    frames = []
+    with zipfile.ZipFile(path) as zf:
+        for i, (f, m) in enumerate(cic_members(zf).items()):
+            with zf.open(m) as fh:
+                d = pd.read_csv(fh, encoding="latin-1", low_memory=False)
+            d.columns = [c.strip() for c in d.columns]
+            d["capture_order"] = i
+            frames.append(d)
+    df = pd.concat(frames, ignore_index=True)
+    df["Label"] = df["Label"].astype("string").str.strip()
+    return df
+
+
+def load_uci_phishing() -> pd.DataFrame:
+    (path,) = verify_local("uci_phishing")
+    with zipfile.ZipFile(path) as zf:
+        text = zf.read(_zip_member(zf, "Training Dataset.arff")).decode("utf-8")
+    names, rows, in_data = [], [], False
+    for line in text.splitlines():
+        s = line.strip()
+        if not s or s.startswith("%"):
+            continue
+        if in_data:
+            rows.append([int(v) for v in s.split(",")])
+        elif s.lower().startswith("@attribute"):
+            names.append(s.split()[1])
+        elif s.lower().startswith("@data"):
+            in_data = True
+    return pd.DataFrame(rows, columns=names)
+
+
+def load_phiusiil() -> pd.DataFrame:
+    (path,) = verify_local("phiusiil")
+    with zipfile.ZipFile(path) as zf, zf.open(_zip_member(zf, "PhiUSIIL_Phishing_URL_Dataset.csv")) as f:
+        return pd.read_csv(f, encoding="utf-8-sig", low_memory=False)
+
+
+def load_sms_spam() -> pd.DataFrame:
+    (path,) = verify_local("sms_spam")
+    with zipfile.ZipFile(path) as zf:
+        text = zf.read(_zip_member(zf, "SMSSpamCollection")).decode("utf-8")
+    rows = [line.split("\t", 1) for line in text.splitlines() if line]
+    return pd.DataFrame(rows, columns=["label", "message"])

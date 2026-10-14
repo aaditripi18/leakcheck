@@ -135,5 +135,94 @@
         "sha256": "bfae9d0b76a745e566e8fcb55d37e1e9d730e9463a16c179cf5d6ef04aa4123b"
       }
     ]
+  },
+  "unsw_nb15": {
+    "description": "UNSW-NB15 official partition: UNSW_NB15_training-set.csv (175,341) and UNSW_NB15_testing-set.csv (82,332)",
+    "source": "Hugging Face Mireu-Lab/UNSW-NB15 @ 3eb02c4 (test.csv / train.csv). The official files sit in a UNSW SharePoint folder that cannot be fetched by script.",
+    "provenance": "Mireu-Lab's test.csv is byte-identical (same SHA-256) to Mouwiya/UNSW-NB15 @ 8ad6b19's UNSW_NB15_training-set.csv, an independent upload under the official name: Mireu-Lab swapped the names. Stored here under the official names. Row and per-category counts are checked against the official page (totals) and Moustafa & Slay 2016 as reproduced in secondary tables (per category).",
+    "licence": "UNSW-NB15 terms (free for academic research; cite Moustafa & Slay 2015, 2016)",
+    "citation": "Moustafa & Slay, UNSW-NB15: a comprehensive data set for network intrusion detection systems, MilCIS 2015",
+    "files": [
+      {
+        "path": "unsw_nb15/UNSW_NB15_training-set.csv",
+        "url": "https://huggingface.co/datasets/Mireu-Lab/UNSW-NB15/resolve/3eb02c4a0a29866b7abcb5ef77c45cf4fcc8f6b0/test.csv",
+        "sha256": "bec7dd5ec88dc2a0ccc7a07879d338395ed7421750f675fd0339e07dfe0648fa"
+      },
+      {
+        "path": "unsw_nb15/UNSW_NB15_testing-set.csv",
+        "url": "https://huggingface.co/datasets/Mireu-Lab/UNSW-NB15/resolve/3eb02c4a0a29866b7abcb5ef77c45cf4fcc8f6b0/train.csv",
+        "sha256": "734fe6642edf758f7c94d7d9149426b49d202fe8e7bf0bef47392489c3c0a559"
+      }
+    ]
+  },
+  "cicids2017": {
+    "description": "CIC-IDS2017 MachineLearningCSV.zip: 8 per-day CSVs, 2,830,743 flows, 78 features + Label",
+    "source": "Hugging Face bencorn/CICIDS2017 @ 811c007, csvs/MachineLearningCSV.zip (the official CIC download sits behind a registration form; no official checksum is published)",
+    "provenance": "The 8 CSVs inside the zip must be byte-identical to the 8 CSVs uploaded independently in c01dsnap/CIC-IDS2017 @ 4e9edfa (hashes in experiments/check_week4.py), and label counts must equal Table II of Ahmim et al. 2018 (arXiv:1812.09059).",
+    "licence": "Canadian Institute for Cybersecurity terms; cite Sharafaldin et al. 2018",
+    "citation": "Sharafaldin, Lashkari, Ghorbani. Toward Generating a New Intrusion Detection Dataset and Intrusion Traffic Characterization. ICISSP 2018",
+    "files": [
+      {
+        "path": "cicids2017/MachineLearningCSV.zip",
+        "url": "https://huggingface.co/datasets/bencorn/CICIDS2017/resolve/811c007f08d693a8a8b4226c197c138391806ce6/csvs/MachineLearningCSV.zip",
+        "sha256": "c3f26274b36c837ccf28ffd2dbf4582941c30b3ee70a635c6e5b2f87c4727928"
+      }
+    ]
+  },
+  "ember2018": {
+    "description": "EMBER 2018 (feature version 2): raw PE features as JSON lines, 800k train (incl. 200k unlabelled) + 200k test, temporal split",
+    "source": "Official: https://ember.elastic.co",
+    "provenance": "SHA-256 published in the elastic/ember README",
+    "licence": "Data: MIT (EMBER code is AGPL-3.0 and is not used or copied here)",
+    "citation": "Anderson & Roth. EMBER: An Open Dataset for Training Static PE Malware Machine Learning Models. arXiv:1804.04637",
+    "files": [
+      {
+        "path": "ember2018/ember_dataset_2018_2.tar.bz2",
+        "url": "https://ember.elastic.co/ember_dataset_2018_2.tar.bz2",
+        "sha256": "b6052eb8d350a49a8d5a5396fbe7d16cf42848b86ff969b77464434cf2997812"
+      }
+    ]
+  },
+  "uci_phishing": {
+    "description": "UCI Phishing Websites: 11,055 sites, 30 ternary features, Result label",
+    "source": "UCI Machine Learning Repository dataset 327 (official)",
+    "provenance": "Official source; SHA-256 recorded on first download. Row and class counts checked against the UCI page / paper.",
+    "licence": "CC BY 4.0",
+    "citation": "Mohammad, Thabtah, McCluskey. Phishing Websites Features. UCI ML Repository, https://doi.org/10.24432/C51W2X",
+    "files": [
+      {
+        "path": "uci_phishing/phishing+websites.zip",
+        "url": "https://archive.ics.uci.edu/static/public/327/phishing+websites.zip",
+        "sha256": "514f582cb44cba17251baf1d59f64cddff16efa2b644d091ce8d2a1e8d492940"
+      }
+    ]
+  },
+  "phiusiil": {
+    "description": "PhiUSIIL Phishing URL dataset: 235,795 URLs with 54 features, URL text",
+    "source": "UCI Machine Learning Repository dataset 967 (official)",
+    "provenance": "Official source; SHA-256 recorded on first download. Row and class counts checked against the UCI page / paper.",
+    "licence": "CC BY 4.0",
+    "citation": "Prasad & Chandra. PhiUSIIL: A diverse security profile empowered phishing URL detection framework based on similarity index and incremental learning. Computers & Security 2024",
+    "files": [
+      {
+        "path": "phiusiil/phiusiil+phishing+url+dataset.zip",
+        "url": "https://archive.ics.uci.edu/static/public/967/phiusiil+phishing+url+dataset.zip",
+        "sha256": "0a639fd03aea6308c5b1c10c92aa23c2ce1505447a9137271865cd0badc9a59a"
+      }
+    ]
+  },
+  "sms_spam": {
+    "description": "SMS Spam Collection: 5,574 messages, ham/spam",
+    "source": "UCI Machine Learning Repository dataset 228 (official)",
+    "provenance": "Official source; SHA-256 recorded on first download. Row and class counts checked against the UCI page / paper.",
+    "licence": "CC BY 4.0",
+    "citation": "Almeida, G\u00f3mez Hidalgo, Yamakami. Contributions to the Study of SMS Spam Filtering. DocEng 2011",
+    "files": [
+      {
+        "path": "sms_spam/sms+spam+collection.zip",
+        "url": "https://archive.ics.uci.edu/static/public/228/sms+spam+collection.zip",
+        "sha256": "1587ea43e58e82b14ff1f5425c88e17f8496bfcdb67a583dbff9eefaf9963ce3"
+      }
+    ]
   }
 }

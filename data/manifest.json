@@ -1,4 +1,11 @@
 {
+  "cicids2017/MachineLearningCSV.zip": {
+    "dataset": "cicids2017",
+    "fetched_at": "2026-10-14T18:45:45+00:00",
+    "sha256": "c3f26274b36c837ccf28ffd2dbf4582941c30b3ee70a635c6e5b2f87c4727928",
+    "size": 235102953,
+    "url": "https://huggingface.co/datasets/bencorn/CICIDS2017/resolve/811c007f08d693a8a8b4226c197c138391806ce6/csvs/MachineLearningCSV.zip"
+  },
   "kdd99/kddcup.data.gz": {
     "dataset": "kdd99",
     "fetched_at": "2026-10-14T18:13:25+00:00",
@@ -145,5 +152,40 @@
     "sha256": "bfae9d0b76a745e566e8fcb55d37e1e9d730e9463a16c179cf5d6ef04aa4123b",
     "size": 6587584,
     "url": "https://raw.githubusercontent.com/Jehuty4949/NSL_KDD/27bbbdf5c5cccf9970b8b6037a0f19dc09c5a0a9/Original%20NSL%20KDD%20Zip.zip"
+  },
+  "phiusiil/phiusiil+phishing+url+dataset.zip": {
+    "dataset": "phiusiil",
+    "fetched_at": "2026-10-14T18:32:36+00:00",
+    "sha256": "0a639fd03aea6308c5b1c10c92aa23c2ce1505447a9137271865cd0badc9a59a",
+    "size": 15376007,
+    "url": "https://archive.ics.uci.edu/static/public/967/phiusiil+phishing+url+dataset.zip"
+  },
+  "sms_spam/sms+spam+collection.zip": {
+    "dataset": "sms_spam",
+    "fetched_at": "2026-10-14T18:32:39+00:00",
+    "sha256": "1587ea43e58e82b14ff1f5425c88e17f8496bfcdb67a583dbff9eefaf9963ce3",
+    "size": 203415,
+    "url": "https://archive.ics.uci.edu/static/public/228/sms+spam+collection.zip"
+  },
+  "uci_phishing/phishing+websites.zip": {
+    "dataset": "uci_phishing",
+    "fetched_at": "2026-10-14T18:29:57+00:00",
+    "sha256": "514f582cb44cba17251baf1d59f64cddff16efa2b644d091ce8d2a1e8d492940",
+    "size": 1011184,
+    "url": "https://archive.ics.uci.edu/static/public/327/phishing+websites.zip"
+  },
+  "unsw_nb15/UNSW_NB15_testing-set.csv": {
+    "dataset": "unsw_nb15",
+    "fetched_at": "2026-10-14T18:33:46+00:00",
+    "sha256": "734fe6642edf758f7c94d7d9149426b49d202fe8e7bf0bef47392489c3c0a559",
+    "size": 15380800,
+    "url": "https://huggingface.co/datasets/Mireu-Lab/UNSW-NB15/resolve/3eb02c4a0a29866b7abcb5ef77c45cf4fcc8f6b0/train.csv"
+  },
+  "unsw_nb15/UNSW_NB15_training-set.csv": {
+    "dataset": "unsw_nb15",
+    "fetched_at": "2026-10-14T18:33:31+00:00",
+    "sha256": "bec7dd5ec88dc2a0ccc7a07879d338395ed7421750f675fd0339e07dfe0648fa",
+    "size": 32293018,
+    "url": "https://huggingface.co/datasets/Mireu-Lab/UNSW-NB15/resolve/3eb02c4a0a29866b7abcb5ef77c45cf4fcc8f6b0/test.csv"
   }
 }

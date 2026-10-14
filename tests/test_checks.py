@@ -120,15 +120,25 @@ def test_categorical_shortcut():
 
 @pytest.mark.parametrize("name", ["Src IP", "dst_port", "Flow ID", "Timestamp", "sha256", "md5"])
 def test_identifier_names_flagged(name):
-    df = pd.DataFrame({name: [1, 2], "bytes": [3, 4], "label": [0, 1]})
+    df = pd.DataFrame({name: range(60), "bytes": [3, 4] * 30, "label": [0, 1] * 30})
     f = shortcut.check_identifiers(Split(df, df.copy(), "label"))
     assert [c["feature"] for c in f.details["columns"]] == [name]
 
 
-@pytest.mark.parametrize("name", ["bytes", "duration", "spot", "valid", "ttl"])
+@pytest.mark.parametrize("name", ["bytes", "duration", "spot", "valid", "ttl", "ct_dst_ltm", "Flow Duration"])
 def test_benign_names_not_flagged(name):
-    df = pd.DataFrame({name: [1, 2], "label": [0, 1]})
+    df = pd.DataFrame({name: range(60), "label": [0, 1] * 30})
     assert shortcut.check_identifiers(Split(df, df.copy(), "label")).value == 0
+
+
+def test_low_cardinality_flag_with_id_name_not_flagged():
+    df = pd.DataFrame({"having_IP_Address": [-1, 1] * 30, "label": [0, 1] * 30})
+    assert shortcut.check_identifiers(Split(df, df.copy(), "label")).value == 0
+
+
+def test_text_column_not_an_identifier():
+    df = pd.DataFrame({"message": [f"text {i}" for i in range(60)], "label": [0, 1] * 30})
+    assert shortcut.check_identifiers(Split(df, df.copy(), "label", text="message")).value == 0
 
 
 # --- scan + CLI ---------------------------------------------------------------

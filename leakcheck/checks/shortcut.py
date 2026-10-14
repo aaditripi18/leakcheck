@@ -19,9 +19,12 @@ HIGH, MEDIUM = 0.95, 0.90
 TOP_K = 10
 
 ID_NAME = re.compile(
-    r"(^|[\s_.-])(id|uid|uuid|ip|addr|address|port|mac|timestamp|time|date|flow|hash|md5|sha\d*|src|dst|source|destination)($|[\s_.-])",
+    r"(^|[\s_.-])(id|uid|uuid|ip|addr|address|port|mac|timestamp|time|date|hash|md5|sha\d*)($|[\s_.-])",
     re.IGNORECASE,
 )
+# A name match only counts when the column could actually identify something:
+# binary/ternary flags such as "having_IP_Address" are features, not identifiers.
+ID_MIN_UNIQUE = 50
 
 
 def _sample(n: int, seed: int) -> np.ndarray:
@@ -90,9 +93,11 @@ def check_identifiers(split: Split) -> Finding:
     hits = []
     n = len(split.train)
     for col in split.features:
+        if col == split.text:  # free text is high-cardinality by nature
+            continue
         s = split.train[col]
         reasons = []
-        if ID_NAME.search(str(col)):
+        if ID_NAME.search(str(col)) and s.nunique(dropna=True) >= ID_MIN_UNIQUE:
             reasons.append("name")
         if not pd.api.types.is_numeric_dtype(s) and n and s.nunique(dropna=True) / n > 0.5:
             reasons.append("high-cardinality text")
