@@ -64,3 +64,24 @@ leakcheck findings on the binary attack/normal task (features only, label column
 | L5.shortcut | not run | 83.01% [ok] |
 
 KDD99 L1.cross by class: normal 12.69% of 60,593, attack 81.83% of 250,436
+
+## E1: leakage audit
+
+Binary task per dataset; official split where one exists, otherwise stratified random 80/20 (seed 0). `n/a` = not applicable (no timestamp / text column / group column).
+
+| Dataset | Split | Test rows | Exact copies of train | Near-copies (x train baseline) | Text near-copies | Accuracy ceiling | Contradicted | Train after test start | Best single feature | Group overlap |
+|---|---|---|---|---|---|---|---|---|---|---|
+| kdd99 | official | 311,029 | 68.36% | 14.80% (x1.37) | n/a | 98.17% | 1.05% | n/a | src_bytes 93.80% | n/a |
+| nslkdd | official | 22,544 | 2.95% | 30.13% (x0.60) | n/a | 99.76% | 0.21% | n/a | src_bytes 83.01% | n/a |
+| unsw_nb15 | official | 82,332 | 10.37% | 7.46% (x1.35) | n/a | 99.99% | 0.36% | n/a | smean 79.13% | n/a |
+| cicids2017 | random 80/20 | 566,149 | 14.09% | 62.67% (x0.98) | n/a | 99.99% | 0.03% | 81.29% | Destination Port 90.17% | n/a |
+| uci_phishing | random 80/20 | 2,211 | 64.41% | 0.00% | n/a | 99.32% | 1.04% | n/a | SSLfinal_State 90.33% | n/a |
+| phiusiil | random 80/20 | 47,159 | 0.00% | 0.31% (x1.32) | 3.98% | 100.00% | 0.00% | n/a | URLSimilarityIndex 99.60% | n/a |
+| sms_spam | random 80/20 | 1,115 | 11.03% | n/a | 2.24% | 100.00% | 0.00% | n/a | message 58.05% | n/a |
+
+Ledger lines: `e1_audit:kdd99` @ `6780929`, `e1_audit:nslkdd` @ `6780929`, `e1_audit:unsw_nb15` @ `6780929`, `e1_audit:cicids2017` @ `6780929`, `e1_audit:uci_phishing` @ `6780929`, `e1_audit:phiusiil` @ `6780929`, `e1_audit:sms_spam` @ `6780929`
+
+### Hypotheses decided by E1 alone
+
+- **H1** (at least half of the audited benchmarks have >= 5% of test rows exactly duplicating a training row): 5 of 7 -> **supported** (provisional: 7 of 8 datasets audited).
+- **H5** (at least one benchmark has a single feature reaching >= 0.95 balanced accuracy): phiusiil 99.60% -> **supported**.

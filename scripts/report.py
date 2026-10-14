@@ -97,6 +97,62 @@ def e0_kdd(d: dict) -> list[str]:
     return out + [""]
 
 
+E1_ORDER = ["kdd99", "nslkdd", "unsw_nb15", "cicids2017", "ember2018", "uci_phishing", "phiusiil", "sms_spam"]
+
+
+def _merged(d: dict) -> tuple[dict, dict]:
+    f = {}
+    for v in d["results"]["views"].values():
+        f.update(v["findings"])
+    return f, next(iter(d["results"]["views"].values()))["meta"]
+
+
+def e1(runs: dict) -> list[str]:
+    done = [n for n in E1_ORDER if f"e1_audit:{n}" in runs]
+    if not done:
+        return []
+
+    def v(f, code, key="value", fmt=pct):
+        if code not in f or f[code].get(key) is None:
+            return "n/a"
+        x = f[code][key]
+        return fmt(x) if fmt else x
+
+    out = ["## E1: leakage audit", "",
+           "Binary task per dataset; official split where one exists, otherwise stratified random 80/20 (seed 0). "
+           "`n/a` = not applicable (no timestamp / text column / group column).", "",
+           "| Dataset | Split | Test rows | Exact copies of train | Near-copies (x train baseline) | Text near-copies "
+           "| Accuracy ceiling | Contradicted | Train after test start | Best single feature | Group overlap |",
+           "|---|---|---|---|---|---|---|---|---|---|---|"]
+    h1, h5 = [], []
+    for n in done:
+        d = runs[f"e1_audit:{n}"]
+        f, meta = _merged(d)
+        near = v(f, "L2.near")
+        ratio = f.get("L2.near", {}).get("vs_train_baseline")
+        if near != "n/a" and ratio is not None:
+            near += f" (x{ratio:.2f})"
+        top = f.get("L5.shortcut", {}).get("top", [{}])
+        best = f"{top[0].get('feature', '')} {pct(f['L5.shortcut']['value'])}" if "L5.shortcut" in f else "n/a"
+        split = "official" if d["results"]["split_policy"].startswith("official") else "random 80/20"
+        out.append(f"| {n} | {split} | {meta['n_test']:,} | {v(f, 'L1.cross')} | {near} | {v(f, 'L2.near_text')} "
+                   f"| {v(f, 'L3.ceiling')} | {v(f, 'L3.cross_contradict')} | {v(f, 'L4.after_test_start')} "
+                   f"| {best} | {v(f, 'L6.group')} |")
+        h1.append(f["L1.cross"]["value"] >= 0.05)
+        if "L5.shortcut" in f:
+            h5.append((n, f["L5.shortcut"]["value"]))
+    out += ["", "Ledger lines: " + ", ".join(f"`e1_audit:{n}` @ `{runs['e1_audit:' + n]['git']['commit']}`" for n in done), ""]
+    k = sum(h1)
+    out += ["### Hypotheses decided by E1 alone", "",
+            f"- **H1** (at least half of the audited benchmarks have >= 5% of test rows exactly duplicating a training "
+            f"row): {k} of {len(h1)} -> **{'supported' if 2 * k >= len(h1) else 'not supported'}**"
+            + ("" if len(h1) == len(E1_ORDER) else f" (provisional: {len(h1)} of {len(E1_ORDER)} datasets audited)") + ".",
+            f"- **H5** (at least one benchmark has a single feature reaching >= 0.95 balanced accuracy): "
+            + (", ".join(f"{n} {pct(x)}" for n, x in h5 if x >= 0.95) or "none")
+            + f" -> **{'supported' if any(x >= 0.95 for _, x in h5) else 'not supported'}**.", ""]
+    return out
+
+
 def main() -> None:
     runs = latest()
     lines = ["# Results", "",
@@ -104,6 +160,7 @@ def main() -> None:
     for name, fn in (("e0_sources", e0_sources), ("e0_synthetic", e0_synthetic), ("e0_kdd", e0_kdd)):
         if name in runs:
             lines += fn(runs[name])
+    lines += e1(runs)
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text("\n".join(lines), encoding="utf-8")
     print(f"wrote {OUT}")

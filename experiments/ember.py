@@ -89,9 +89,15 @@ def digest(r: dict) -> str:
     return hashlib.sha1(json.dumps(body, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
 
 
+CHUNK = 50_000
+
+
 def parse(tar_path: Path, limit: int | None = None) -> pd.DataFrame:
+    """Rows are buffered as Python lists in chunks and packed into float32
+    arrays (EMBER's own vectors are float32): 1M x ~680 Python floats would
+    otherwise need ~20 GB."""
     cols = columns()
-    meta, num, cat = [], [], []
+    meta, num, cat, chunks = [], [], [], []
     with tarfile.open(tar_path, mode="r|bz2") as tf:
         for m in tf:
             hit = MEMBER.match(m.name)
@@ -103,11 +109,16 @@ def parse(tar_path: Path, limit: int | None = None) -> pd.DataFrame:
                 r = json.loads(line)
                 meta.append((split, r["sha256"], r["appeared"], int(r["label"]), r.get("avclass") or "", digest(r)))
                 num.append(numeric_row(r))
+                if len(num) == CHUNK:
+                    chunks.append(np.asarray(num, dtype=np.float32))
+                    num = []
                 coff, opt = r["header"]["coff"], r["header"].get("optional", {})
                 cat.append((coff.get("machine", ""), opt.get("subsystem", ""), opt.get("magic", "")))
                 if limit and len(meta) >= limit:
                     break
-    df = pd.DataFrame(np.asarray(num, dtype=np.float64), columns=cols)
+    if num or not chunks:
+        chunks.append(np.asarray(num, dtype=np.float32).reshape(-1, len(cols)))
+    df = pd.DataFrame(np.vstack(chunks), columns=cols)
     df[list(CATEGORICAL)] = pd.DataFrame(cat, dtype="string")
     m = pd.DataFrame(meta, columns=["split", "sha256", "appeared", "label", "avclass", "raw_digest"])
     return pd.concat([m, df], axis=1)

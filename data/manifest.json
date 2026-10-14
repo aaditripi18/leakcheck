@@ -6,6 +6,13 @@
     "size": 235102953,
     "url": "https://huggingface.co/datasets/bencorn/CICIDS2017/resolve/811c007f08d693a8a8b4226c197c138391806ce6/csvs/MachineLearningCSV.zip"
   },
+  "ember2018/ember_dataset_2018_2.tar.bz2": {
+    "dataset": "ember2018",
+    "fetched_at": "2026-10-14T19:03:19+00:00",
+    "sha256": "b6052eb8d350a49a8d5a5396fbe7d16cf42848b86ff969b77464434cf2997812",
+    "size": 1696539273,
+    "url": "https://ember.elastic.co/ember_dataset_2018_2.tar.bz2"
+  },
   "kdd99/kddcup.data.gz": {
     "dataset": "kdd99",
     "fetched_at": "2026-10-14T18:13:25+00:00",

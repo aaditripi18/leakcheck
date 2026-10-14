@@ -1,9 +1,9 @@
-# Findings (preliminary, E0 only)
+# Findings (preliminary: E0 + E1)
 
 Every number here is in [RESULTS.md](RESULTS.md), which is generated from
-`results/ledger.jsonl` at commit `0f452ad`. This file is the narrative. E1
-(the audit across all datasets) has not started; nothing below is a
-hypothesis verdict yet.
+`results/ledger.jsonl`. E0 ran at commit `0f452ad`, E1 at `6780929`. This file
+is the narrative. Only H1 and H5 can be decided from E1 alone. H2–H4 need the
+retraining experiments (E2–E3).
 
 ## 1. leakcheck recovers planted leakage exactly
 
@@ -64,3 +64,78 @@ This was found during E0, before any E1 run. leakcheck now reports the ratio
 **unchanged** so that no threshold is tuned on data. E1 reports must quote L2
 with its ratio, and a near-duplicate claim needs both a high absolute rate and
 a ratio above 1.
+
+# E1: the audit
+
+Eight benchmarks, binary task. Official splits are used for KDD99, NSL-KDD,
+UNSW-NB15 and EMBER; the others use a stratified random 80/20 split with seed 0.
+The split policy was fixed in code before any E1 result existed.
+
+## 6. H1 supported: exact train/test copies are the norm, not the exception
+
+Five of seven datasets audited so far (EMBER pending) have at least 5% of test
+rows exactly duplicating a training row:
+
+| Dataset | Split | Exact copies of a training row |
+|---|---|---|
+| KDD99 | official | 68.36% (attack rows 81.83%) |
+| UCI Phishing Websites | random | **64.41%**, with 42.61% of training rows repeated within training |
+| CIC-IDS2017 | random | 14.09% (attack rows 28.71%) |
+| SMS Spam Collection | random | 11.03% |
+| UNSW-NB15 | **official** | 10.37% (attack rows 15.59%) |
+| NSL-KDD | official | 2.95% |
+| PhiUSIIL | random | 0.00% |
+
+A random split cannot add duplication; it only shows the duplication already in
+the dataset. The UCI Phishing figure follows from its feature space: 30
+features with 2–3 values each, which 11,055 sites must share. UNSW-NB15 matters
+more, because its overlap sits in the **official** split that published results
+are measured on.
+
+## 7. Official splits that sit closer than random
+
+L2 compares test rows' distance to training with training rows' distance to
+each other (×1 = what a random split would give). On the official splits,
+KDD99 (×1.37) and UNSW-NB15 (×1.35) put test rows *closer* to training than a
+random split would, on top of their exact copies. NSL-KDD (×0.60) goes the
+other way, as designed. The random-split CIC-IDS2017 sits at ×0.98, as
+expected. On PhiUSIIL, 3.98% of test URLs are near-copies (Jaccard ≥ 0.8) of a
+training URL, with no exact copies.
+
+## 8. H5 supported: one feature can do the whole job
+
+**PhiUSIIL: `URLSimilarityIndex` alone reaches 99.60% balanced test accuracy**
+(a 32-leaf tree on that one column). Four more single features exceed 95%
+(`LineOfCode` 96.17%, `NoOfExternalRef` 96.12%, `NoOfSelfRef` 95.36%). Going by its
+title, the PhiUSIIL paper proposes a "similarity index" as the core of its
+framework. Before near-perfect accuracy on this dataset is credited to a model,
+check whether the model only re-learns that one column. (To verify: how the
+paper defines URLSimilarityIndex.) Elsewhere, the best single features are high but below the threshold:
+KDD99 `src_bytes` 93.80%, UCI Phishing `SSLfinal_State` 90.33%, CIC-IDS2017
+`Destination Port` 90.17%. Destination Port is a context shortcut rather than
+behaviour: in CIC-IDS2017 each attack scenario targets a fixed service, so the
+port identifies the scenario.
+
+## 9. Accuracy ceilings
+
+Identical features carrying both labels cap test accuracy at 98.17% on KDD99
+and 99.32% on UCI Phishing. In those two datasets, 1.05% and 1.04% of test
+rows have training copies that all carry the *opposite* label.
+
+## 10. Changes made during E1 setup (before any recorded E1 run)
+
+- **L5 identifier heuristic tightened** after a smoke run on SMS, UCI Phishing
+  and UNSW-NB15. It flagged the SMS text column, the binary flag
+  `having_IP_Address` and UNSW's `ct_dst_*` counters. Now: no `src`/`dst`/`flow`
+  name tokens, at least 50 distinct values for a name match, and the text column
+  is exempt. It still flags KDD's `dst_host_same_src_port_rate`, a rate rather
+  than a port. That is a known false positive, left as is so the heuristic is not
+  tuned on audit results. The identifier check is advisory and feeds no
+  hypothesis.
+- **CIC-IDS2017 labels:** the "Web Attack – XSS" dash is a non-ASCII byte;
+  the loader replaces it with a space. Counts then match the published table
+  exactly.
+
+## 11. EMBER 2018
+
+Pending (download in progress).
