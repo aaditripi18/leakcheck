@@ -75,13 +75,14 @@ Binary task per dataset; official split where one exists, otherwise stratified r
 | nslkdd | official | 22,544 | 2.95% | 30.13% (x0.60) | n/a | 99.76% | 0.21% | n/a | src_bytes 83.01% | n/a |
 | unsw_nb15 | official | 82,332 | 10.37% | 7.46% (x1.35) | n/a | 99.99% | 0.36% | n/a | smean 79.13% | n/a |
 | cicids2017 | random 80/20 | 566,149 | 14.09% | 62.67% (x0.98) | n/a | 99.99% | 0.03% | 81.29% | Destination Port 90.17% | n/a |
+| ember2018 | official | 200,000 | 0.01% | 19.95% (x0.79) | n/a | 100.00% | 0.00% | 0.00% | sec_entropy_max 71.69% | 49.48% |
 | uci_phishing | random 80/20 | 2,211 | 64.41% | 0.00% | n/a | 99.32% | 1.04% | n/a | SSLfinal_State 90.33% | n/a |
 | phiusiil | random 80/20 | 47,159 | 0.00% | 0.31% (x1.32) | 3.98% | 100.00% | 0.00% | n/a | URLSimilarityIndex 99.60% | n/a |
 | sms_spam | random 80/20 | 1,115 | 11.03% | n/a | 2.24% | 100.00% | 0.00% | n/a | message 58.05% | n/a |
 
-Ledger lines: `e1_audit:kdd99` @ `6780929`, `e1_audit:nslkdd` @ `6780929`, `e1_audit:unsw_nb15` @ `6780929`, `e1_audit:cicids2017` @ `6780929`, `e1_audit:uci_phishing` @ `6780929`, `e1_audit:phiusiil` @ `6780929`, `e1_audit:sms_spam` @ `6780929`
+Ledger lines: `e1_audit:kdd99` @ `6780929`, `e1_audit:nslkdd` @ `6780929`, `e1_audit:unsw_nb15` @ `6780929`, `e1_audit:cicids2017` @ `6780929`, `e1_audit:ember2018` @ `5074849`, `e1_audit:uci_phishing` @ `6780929`, `e1_audit:phiusiil` @ `6780929`, `e1_audit:sms_spam` @ `6780929`
 
 ### Hypotheses decided by E1 alone
 
-- **H1** (at least half of the audited benchmarks have >= 5% of test rows exactly duplicating a training row): 5 of 7 -> **supported** (provisional: 7 of 8 datasets audited).
+- **H1** (at least half of the audited benchmarks have >= 5% of test rows exactly duplicating a training row): 5 of 8 -> **supported**.
 - **H5** (at least one benchmark has a single feature reaching >= 0.95 balanced accuracy): phiusiil 99.60% -> **supported**.

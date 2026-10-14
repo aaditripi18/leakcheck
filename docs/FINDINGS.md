@@ -73,8 +73,8 @@ The split policy was fixed in code before any E1 result existed.
 
 ## 6. H1 supported: exact train/test copies are the norm, not the exception
 
-Five of seven datasets audited so far (EMBER pending) have at least 5% of test
-rows exactly duplicating a training row:
+Five of eight datasets have at least 5% of test rows exactly duplicating a
+training row:
 
 | Dataset | Split | Exact copies of a training row |
 |---|---|---|
@@ -85,6 +85,7 @@ rows exactly duplicating a training row:
 | UNSW-NB15 | **official** | 10.37% (attack rows 15.59%) |
 | NSL-KDD | official | 2.95% |
 | PhiUSIIL | random | 0.00% |
+| EMBER 2018 | official (temporal) | 0.009% |
 
 A random split cannot add duplication; it only shows the duplication already in
 the dataset. The UCI Phishing figure follows from its feature space: 30
@@ -136,6 +137,31 @@ rows have training copies that all carry the *opposite* label.
   the loader replaces it with a space. Counts then match the published table
   exactly.
 
-## 11. EMBER 2018
+## 11. EMBER 2018: the negative control comes back clean
 
-Pending (download in progress).
+EMBER's official split is temporal: train up to Oct 2018, test Nov–Dec 2018,
+600k labelled training files and 200k test files. leakcheck finds what a
+well-built split should look like:
+
+- **18 of 200,000 test files (0.009%)** have raw features identical to a
+  training file, measured on the digest of every raw feature, so under any
+  vectorisation. There are no label conflicts.
+- **0%** of training files are newer than the earliest test file, and the
+  timestamp alone is at chance (50.00%).
+- Near-copies: 19.95% of test rows, but **×0.79** of the training baseline, so
+  test sits further from training than training sits from itself.
+- No single feature passes 72% (best: max section entropy, 71.69%).
+
+That matters for the method: the audit does not flag everything. Two facts
+worth stating alongside EMBER results:
+
+- **Family overlap (L6): 49.48% of test rows, which is essentially every malware
+  test file, belong to an AVClass family also present in training** (748 shared
+  families). That is not a defect, since families persist. But it means EMBER's
+  test set measures "new samples of known families", not unseen families.
+- **50,000 training files (8.3%) first appeared before 2018**, back to Dec
+  2006. EMBER's README says 2018 samples were chosen to be harder; the older
+  ones are a detail to check against the EMBER 2018 description before citing.
+
+H1 with all eight datasets: **5 of 8** have ≥ 5% exact cross-split copies, so H1
+is supported.
