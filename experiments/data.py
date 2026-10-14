@@ -275,7 +275,9 @@ def load_cicids2017() -> pd.DataFrame:
             d["capture_order"] = i
             frames.append(d)
     df = pd.concat(frames, ignore_index=True)
-    df["Label"] = df["Label"].astype("string").str.strip()
+    # "Web Attack <dash> XSS": the dash byte is not valid in any one encoding across copies
+    df["Label"] = df["Label"].astype("string").str.replace(r"[^\x20-\x7e]+", " ", regex=True)
+    df["Label"] = df["Label"].str.replace(r"\s+", " ", regex=True).str.strip()
     return df
 
 
