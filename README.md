@@ -46,7 +46,12 @@ rows against a 1M-row training set.
 
 ## Status
 
-- Weeks 1�3 done. E0 validation: exact recovery of planted leakage (0 error
+- Weeks 1–4 done. E1 audit of 8 benchmarks (KDD99, NSL-KDD, UNSW-NB15,
+  CIC-IDS2017, EMBER 2018, UCI Phishing, PhiUSIIL, SMS Spam): 5 of 8 have
+  ≥ 5% of test rows exactly copying a training row (H1 supported); PhiUSIIL
+  has a single feature at 99.6% balanced accuracy (H5 supported); EMBER's
+  temporal split comes back clean (negative control).
+- Weeks 1–3: E0 validation: exact recovery of planted leakage (0 error
   over 720 configurations), and the KDD99 redundancy figures of Tavallaee et
   al. (2009) reproduced exactly for the training set and to within 2 records
   for the test set. See [docs/RESULTS.md](docs/RESULTS.md) (generated) and
@@ -54,8 +59,10 @@ rows against a 1M-row training set.
 - Data provenance: [data/README.md](data/README.md).
 
 ```
-python scripts/fetch.py kdd99 kdd99_test kdd99_hf_train nslkdd
-python -m experiments.e0_sources && python -m experiments.e0_synthetic && python -m experiments.e0_kdd
+python scripts/fetch.py
+python -m experiments.e0_sources && python -m experiments.e0_sources_week4
+python -m experiments.e0_synthetic && python -m experiments.e0_kdd
+python -m experiments.e1_audit      # ~45 min on a laptop CPU, EMBER is 30 of them
 python scripts/report.py
 ```
 
