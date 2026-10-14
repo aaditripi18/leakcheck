@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "leakcheck"
+version = "0.1.0"
+description = "Find train/test leakage in security ML datasets and measure what it inflates."
+requires-python = ">=3.10"
+dependencies = ["numpy", "pandas", "scikit-learn"]
+
+[project.optional-dependencies]
+dev = ["pytest", "pyarrow"]
+
+[project.scripts]
+leakcheck = "leakcheck.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["leakcheck*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
