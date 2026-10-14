@@ -44,6 +44,21 @@ reason.
 `clean --near-eps` checks every test row, so expect roughly 30 s per 10k test
 rows against a 1M-row training set.
 
+## Status
+
+- Weeks 1–3 done. E0 validation: exact recovery of planted leakage (0 error
+  over 720 configurations), and the KDD99 redundancy figures of Tavallaee et
+  al. (2009) reproduced exactly for the training set and to within 2 records
+  for the test set. See [docs/RESULTS.md](docs/RESULTS.md) (generated) and
+  [docs/FINDINGS.md](docs/FINDINGS.md).
+- Data provenance: [data/README.md](data/README.md).
+
+```
+python scripts/fetch.py kdd99 kdd99_test kdd99_hf_train nslkdd
+python -m experiments.e0_sources && python -m experiments.e0_synthetic && python -m experiments.e0_kdd
+python scripts/report.py
+```
+
 See [PLAN.md](PLAN.md) for hypotheses, datasets, experiments and timeline.
 
 ## Development
