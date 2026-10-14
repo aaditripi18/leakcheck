@@ -66,6 +66,7 @@ class Split:
     time: str | None = None
     group: str | None = None
     ignore: list[str] = field(default_factory=list)
+    text: str | None = None  # a free-text feature (URL, message) for MinHash near-duplicates
 
     def __post_init__(self) -> None:
         for name, df in (("train", self.train), ("test", self.test)):
@@ -74,9 +75,11 @@ class Split:
         missing = set(self.train.columns) ^ set(self.test.columns)
         if missing:
             raise ValueError(f"train and test have different columns: {sorted(missing)}")
-        for c in [self.time, self.group, *self.ignore]:
+        for c in [self.time, self.group, self.text, *self.ignore]:
             if c is not None and c not in self.train.columns:
                 raise ValueError(f"column {c!r} not found")
+        if self.text is not None and self.text in {self.label, self.time, self.group, *self.ignore}:
+            raise ValueError(f"text column {self.text!r} must be a feature")
         self.train = self.train.reset_index(drop=True)
         self.test = self.test.reset_index(drop=True)
 

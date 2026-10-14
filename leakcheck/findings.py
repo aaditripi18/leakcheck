@@ -7,6 +7,7 @@ example row indices so any claim can be checked by hand.
 from __future__ import annotations
 
 import json
+import math
 from dataclasses import asdict, dataclass, field
 from typing import Any
 
@@ -37,6 +38,17 @@ def grade(value: float, high: float, medium: float, low: float = 0.0) -> str:
     if value > low:
         return "low"
     return "ok"
+
+
+def wilson(k: int, n: int, z: float = 1.96) -> tuple[float, float]:
+    """95% Wilson interval for a rate estimated from a sample."""
+    if n == 0:
+        return (0.0, 1.0)
+    p = k / n
+    d = 1 + z * z / n
+    c = (p + z * z / (2 * n)) / d
+    h = z * math.sqrt(p * (1 - p) / n + z * z / (4 * n * n)) / d
+    return (max(0.0, c - h), min(1.0, c + h))
 
 
 @dataclass

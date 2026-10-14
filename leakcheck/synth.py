@@ -17,6 +17,8 @@ def make_split(
     n_features: int = 8,
     n_classes: int = 2,
     cross_dup: float = 0.0,
+    near_dup: float = 0.0,
+    near_noise: float = 1e-5,
     train_dup: float = 0.0,
     conflict: float = 0.0,
     shortcut: bool = False,
@@ -26,6 +28,8 @@ def make_split(
 
     cross_dup: fraction of test rows replaced by copies of training rows (with
       their training label).
+    near_dup: fraction of test rows replaced by training rows with every value
+      multiplied by (1 + N(0, near_noise)): near-copies that are never exact.
     train_dup: fraction of training rows replaced by copies of other training rows.
     conflict: fraction of training rows that get a copy with a different label
       appended to the training set.
@@ -61,6 +65,17 @@ def make_split(
         src = rng.choice(n_train, k_x, replace=False)
         xte[dst], yte[dst] = xtr[src], ytr[src]
         used[src] = True
+    else:
+        dst = np.array([], dtype=np.int64)
+
+    k_n = int(round(near_dup * n_test))
+    if k_n:
+        free = np.setdiff1d(np.arange(n_test), dst)
+        dst_n = rng.choice(free, k_n, replace=False)
+        src_n = rng.choice(n_train, k_n, replace=False)
+        noise = 1 + rng.normal(scale=near_noise, size=xtr[src_n].shape)
+        xte[dst_n], yte[dst_n] = xtr[src_n] * noise, ytr[src_n]
+        used[src_n] = True
 
     k_c = int(round(conflict * n_train))
     if k_c:
@@ -82,6 +97,7 @@ def make_split(
     truth = {
         "cross_dup_rows": k_x,
         "cross_dup_rate": k_x / n_test if n_test else 0.0,
+        "near_dup_rows": k_n,
         "train_dup_rows": k_tr,
         "conflict_pairs": k_c,
         "conflict_rows": 2 * k_c,
