@@ -749,8 +749,10 @@ HEADERS = {"Content-Security-Policy": HEADER_CSP, "X-Content-Type-Options": "nos
 def write_host_headers() -> None:
     """Serve the same policy as an HTTP header on Vercel, Netlify or Cloudflare Pages."""
     rules = [{"key": k, "value": v} for k, v in HEADERS.items()]
-    (SITE / "vercel.json").write_text(json.dumps({"headers": [{"source": "/(.*)", "headers": rules}]}, indent=2) + "\n",
-                                      encoding="utf-8")
+    # the site is prebuilt: Vercel serves the folder as is, with no install or build step
+    config = {"framework": None, "installCommand": "", "buildCommand": "", "outputDirectory": ".",
+              "headers": [{"source": "/(.*)", "headers": rules}]}
+    (SITE / "vercel.json").write_text(json.dumps(config, indent=2) + "\n", encoding="utf-8")
     (SITE / "_headers").write_text("/*\n" + "".join(f"  {k}: {v}\n" for k, v in HEADERS.items()), encoding="utf-8")
     ignore = ["node_modules", "src", "package.json", "package-lock.json", "tailwind.config.cjs", "engine/cli.mjs",
               "examples/examples.json"]
