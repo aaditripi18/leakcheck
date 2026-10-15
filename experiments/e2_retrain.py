@@ -109,7 +109,44 @@ def time_split_cic(seed: int) -> Split:
                  "is_attack", time="capture_order")
 
 
-TIME_SPLITS = {"cicids2017": time_split_cic}
+EMBER_TEST = 200_000
+
+
+def _ember_labelled() -> pd.DataFrame:
+    from experiments.ember import CATEGORICAL, columns, load_ember
+
+    df = data.cached(load_ember)
+    df = df[df["label"] != -1]
+    return df[["split", "appeared"] + columns() + list(CATEGORICAL) + ["label"]].reset_index(drop=True)
+
+
+def ember_random(seed: int) -> Split:
+    """All 800k labelled files, stratified random split with the official sizes (600k / 200k)."""
+    df = _ember_labelled()
+    tr, te = train_test_split(df, test_size=EMBER_TEST, random_state=seed, stratify=df["label"])
+    return Split(tr.drop(columns=["split"]).reset_index(drop=True), te.drop(columns=["split"]).reset_index(drop=True),
+                 "label", time="appeared")
+
+
+def ember_temporal(seed: int) -> Split:
+    """The official split: train up to Oct 2018, test Nov-Dec 2018."""
+    df = _ember_labelled()
+    tr, te = df[df["split"] == "train"], df[df["split"] == "test"]
+    return Split(tr.drop(columns=["split"]).reset_index(drop=True), te.drop(columns=["split"]).reset_index(drop=True),
+                 "label", time="appeared")
+
+
+TIME_SPLITS = {"cicids2017": time_split_cic, "ember2018": ember_temporal}
+# E2 "original" split where it differs from E1's audit split: for EMBER the
+# original is a random split, so the official temporal split can play "time".
+E2_SPLITS = {"ember2018": ember_random}
+
+
+def original_split(name: str, seed: int) -> Split:
+    if name in E2_SPLITS:
+        return E2_SPLITS[name](seed)
+    (_, split, _), *_ = PREP[name](seed).splits
+    return split
 
 
 # --- one (dataset, seed) ----------------------------------------------------------------
@@ -123,8 +160,7 @@ def run_one(name: str, seed: int) -> dict:
         if res.get("commit") == commit:  # results from other code versions are recomputed
             return res
     t0 = time.time()
-    (_, split, _), *_ = PREP[name](seed).splits
-    split = subsample(split, seed)
+    split = subsample(original_split(name, seed), seed)
     masks = leak_masks(split)
     y = split.y_test
     subsets = {"original": np.ones(len(y), bool), "no_exact": ~masks["exact"], "no_near": ~masks["near"],
@@ -191,8 +227,10 @@ def main(names: list[str]) -> None:
         per_seed = [run_one(name, s) for s in SEEDS]
         summary = summarize(per_seed)
         prep = PREP[name]()
+        policy = ("random 600k/200k of all labelled files (original) vs official temporal (time)"
+                  if name in E2_SPLITS else prep.split_policy)
         record("e2_retrain:" + name, {"seeds": list(SEEDS), "max_train": MAX_TRAIN, "near_eps": NEAR_EPS,
-                                       "text_tau": TEXT_TAU, "models": list(MODELS), "split_policy": prep.split_policy},
+                                       "text_tau": TEXT_TAU, "models": list(MODELS), "split_policy": policy},
                summary, {d: data.dataset_hashes(d) for d in prep.datasets})
         all_rows = [r for res in per_seed for r in rows(res)]
         existing = []

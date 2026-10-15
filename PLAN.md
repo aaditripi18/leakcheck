@@ -155,3 +155,25 @@ exists:
 - Week 5 runs the five leakiest datasets (KDD99, UCI Phishing, CIC-IDS2017,
   SMS Spam, UNSW-NB15). NSL-KDD, PhiUSIIL and EMBER follow in week 6. The
   final H4 verdict waits for all eight.
+
+## Week 6 operationalisation (fixed 2026-10-15, before any week-6 run)
+
+- **E2 on NSL-KDD and PhiUSIIL**: same harness and rules as week 5.
+- **E2 on EMBER, and its H3 test**: models see leakcheck's numeric view (about
+  680 columns, not the official EMBER vector). "original" = a stratified random
+  split of all 800k labelled files, with the official sizes (600k / 200k)
+  re-drawn per seed; leaked rows are measured on the numeric view. "time" = the
+  official temporal split (train up to Oct 2018, test Nov–Dec 2018). Training
+  sets are capped at 300k as before. H3's rule is unchanged: the time gap must
+  exceed the no_near gap for at least 3 of 4 models. **EMBER is the decisive H3
+  test**, because CIC-IDS2017's chronological split is confounded with unseen
+  attack types (FINDINGS §13). H3 is supported overall only if it holds on
+  EMBER.
+- **E4 shortcut ablation**: drop sets are read from each dataset's E1 ledger
+  line (`experiments/e4_ablation.py`). minus_top = E1's best single feature;
+  minus_flagged = all features at ≥ 0.95 plus name-matched identifier columns,
+  minus the known false positive. Datasets: **PhiUSIIL** (URLSimilarityIndex;
+  flagged: URLSimilarityIndex, LineOfCode, NoOfExternalRef, NoOfSelfRef) and
+  **CIC-IDS2017** (Destination Port). Same 4 models, 5 seeds, macro-F1 on the
+  full test set. A shortcut "carries" the score if removing it costs ≥ 5 points
+  for at least 3 of 4 models.
