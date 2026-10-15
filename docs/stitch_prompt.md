@@ -65,3 +65,23 @@ with a caption "Laptop CPU only · every number on this page comes from an appen
 Design "Limitations" as a quiet, muted list of six short lines, deliberately understated.
 
 Footer: the mono wordmark, the line "Built with a ledger, not a slide deck.", and links GitHub, Findings, Data provenance.
+
+---
+
+## Prompt 5: the scanner page (a second screen, same design system)
+
+Add a second page in the same style: "Scan your own split". This is where a visitor checks their own dataset, entirely inside the browser.
+
+Top: title "Scan your own split" and a reassurance line with a small lock icon: "Your files never leave this page. It is technically blocked from sending data anywhere."
+
+Step 1, two large side-by-side drop zones with dashed hairline borders, labelled TRAIN and TEST: "Drop a CSV here or click to choose". After a file is dropped, the zone shows the file name, row count and column count in mono, with a small "replace" link. A muted line under them: "Or try an example:" followed by two small chips, "KDD Cup 99 sample" and "UCI Phishing".
+
+Step 2, a compact settings row: a dropdown "Label column" (filled from the file's columns), optional dropdowns "Time column", "Group column", "Text column", and a multi-select "Ignore columns". A primary button "Run scan".
+
+While scanning: a thin amber progress bar and a mono log line that updates, e.g. "Hashing 175,341 rows…", "Finding near copies…".
+
+Results: a summary banner with the worst severity (High in amber, Medium in yellow, Clean in green) and one sentence, e.g. "10.4% of your test rows are exact copies of training rows." Then a list of finding cards, one per check (L1 Exact copies, L2 Near copies, L3 Label conflicts, L4 Time leakage, L5 Shortcuts, L6 Group overlap). Each card has a severity pill, the headline number in large mono, a one-line explanation, and an expandable "Show examples" area with a small table of matching train/test row numbers. At the bottom, two buttons: "Download report (JSON)" and "Download cleaned test set (CSV)".
+
+Empty and error states: a friendly message when the two files have different columns, and when no label column is chosen.
+
+Keep the same typography, amber accent, hairline rules and dark mode as the main page. On phones the drop zones stack vertically.
