@@ -86,3 +86,78 @@ Ledger lines: `e1_audit:kdd99` @ `6780929`, `e1_audit:nslkdd` @ `6780929`, `e1_a
 
 - **H1** (at least half of the audited benchmarks have >= 5% of test rows exactly duplicating a training row): 5 of 8 -> **supported**.
 - **H5** (at least one benchmark has a single feature reaching >= 0.95 balanced accuracy): phiusiil 99.60% -> **supported**.
+
+## E2: retraining the baselines
+
+Macro-F1, mean over 5 seeds (± sd). Each model is trained once and scored on the full test set (original), on test rows with no exact training copy (no_exact), on rows with neither an exact nor a near copy (no_near), and on the removed rows alone (leaked). `time` = retrained on a chronological split. Gap = original minus cleaned, in points.
+
+### kdd99
+
+_ledger: `e2_retrain:kdd99` @ `42caa56`, 2026-10-15T05:57:18+00:00_
+
+Training rows used: 300,000; test rows: 311,029; leaked test rows: exact 55.92%, exact or near 78.03%.
+
+| Model | original | no_exact | no_near | leaked | gap no_exact | gap no_near |
+|---|---|---|---|---|---|---|
+| lr | 0.8886 ± 0.0011 | 0.8406 ± 0.0067 | 0.7135 ± 0.0062 | 0.9238 ± 0.0002 | +4.80 | +17.51 |
+| rf | 0.8939 ± 0.0006 | 0.8490 ± 0.0061 | 0.7312 ± 0.0040 | 0.9238 ± 0.0002 | +4.49 | +16.27 |
+| hgb | 0.8965 ± 0.0021 | 0.8541 ± 0.0041 | 0.7466 ± 0.0067 | 0.9238 ± 0.0002 | +4.24 | +15.00 |
+| mlp | 0.8928 ± 0.0020 | 0.8480 ± 0.0083 | 0.7333 ± 0.0104 | 0.9238 ± 0.0002 | +4.47 | +15.95 |
+
+### unsw_nb15
+
+_ledger: `e2_retrain:unsw_nb15` @ `42caa56`, 2026-10-15T05:52:46+00:00_
+
+Training rows used: 175,341; test rows: 82,332; leaked test rows: exact 10.37%, exact or near 17.89%.
+
+| Model | original | no_exact | no_near | leaked | gap no_exact | gap no_near |
+|---|---|---|---|---|---|---|
+| lr | 0.8270 ± 0.0000 | 0.8187 ± 0.0000 | 0.8069 ± 0.0000 | 0.9267 ± 0.0000 | +0.83 | +2.01 |
+| rf | 0.8663 ± 0.0011 | 0.8607 ± 0.0012 | 0.8548 ± 0.0013 | 0.9191 ± 0.0008 | +0.56 | +1.16 |
+| hgb | 0.8675 ± 0.0017 | 0.8629 ± 0.0018 | 0.8573 ± 0.0018 | 0.9120 ± 0.0027 | +0.47 | +1.02 |
+| mlp | 0.8613 ± 0.0079 | 0.8549 ± 0.0085 | 0.8462 ± 0.0092 | 0.9337 ± 0.0019 | +0.64 | +1.51 |
+
+### cicids2017
+
+_ledger: `e2_retrain:cicids2017` @ `42caa56`, 2026-10-15T06:26:23+00:00_
+
+Training rows used: 300,000; test rows: 566,149; leaked test rows: exact 7.06%, exact or near 66.91%.
+
+| Model | original | no_exact | no_near | leaked | gap no_exact | gap no_near | time | gap time |
+|---|---|---|---|---|---|---|---|---|
+| lr | 0.9707 ± 0.0002 | 0.9687 ± 0.0001 | 0.9733 ± 0.0003 | 0.9696 ± 0.0004 | +0.20 | -0.25 | 0.5654 ± 0.0002 | +40.53 |
+| rf | 0.9975 ± 0.0001 | 0.9973 ± 0.0001 | 0.9988 ± 0.0001 | 0.9968 ± 0.0001 | +0.02 | -0.14 | 0.5622 ± 0.0002 | +43.53 |
+| hgb | 0.9985 ± 0.0001 | 0.9984 ± 0.0001 | 0.9994 ± 0.0001 | 0.9982 ± 0.0001 | +0.01 | -0.08 | 0.4619 ± 0.1204 | +53.67 |
+| mlp | 0.9963 ± 0.0003 | 0.9962 ± 0.0003 | 0.9983 ± 0.0002 | 0.9954 ± 0.0004 | +0.01 | -0.20 | 0.5159 ± 0.0361 | +48.04 |
+
+### uci_phishing
+
+_ledger: `e2_retrain:uci_phishing` @ `42caa56`, 2026-10-15T05:47:07+00:00_
+
+Training rows used: 8,844; test rows: 2,211; leaked test rows: exact 65.36%, exact or near 65.36%.
+
+| Model | original | no_exact | no_near | leaked | gap no_exact | gap no_near |
+|---|---|---|---|---|---|---|
+| lr | 0.9278 ± 0.0030 | 0.9127 ± 0.0126 | 0.9127 ± 0.0126 | 0.9317 ± 0.0042 | +1.51 | +1.51 |
+| rf | 0.9703 ± 0.0047 | 0.9598 ± 0.0116 | 0.9598 ± 0.0116 | 0.9741 ± 0.0052 | +1.05 | +1.05 |
+| hgb | 0.9688 ± 0.0033 | 0.9608 ± 0.0076 | 0.9608 ± 0.0076 | 0.9712 ± 0.0051 | +0.81 | +0.81 |
+| mlp | 0.9615 ± 0.0059 | 0.9448 ± 0.0154 | 0.9448 ± 0.0154 | 0.9682 ± 0.0063 | +1.67 | +1.67 |
+
+### sms_spam
+
+_ledger: `e2_retrain:sms_spam` @ `42caa56`, 2026-10-15T05:49:02+00:00_
+
+Training rows used: 4,459; test rows: 1,115; leaked test rows: exact 11.43%, exact or near 14.04%.
+
+| Model | original | no_exact | no_near | leaked | gap no_exact | gap no_near |
+|---|---|---|---|---|---|---|
+| lr | 0.9260 ± 0.0112 | 0.9118 ± 0.0143 | 0.8952 ± 0.0153 | 0.9690 ± 0.0067 | +1.42 | +3.07 |
+| rf | 0.9386 ± 0.0102 | 0.9204 ± 0.0113 | 0.8991 ± 0.0127 | 1.0000 ± 0.0000 | +1.82 | +3.95 |
+| hgb | 0.9585 ± 0.0038 | 0.9468 ± 0.0036 | 0.9336 ± 0.0042 | 1.0000 ± 0.0000 | +1.16 | +2.49 |
+| mlp | 0.9681 ± 0.0097 | 0.9594 ± 0.0112 | 0.9499 ± 0.0125 | 1.0000 ± 0.0000 | +0.87 | +1.82 |
+
+### Hypotheses (rules fixed in PLAN.md before any E2 run)
+
+- **H2** (cleaning costs >= 5 macro-F1 points on the two most affected datasets): kdd99: 4/4 models with gap >= 5 pt; uci_phishing: 0/4 models with gap >= 5 pt -> **not supported**.
+- **H3** (a time split costs more than deduplication): cicids2017: time gap > no_near gap for 4/4 models -> supported.
+- **H4** (the leakage gap is larger for LR than for HistGB): LR gap > HGB gap on 4 of 4 eligible datasets (kdd99, unsw_nb15, uci_phishing, sms_spam) -> **supported** (provisional until all 8 datasets are in).

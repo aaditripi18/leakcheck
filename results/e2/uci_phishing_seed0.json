@@ -1,0 +1,122 @@
+{
+ "dataset": "uci_phishing",
+ "seed": 0,
+ "commit": "42caa56",
+ "n_train": 8844,
+ "n_test": 2211,
+ "leak_rate": {
+  "exact": 0.6440524649479873,
+  "near": 0.6440524649479873
+ },
+ "models": {
+  "lr": {
+   "original": {
+    "n": 2211,
+    "accuracy": 0.9294436906377205,
+    "macro_f1": 0.9283836085179895,
+    "balanced_accuracy": 0.9275862497720453
+   },
+   "no_exact": {
+    "n": 787,
+    "accuracy": 0.9123252858958069,
+    "macro_f1": 0.9113149647320896,
+    "balanced_accuracy": 0.9124541524757663
+   },
+   "no_near": {
+    "n": 787,
+    "accuracy": 0.9123252858958069,
+    "macro_f1": 0.9113149647320896,
+    "balanced_accuracy": 0.9124541524757663
+   },
+   "leaked": {
+    "n": 1424,
+    "accuracy": 0.9389044943820225,
+    "macro_f1": 0.934904293737754,
+    "balanced_accuracy": 0.9334967320261438
+   },
+   "fit_seconds": 0.0
+  },
+  "rf": {
+   "original": {
+    "n": 2211,
+    "accuracy": 0.968340117593849,
+    "macro_f1": 0.9679200715015321,
+    "balanced_accuracy": 0.9678227424194699
+   },
+   "no_exact": {
+    "n": 787,
+    "accuracy": 0.963151207115629,
+    "macro_f1": 0.9627058710106491,
+    "balanced_accuracy": 0.9636953104532355
+   },
+   "no_near": {
+    "n": 787,
+    "accuracy": 0.963151207115629,
+    "macro_f1": 0.9627058710106491,
+    "balanced_accuracy": 0.9636953104532355
+   },
+   "leaked": {
+    "n": 1424,
+    "accuracy": 0.9712078651685393,
+    "macro_f1": 0.9694780838066659,
+    "balanced_accuracy": 0.9703242835595777
+   },
+   "fit_seconds": 0.2
+  },
+  "hgb": {
+   "original": {
+    "n": 2211,
+    "accuracy": 0.9678878335594754,
+    "macro_f1": 0.9674651923506177,
+    "balanced_accuracy": 0.9674165685770653
+   },
+   "no_exact": {
+    "n": 787,
+    "accuracy": 0.9695044472681067,
+    "macro_f1": 0.9691271657404381,
+    "balanced_accuracy": 0.96998624574273
+   },
+   "no_near": {
+    "n": 787,
+    "accuracy": 0.9695044472681067,
+    "macro_f1": 0.9691271657404381,
+    "balanced_accuracy": 0.96998624574273
+   },
+   "leaked": {
+    "n": 1424,
+    "accuracy": 0.9669943820224719,
+    "macro_f1": 0.9650114619247147,
+    "balanced_accuracy": 0.9658496732026144
+   },
+   "fit_seconds": 0.3
+  },
+  "mlp": {
+   "original": {
+    "n": 2211,
+    "accuracy": 0.9565807327001357,
+    "macro_f1": 0.9559479118758998,
+    "balanced_accuracy": 0.9552856479716176
+   },
+   "no_exact": {
+    "n": 787,
+    "accuracy": 0.9504447268106735,
+    "macro_f1": 0.9498736757181376,
+    "balanced_accuracy": 0.9511134398742468
+   },
+   "no_near": {
+    "n": 787,
+    "accuracy": 0.9504447268106735,
+    "macro_f1": 0.9498736757181376,
+    "balanced_accuracy": 0.9511134398742468
+   },
+   "leaked": {
+    "n": 1424,
+    "accuracy": 0.9599719101123596,
+    "macro_f1": 0.9574139220084209,
+    "balanced_accuracy": 0.9565904139433551
+   },
+   "fit_seconds": 0.8
+  }
+ },
+ "seconds": 1.6
+}

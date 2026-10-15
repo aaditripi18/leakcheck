@@ -1,9 +1,9 @@
-# Findings (preliminary: E0 + E1)
+# Findings (preliminary: E0, E1, E2 on 5 of 8 datasets)
 
 Every number here is in [RESULTS.md](RESULTS.md), which is generated from
 `results/ledger.jsonl`. E0 ran at commit `0f452ad`, E1 at `6780929`. This file
-is the narrative. Only H1 and H5 can be decided from E1 alone. H2–H4 need the
-retraining experiments (E2–E3).
+is the narrative. E2 (week 5) ran at `42caa56` on the five leakiest datasets,
+with H2–H4 decision rules committed in PLAN.md before any E2 run.
 
 ## 1. leakcheck recovers planted leakage exactly
 
@@ -165,3 +165,79 @@ worth stating alongside EMBER results:
 
 H1 with all eight datasets: **5 of 8** have ≥ 5% exact cross-split copies, so H1
 is supported.
+
+# E2: retraining the baselines (week 5: KDD99, UCI Phishing, CIC-IDS2017, SMS Spam, UNSW-NB15)
+
+Four untuned baselines (LR, RF, HistGB, MLP), 5 seeds, macro-F1. Each model is
+trained once and scored on the full test set and on the test rows that have no
+exact or near copy in its training data. Training sets above 300k rows are
+subsampled (KDD99, CIC-IDS2017), so "leaked" means a copy in the rows the model
+actually saw.
+
+## 12. H2 not supported: copies inflate scores only when they are memorised exceptions
+
+| Dataset | Leaked test rows (exact / exact or near) | Macro-F1 gap, original → no_near (LR / RF / HGB / MLP) |
+|---|---|---|
+| **KDD99** | 55.9% / 78.0% | **+17.51 / +16.27 / +15.00 / +15.95** |
+| SMS Spam | 11.4% / 14.0% | +3.07 / +3.95 / +2.49 / +1.82 |
+| UNSW-NB15 | 10.4% / 17.9% | +2.01 / +1.16 / +1.02 / +1.51 |
+| UCI Phishing | 65.4% / 65.4% | +1.51 / +1.05 / +0.81 / +1.67 |
+| CIC-IDS2017 | 7.1% / 66.9% | −0.25 / −0.14 / −0.08 / −0.20 |
+
+H2 required a ≥ 5-point gap for 3 of 4 models on **both** of the two most
+affected datasets. KDD99 passes with all four models (15–17.5 points); UCI
+Phishing fails with all four (≤ 1.7 points), so **H2 is not supported**.
+
+The contrast is the finding. UCI Phishing has as many copies as KDD99, but its
+30 features take only 2–3 values each, so a duplicate is a *common pattern*
+that any model that generalises also gets right. KDD99's copies are a few
+traffic patterns repeated hundreds of thousands of times, and its clean
+remainder is dominated by the rare attacks a copy-trained model never learned.
+**The exact-copy rate alone does not predict inflation.** On KDD99, two thirds
+of the gap comes from *near*-copies (+4.2–4.8 points from exact copies alone).
+
+Caveat on reading the gap: the no_near subset is, by construction, the part of
+the test set unlike the training data, so it is harder than the full set. The
+gap measures how much of the headline score is earned on copies rather than on
+new traffic. That is the quantity a deployment cares about, but it is not
+"the model is worse than reported" in every sense.
+
+Memorisation is visible directly: on SMS Spam, RF, HistGB and MLP score
+**exactly 1.0000 macro-F1 on the leaked rows in all 5 seeds**. On KDD99, all
+four models score an identical 0.9238 on the leaked rows: on exact copies they
+all predict the training label, so they all make the same mistakes, on the rows
+whose training copies carry the opposite label (L3.cross_contradict).
+
+## 13. H3 supported by its rule on CIC-IDS2017, but confounded
+
+Retrained on a chronological split (train = capture files up to the boundary
+closest to 80% of rows, Monday to Friday morning; test = Friday afternoon),
+macro-F1 falls from 0.97–0.999 to **0.46–0.57**: gaps of 40.5–53.7 points,
+against −0.1 to −0.25 for removing near-copies. 4 of 4 models, so H3's rule is
+met.
+
+But in CIC-IDS2017 each capture day runs different attacks, and Friday
+afternoon holds PortScan and DDoS, which appear nowhere earlier in the week.
+This "time split" is really an **unseen-attack-type split**: balanced accuracy
+around 0.5–0.64 means the models mostly call the new attacks benign. That is a
+real and important result: random splits of CIC-IDS2017 hide that the
+detectors do not transfer to attack types absent from training. But it is not
+evidence about gradual drift. **EMBER's temporal split (week 6) is the cleaner
+H3 test**, so H3 is held as provisional.
+
+## 14. H4 supported so far: weaker models lean harder on leaked rows
+
+On every dataset where the LR or HistGB gap is at least 1 point (KDD99,
+UNSW-NB15, UCI Phishing, SMS Spam), LR's gap exceeds HistGB's: 17.51 vs 15.00,
+2.01 vs 1.02, 1.51 vs 0.81 and 3.07 vs 2.49. The direction is consistent but the
+differences are modest. CIC-IDS2017 is excluded by the rule (both gaps below
+1 point). Final verdict once NSL-KDD, PhiUSIIL and EMBER are in.
+
+## 15. What did not move
+
+- **CIC-IDS2017 random split**: removing 67% of test rows as near-copies leaves
+  macro-F1 unchanged, even slightly higher. Near-copies here are dense benign
+  traffic, not memorised attacks, which is why the L2 ratio (×0.98) said a
+  random split looks like this anyway.
+- **UNSW-NB15 official split**: 10.4% exact copies cost 1–2 points. Real, but
+  small next to KDD99.

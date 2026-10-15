@@ -46,6 +46,11 @@ rows against a 1M-row training set.
 
 ## Status
 
+- Week 5 done: E2 retraining on the five leakiest datasets. Removing leaked
+  test rows costs 15–17.5 macro-F1 points on KDD99 but under 2 points on UCI
+  Phishing despite equal duplication (H2 not supported: copy rate alone does
+  not predict inflation). LR leans on leaked rows more than HistGB on 4 of 4
+  eligible datasets (H4, provisional).
 - Weeks 1–4 done. E1 audit of 8 benchmarks (KDD99, NSL-KDD, UNSW-NB15,
   CIC-IDS2017, EMBER 2018, UCI Phishing, PhiUSIIL, SMS Spam): 5 of 8 have
   ≥ 5% of test rows exactly copying a training row (H1 supported); PhiUSIIL
@@ -63,6 +68,7 @@ python scripts/fetch.py
 python -m experiments.e0_sources && python -m experiments.e0_sources_week4
 python -m experiments.e0_synthetic && python -m experiments.e0_kdd
 python -m experiments.e1_audit      # ~45 min on a laptop CPU, EMBER is 30 of them
+python -m experiments.e2_retrain uci_phishing sms_spam unsw_nb15 kdd99 cicids2017   # ~45 min
 python scripts/report.py
 ```
 
