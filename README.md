@@ -1,5 +1,7 @@
 # leakcheck
 
+**Live site and in-browser scanner: https://leakcheck-nu.vercel.app**
+
 Security ML benchmarks report 99% accuracy. leakcheck measures how much of
 that comes from the test set overlapping the training set: exact and
 near-duplicates, contradictory labels, future data in training, and single
@@ -113,7 +115,8 @@ python scripts/build_site.py --examples    # pages, example datasets, CSS (needs
 python -m http.server 8765 --directory site
 ```
 
-Deploy the `site/` folder to any static host. `vercel.json` and `_headers`
+Deployed on Vercel from `site/` (`cd site && vercel deploy --prod` after
+`python scripts/build_site.py`). Any static host works. `vercel.json` and `_headers`
 send the same policy as an HTTP header. Design from Stitch; content and
 wiring are generated.
 
