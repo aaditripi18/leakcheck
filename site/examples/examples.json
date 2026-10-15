@@ -1,0 +1,76 @@
+{
+ "kdd99": {
+  "name": "KDD Cup 99 sample",
+  "exact_copies": 0.39275,
+  "n_train": 12000,
+  "n_test": 4000,
+  "pairs": [
+   {
+    "test": 1,
+    "train": 6801,
+    "label": "normal",
+    "proto": "tcp/http/SF",
+    "src_bytes": 260
+   },
+   {
+    "test": 2,
+    "train": 1,
+    "label": "smurf",
+    "proto": "icmp/ecr_i/SF",
+    "src_bytes": 1032
+   },
+   {
+    "test": 4,
+    "train": 1,
+    "label": "smurf",
+    "proto": "icmp/ecr_i/SF",
+    "src_bytes": 1032
+   },
+   {
+    "test": 6,
+    "train": 4,
+    "label": "smurf",
+    "proto": "icmp/ecr_i/SF",
+    "src_bytes": 1032
+   }
+  ],
+  "context": {
+   "test": [
+    {
+     "row": 3,
+     "label": "neptune",
+     "proto": "tcp/private/REJ"
+    },
+    {
+     "row": 5,
+     "label": "neptune",
+     "proto": "tcp/private/REJ"
+    }
+   ],
+   "train": [
+    {
+     "row": 2,
+     "label": "neptune",
+     "proto": "tcp/private/S0"
+    },
+    {
+     "row": 3,
+     "label": "smurf",
+     "proto": "icmp/ecr_i/SF"
+    }
+   ]
+  }
+ },
+ "uci_phishing": {
+  "name": "UCI Phishing Websites",
+  "exact_copies": 0.6440524649479873,
+  "n_train": 8844,
+  "n_test": 2211
+ },
+ "control": {
+  "name": "Clean control split",
+  "exact_copies": 0.0,
+  "n_train": 3000,
+  "n_test": 1000
+ }
+}

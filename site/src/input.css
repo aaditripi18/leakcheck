@@ -1,0 +1,67 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Light tokens (Stitch design). Values are RGB triplets for Tailwind's alpha syntax. */
+:root {
+  --background: 249 249 246;
+  --surface: 249 249 246;
+  --surface-container-lowest: 255 255 255;
+  --surface-container-low: 244 244 241;
+  --surface-container: 238 238 235;
+  --surface-container-high: 232 232 229;
+  --surface-container-highest: 226 227 224;
+  --on-surface: 26 28 27;
+  --on-surface-variant: 85 67 54;
+  --secondary: 95 94 93;
+  --outline: 136 115 100;
+  --outline-variant: 219 194 176;
+  --primary: 180 83 9;          /* amber, darkened for 4.5:1 text contrast */
+  --primary-fixed: 255 220 195;
+  --on-primary: 255 255 255;
+  --ink: 17 17 16;
+  --on-ink: 249 249 246;
+  --bar: 39 39 42;
+  --success: 21 128 61;
+  --error: 186 26 26;
+  color-scheme: light;
+}
+
+.dark {
+  --background: 18 18 17;
+  --surface: 18 18 17;
+  --surface-container-lowest: 11 11 10;
+  --surface-container-low: 26 26 25;
+  --surface-container: 34 34 32;
+  --surface-container-high: 43 43 41;
+  --surface-container-highest: 52 52 50;
+  --on-surface: 236 235 231;
+  --on-surface-variant: 191 179 168;
+  --secondary: 163 161 157;
+  --outline: 138 124 112;
+  --outline-variant: 74 63 54;
+  --primary: 245 158 11;
+  --primary-fixed: 74 42 5;
+  --on-primary: 26 16 0;
+  --ink: 236 235 231;
+  --on-ink: 18 18 17;
+  --bar: 161 161 170;
+  --success: 74 222 128;
+  --error: 248 113 113;
+  color-scheme: dark;
+}
+
+@layer base {
+  html { scroll-behavior: smooth; }
+  body { @apply bg-background text-on-surface font-body-md antialiased; overscroll-behavior: none; }
+  :focus-visible { outline: 2px solid rgb(var(--primary)); outline-offset: 2px; }
+  [hidden] { display: none !important; }
+  .tabular { font-variant-numeric: tabular-nums; }
+}
+
+@layer components {
+  .icon { width: 1em; height: 1em; display: inline-block; vertical-align: -0.125em; flex: none; }
+  .pill-leak { @apply inline-block px-2 py-0.5 bg-primary/10 text-primary font-semibold border border-primary/20; }
+  .sec-label { @apply font-label-caps text-label-caps uppercase; }
+  .dropzone.is-over { @apply border-primary bg-primary/5; }
+}

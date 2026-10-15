@@ -1,0 +1,66 @@
+// Design tokens from the Stitch design, as CSS variables so dark mode can swap them.
+const v = (name) => `rgb(var(--${name}) / <alpha-value>)`;
+
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: ["./*.html", "./assets/*.js"],
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        background: v("background"),
+        surface: v("surface"),
+        "surface-container-lowest": v("surface-container-lowest"),
+        "surface-container-low": v("surface-container-low"),
+        "surface-container": v("surface-container"),
+        "surface-container-high": v("surface-container-high"),
+        "surface-container-highest": v("surface-container-highest"),
+        "on-surface": v("on-surface"),
+        "on-surface-variant": v("on-surface-variant"),
+        secondary: v("secondary"),
+        outline: v("outline"),
+        "outline-variant": v("outline-variant"),
+        primary: v("primary"),
+        "primary-fixed": v("primary-fixed"),
+        "on-primary": v("on-primary"),
+        ink: v("ink"),
+        "on-ink": v("on-ink"),
+        bar: v("bar"),
+        success: v("success"),
+        error: v("error"),
+      },
+      borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" },
+      spacing: {
+        margin: "3rem", "space-xs": "0.25rem", "space-sm": "0.5rem", "space-md": "1rem", "space-lg": "1.5rem",
+        "space-xl": "2.5rem", "space-2xl": "4rem", gutter: "1.5rem", "gutter-sm": "1rem", "margin-mobile": "1rem",
+      },
+      fontFamily: {
+        "mono-data-lg": ["JetBrains Mono", "ui-monospace", "monospace"],
+        "mono-data-md": ["JetBrains Mono", "ui-monospace", "monospace"],
+        "mono-data-sm": ["JetBrains Mono", "ui-monospace", "monospace"],
+        "label-caps": ["JetBrains Mono", "ui-monospace", "monospace"],
+        "body-sm": ["Inter", "system-ui", "sans-serif"],
+        "body-md": ["Inter", "system-ui", "sans-serif"],
+        "body-lg": ["Inter", "system-ui", "sans-serif"],
+        "headline-sm": ["Newsreader", "Georgia", "serif"],
+        "headline-md": ["Newsreader", "Georgia", "serif"],
+        "headline-lg": ["Newsreader", "Georgia", "serif"],
+        "display-editorial": ["Newsreader", "Georgia", "serif"],
+      },
+      fontSize: {
+        "mono-data-lg": ["16px", { lineHeight: "24px", fontWeight: "500" }],
+        "mono-data-md": ["13px", { lineHeight: "20px", fontWeight: "400" }],
+        "mono-data-sm": ["11px", { lineHeight: "16px", letterSpacing: "0.04em", fontWeight: "400" }],
+        "label-caps": ["10px", { lineHeight: "14px", letterSpacing: "0.08em", fontWeight: "600" }],
+        "body-sm": ["12px", { lineHeight: "18px", fontWeight: "400" }],
+        "body-md": ["14px", { lineHeight: "22px", fontWeight: "400" }],
+        "body-lg": ["17px", { lineHeight: "28px", letterSpacing: "-0.005em", fontWeight: "400" }],
+        "headline-sm": ["20px", { lineHeight: "28px", fontWeight: "500" }],
+        "headline-md": ["26px", { lineHeight: "34px", letterSpacing: "-0.01em", fontWeight: "400" }],
+        "headline-lg": ["38px", { lineHeight: "46px", letterSpacing: "-0.015em", fontWeight: "400" }],
+        "display-editorial": ["56px", { lineHeight: "64px", letterSpacing: "-0.02em", fontWeight: "400" }],
+      },
+    },
+  },
+  plugins: [],
+};

@@ -1,0 +1,12 @@
+{
+  "name": "leakcheck-site",
+  "private": true,
+  "description": "Static project page and in-browser scanner for leakcheck",
+  "scripts": {
+    "build:css": "tailwindcss -i src/input.css -o assets/site.css --minify",
+    "test:engine": "node engine/cli.mjs"
+  },
+  "devDependencies": {
+    "tailwindcss": "3.4.17"
+  }
+}

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'none'; worker-src 'self' blob:; form-action 'none'; base-uri 'none'; manifest-src 'self'">
+<meta name="referrer" content="no-referrer">
+<title>Scan your own split · leakcheck</title>
+<meta name="description" content="Check a train/test split for leakage in your browser. Files never leave the page.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23111110'/%3E%3Crect x='3' y='3' width='4' height='10' fill='%23d97706'/%3E%3Crect x='9' y='3' width='4' height='10' fill='%23f9f9f6'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+<script src="assets/theme.js"></script>
+</head>
+<body>
+<a href="#main" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 bg-surface p-2 z-[60]">Skip to content</a>
+<header class="fixed top-0 w-full z-50 bg-background/90 backdrop-blur-md border-b border-surface-container-high">
+  <div class="h-14 max-w-[1100px] mx-auto px-margin-mobile md:px-gutter flex items-center justify-between gap-space-md">
+    <div class="flex items-center gap-space-sm">
+      <a class="font-mono-data-lg text-mono-data-lg text-on-surface tracking-tight font-medium hover:text-primary transition-colors" href="index.html">leakcheck</a>
+      <span class="hidden sm:inline-flex items-center border border-outline-variant px-space-xs py-0.5 bg-surface-container-low sec-label text-on-surface-variant">v0.1</span>
+    </div>
+    <nav class="hidden md:flex items-center gap-space-lg" aria-label="Main"><a class="font-mono-data-sm text-mono-data-sm transition-colors text-on-surface-variant hover:text-on-surface" href="index.html#audit">Results</a><a class="font-mono-data-sm text-mono-data-sm transition-colors text-on-surface-variant hover:text-on-surface" href="index.html#hypotheses">Hypotheses</a><a class="font-mono-data-sm text-mono-data-sm transition-colors text-on-surface font-medium underline underline-offset-8 decoration-primary" href="scan.html" aria-current="page">Scanner</a><a class="font-mono-data-sm text-mono-data-sm transition-colors text-on-surface-variant hover:text-on-surface" href="index.html#reproduce">Reproduce</a><a class="font-mono-data-sm text-mono-data-sm text-on-surface-variant hover:text-on-surface inline-flex items-center gap-0.5" href="https://github.com/aaditripi18/leakcheck" rel="noopener noreferrer">GitHub<svg class="icon text-[12px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></nav>
+    <div class="flex items-center gap-space-sm">
+      <a class="md:hidden font-mono-data-sm text-mono-data-sm text-on-surface-variant hover:text-on-surface" href="index.html">Report</a>
+      <button type="button" data-theme-toggle aria-label="Toggle dark mode" class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors">
+        <span class="dark:hidden"><svg class="icon text-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></span><span class="hidden dark:inline"><svg class="icon text-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></span>
+      </button>
+    </div>
+  </div>
+</header>
+<main id="main" class="w-full pt-14">
+
+<div class="w-full max-w-[1100px] mx-auto px-margin-mobile md:px-gutter py-space-xl flex flex-col gap-space-2xl">
+
+<section class="flex flex-col gap-space-md">
+  <div class="flex flex-wrap items-center justify-between gap-space-sm">
+    <div class="flex items-center gap-space-xs"><span class="sec-label text-primary tracking-wider">Scanner</span><span class="text-outline-variant font-mono-data-sm">/</span><span class="sec-label text-on-surface-variant tracking-wider">runs in this tab</span></div>
+    <div class="flex items-center gap-1.5 px-space-sm py-1 bg-surface-container border border-outline-variant font-mono-data-sm text-mono-data-sm text-on-surface"><span class="w-2 h-2 rounded-full bg-success"></span><span>JavaScript engine · checks L1–L6</span></div>
+  </div>
+  <div class="flex flex-col md:flex-row md:items-baseline justify-between gap-space-md">
+    <h1 class="font-display-editorial text-[40px] leading-tight md:text-display-editorial text-on-surface">Scan your own split</h1>
+    <p class="font-mono-data-sm text-mono-data-sm text-on-surface-variant max-w-sm md:text-right">Exact and near copies, label conflicts, time leakage, one-column shortcuts and group overlap between a training and a test file.</p>
+  </div>
+  <div class="bg-surface-container-low border border-outline-variant p-space-md flex items-start gap-space-md">
+    <div class="p-1.5 bg-surface-container-high border border-outline-variant text-on-surface shrink-0 text-[18px]"><svg class="icon " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="1"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
+    <div class="flex flex-col gap-1">
+      <span class="font-mono-data-sm text-mono-data-sm font-medium text-on-surface">Your files never leave this page.</span>
+      <p class="font-body-md text-body-md text-on-surface-variant">The page's Content-Security-Policy sets <code class="font-mono-data-sm bg-surface-container px-1 text-on-surface">connect-src 'none'</code>, so it cannot make network requests, and the scan runs in a worker that inherits that policy. Check it yourself: open your browser's network panel and run a scan.</p>
+    </div>
+  </div>
+</section>
+
+<section class="flex flex-col gap-space-md" aria-labelledby="step1">
+  <div class="flex flex-wrap items-center justify-between gap-2">
+    <div class="flex items-center gap-space-sm"><span class="w-5 h-5 bg-ink text-on-ink flex items-center justify-center font-mono-data-sm text-[11px] font-bold">1</span><h2 id="step1" class="sec-label text-on-surface font-medium">Load the two files</h2></div>
+    <span class="font-mono-data-sm text-mono-data-sm text-on-surface-variant">CSV with a header row · same columns in both</span>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-space-md"><div class="dropzone bg-surface-container-lowest border border-dashed border-outline-variant p-space-lg flex flex-col justify-between gap-space-md transition-colors hover:border-outline min-h-[168px]" data-drop="train">
+  <div class="flex items-start justify-between gap-2">
+    <span class="sec-label px-1.5 py-0.5 bg-surface-container-high text-on-surface tracking-wider">TRAIN SPLIT</span>
+    <span class="hidden items-center text-success font-mono-data-sm text-mono-data-sm gap-1" data-loaded-badge><svg class="icon " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg> Loaded</span>
+  </div>
+  <label class="flex flex-col items-center justify-center text-center gap-1 cursor-pointer py-space-sm" data-empty>
+    <span class="text-on-surface-variant text-[22px]"><svg class="icon " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4m0 0-4 4m4-4 4 4M4 16v4h16v-4"/></svg></span>
+    <span class="font-mono-data-sm text-mono-data-sm text-on-surface">Drop a CSV here or <span class="underline underline-offset-2">choose a file</span></span>
+    <input type="file" accept=".csv,text/csv" class="sr-only" data-input="train" aria-label="Choose the train CSV">
+  </label>
+  <div class="hidden flex-col gap-space-sm" data-filled>
+    <div class="flex items-center gap-space-md">
+      <div class="w-10 h-10 bg-surface-container flex items-center justify-center text-on-surface shrink-0 border border-outline-variant text-[20px]"><svg class="icon " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/></svg></div>
+      <div class="flex flex-col min-w-0">
+        <span class="font-mono-data-md text-mono-data-md font-medium text-on-surface truncate" data-field="name"></span>
+        <span class="font-mono-data-sm text-mono-data-sm text-on-surface-variant tabular" data-field="shape"></span>
+      </div>
+    </div>
+    <div class="flex items-center justify-between gap-2 text-on-surface-variant font-mono-data-sm text-mono-data-sm border-t border-surface-container pt-space-xs">
+      <span class="truncate" data-field="sha"></span>
+      <button type="button" class="underline underline-offset-4 hover:text-on-surface shrink-0" data-replace="train">replace</button>
+    </div>
+  </div>
+</div><div class="dropzone bg-surface-container-lowest border border-dashed border-outline-variant p-space-lg flex flex-col justify-between gap-space-md transition-colors hover:border-outline min-h-[168px]" data-drop="test">
+  <div class="flex items-start justify-between gap-2">
+    <span class="sec-label px-1.5 py-0.5 bg-surface-container-high text-on-surface tracking-wider">TEST SPLIT</span>
+    <span class="hidden items-center text-success font-mono-data-sm text-mono-data-sm gap-1" data-loaded-badge><svg class="icon " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg> Loaded</span>
+  </div>
+  <label class="flex flex-col items-center justify-center text-center gap-1 cursor-pointer py-space-sm" data-empty>
+    <span class="text-on-surface-variant text-[22px]"><svg class="icon " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V4m0 0-4 4m4-4 4 4M4 16v4h16v-4"/></svg></span>
+    <span class="font-mono-data-sm text-mono-data-sm text-on-surface">Drop a CSV here or <span class="underline underline-offset-2">choose a file</span></span>
+    <input type="file" accept=".csv,text/csv" class="sr-only" data-input="test" aria-label="Choose the test CSV">
+  </label>
+  <div class="hidden flex-col gap-space-sm" data-filled>
+    <div class="flex items-center gap-space-md">
+      <div class="w-10 h-10 bg-surface-container flex items-center justify-center text-on-surface shrink-0 border border-outline-variant text-[20px]"><svg class="icon " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/></svg></div>
+      <div class="flex flex-col min-w-0">
+        <span class="font-mono-data-md text-mono-data-md font-medium text-on-surface truncate" data-field="name"></span>
+        <span class="font-mono-data-sm text-mono-data-sm text-on-surface-variant tabular" data-field="shape"></span>
+      </div>
+    </div>
+    <div class="flex items-center justify-between gap-2 text-on-surface-variant font-mono-data-sm text-mono-data-sm border-t border-surface-container pt-space-xs">
+      <span class="truncate" data-field="sha"></span>
+      <button type="button" class="underline underline-offset-4 hover:text-on-surface shrink-0" data-replace="test">replace</button>
+    </div>
+  </div>
+</div></div>
+  <div class="flex flex-wrap items-center gap-space-sm pt-space-xs font-mono-data-sm text-mono-data-sm">
+    <span class="font-body-sm text-body-sm text-on-surface-variant">Or try an example:</span><button type="button" data-example="kdd99" class="px-space-sm py-1 bg-surface-container border border-outline-variant hover:border-outline text-on-surface flex items-center gap-1.5 transition-colors"><span class="w-1.5 h-1.5 bg-primary"></span><span>KDD Cup 99 sample</span><span class="text-primary font-semibold">(39.3% copies)</span></button><button type="button" data-example="uci_phishing" class="px-space-sm py-1 bg-surface-container border border-outline-variant hover:border-outline text-on-surface flex items-center gap-1.5 transition-colors"><span class="w-1.5 h-1.5 bg-primary"></span><span>UCI Phishing Websites</span><span class="text-primary font-semibold">(64.4% copies)</span></button><button type="button" data-example="control" class="px-space-sm py-1 bg-surface-container border border-outline-variant hover:border-outline text-on-surface flex items-center gap-1.5 transition-colors"><span class="w-1.5 h-1.5 bg-secondary"></span><span>Clean control split</span><span class="text-on-surface-variant">(0.0% copies)</span></button>
+  </div>
+  <p class="font-body-sm text-body-sm text-on-surface-variant" data-example-note hidden></p>
+</section>
+
+<section class="flex flex-col gap-space-sm" aria-labelledby="step2">
+  <div class="flex flex-wrap items-center justify-between gap-2">
+    <div class="flex items-center gap-space-sm"><span class="w-5 h-5 bg-ink text-on-ink flex items-center justify-center font-mono-data-sm text-[11px] font-bold">2</span><h2 id="step2" class="sec-label text-on-surface font-medium">Tell it about the columns</h2></div>
+    <span class="font-mono-data-sm text-mono-data-sm text-on-surface-variant" data-schema>Load both files to continue</span>
+  </div>
+  <div class="bg-surface-container-low border border-outline-variant p-space-md flex flex-col gap-space-md">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-space-md">
+      <div class="flex flex-col gap-1">
+  <label for="opt-label" class="sec-label text-on-surface-variant">Label column</label>
+  <select id="opt-label" data-opt="label" class="bg-surface border border-outline-variant px-space-sm py-1.5 font-mono-data-sm text-mono-data-sm text-on-surface" disabled>
+    <option value="">Choose…</option>
+  </select>
+</div><div class="flex flex-col gap-1">
+  <label for="opt-time" class="sec-label text-on-surface-variant">Time column (optional)</label>
+  <select id="opt-time" data-opt="time" class="bg-surface border border-outline-variant px-space-sm py-1.5 font-mono-data-sm text-mono-data-sm text-on-surface" disabled>
+    <option value="">None</option>
+  </select>
+</div><div class="flex flex-col gap-1">
+  <label for="opt-group" class="sec-label text-on-surface-variant">Group column (optional)</label>
+  <select id="opt-group" data-opt="group" class="bg-surface border border-outline-variant px-space-sm py-1.5 font-mono-data-sm text-mono-data-sm text-on-surface" disabled>
+    <option value="">None</option>
+  </select>
+</div><div class="flex flex-col gap-1">
+  <label for="opt-text" class="sec-label text-on-surface-variant">Text column (optional)</label>
+  <select id="opt-text" data-opt="text" class="bg-surface border border-outline-variant px-space-sm py-1.5 font-mono-data-sm text-mono-data-sm text-on-surface" disabled>
+    <option value="">None</option>
+  </select>
+</div>
+    </div>
+    <div class="border-t border-surface-container-high pt-space-sm flex flex-col gap-space-sm">
+      <span class="sec-label text-on-surface-variant">Leave out of the features (IDs, the attack name, anything that encodes the label)</span>
+      <div class="flex flex-wrap gap-1.5" data-ignore-list><span class="font-mono-data-sm text-mono-data-sm text-on-surface-variant">—</span></div>
+    </div>
+    <div class="border-t border-surface-container-high pt-space-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-space-md">
+      <label class="flex items-center gap-space-sm font-mono-data-sm text-mono-data-sm text-on-surface-variant">Near-copy check on
+        <select data-opt="sample" class="bg-surface border border-outline-variant px-1.5 py-1 text-on-surface">
+          <option value="1000">1,000</option><option value="2000" selected>2,000</option><option value="5000">5,000</option><option value="1000000000">all</option>
+        </select> test rows</label>
+      <div class="flex items-center gap-space-sm w-full md:w-auto justify-end">
+        <span class="hidden sm:inline font-mono-data-sm text-mono-data-sm text-on-surface-variant"><kbd class="px-1.5 py-0.5 bg-surface border border-outline-variant text-[10px]">Ctrl</kbd> + <kbd class="px-1.5 py-0.5 bg-surface border border-outline-variant text-[10px]">Enter</kbd></span>
+        <button type="button" data-run disabled class="w-full sm:w-auto bg-ink text-on-ink px-space-lg py-2 font-mono-data-sm text-mono-data-sm font-medium flex items-center justify-center gap-space-sm border border-ink disabled:opacity-40 disabled:cursor-not-allowed"><svg class="icon " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 5v14l12-7z"/></svg><span>Run scan</span></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="bg-surface-container-low border border-outline-variant p-space-md flex-col gap-space-sm hidden" data-progress aria-live="polite">
+  <div class="flex items-center justify-between font-mono-data-sm text-mono-data-sm"><span class="text-on-surface font-medium" data-progress-title>Scanning</span><span class="text-primary font-semibold tabular" data-progress-pct>0%</span></div>
+  <div class="w-full bg-surface-container-high h-1.5 overflow-hidden"><div class="bg-primary h-full w-0 transition-all duration-200" data-progress-bar></div></div>
+  <div class="flex items-center gap-space-sm font-mono-data-sm text-mono-data-sm text-on-surface-variant"><svg class="icon text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 8 4 4-4 4M12 16h7"/></svg><span class="truncate" data-progress-log></span></div>
+</section>
+
+<section class="border-l-2 border-error bg-error/5 p-space-md font-mono-data-sm text-mono-data-sm text-on-surface hidden" data-error role="alert"></section>
+
+<section class="flex-col gap-space-lg border-t border-outline-variant pt-space-xl hidden" data-results aria-live="polite">
+  <div class="flex flex-wrap items-center justify-between gap-2">
+    <div class="flex items-center gap-space-sm"><span class="w-2.5 h-2.5 bg-primary"></span><h2 class="sec-label text-on-surface tracking-wider">Findings</h2></div>
+    <span class="font-mono-data-sm text-mono-data-sm text-on-surface-variant" data-results-meta></span>
+  </div>
+  <div class="border-2 p-space-lg flex flex-col gap-space-md" data-banner>
+    <div class="flex flex-wrap items-center justify-between gap-space-sm"><span class="px-2 py-0.5 sec-label tracking-wider" data-banner-pill></span><span class="font-mono-data-sm text-mono-data-sm text-on-surface-variant" data-banner-meta></span></div>
+    <h3 class="font-headline-md text-headline-md text-on-surface" data-banner-title></h3>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-space-md border-t border-outline-variant/40 pt-space-md" data-scoreboard></div>
+  </div>
+  <div class="flex flex-col gap-space-sm">
+    <div class="flex items-center justify-between pb-space-xs border-b border-on-surface"><span class="sec-label text-on-surface-variant">Every check</span><span class="sec-label text-on-surface-variant" data-count></span></div>
+    <div class="flex flex-col gap-space-sm" data-cards></div>
+  </div>
+  <div class="border-t border-outline-variant pt-space-lg flex flex-col gap-space-sm">
+    <div class="flex flex-wrap items-center gap-space-sm">
+      <button type="button" data-download-report class="bg-surface-container hover:bg-surface-container-high text-on-surface px-space-md py-2 font-mono-data-sm text-mono-data-sm font-medium flex items-center gap-2 border border-outline-variant"><svg class="icon " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12m0 0-4-4m4 4 4-4M4 20h16"/></svg><span>Download report (JSON)</span></button>
+      <button type="button" data-download-clean class="bg-ink text-on-ink px-space-md py-2 font-mono-data-sm text-mono-data-sm font-medium flex items-center gap-2 border border-ink"><svg class="icon " viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12m0 0-4-4m4 4 4-4M4 20h16"/></svg><span>Download test set without exact copies (CSV)</span></button>
+    </div>
+    <p class="font-body-sm text-body-sm text-on-surface-variant" data-clean-note>The cleaned file is re-read and re-checked before you get it. To also remove near-copies across every row, use <code class="font-mono-data-sm">leakcheck clean</code> from the Python package.</p>
+  </div>
+</section>
+
+</div>
+<script type="module" src="assets/scan.js"></script>
+</main>
+<footer class="w-full bg-surface-container-low border-t border-surface-container-high py-space-xl mt-space-2xl">
+  <div class="max-w-[1100px] mx-auto px-margin-mobile md:px-gutter flex flex-col md:flex-row justify-between items-start md:items-center gap-space-lg">
+    <div class="flex flex-col gap-space-xs">
+      <span class="font-mono-data-md text-mono-data-md font-medium text-on-surface">leakcheck</span>
+      <p class="font-mono-data-sm text-mono-data-sm text-on-surface-variant">Built with a ledger, not a slide deck.</p>
+    </div>
+    <nav class="flex flex-wrap items-center gap-space-md" aria-label="Footer">
+      <a class="font-mono-data-sm text-mono-data-sm text-on-surface-variant hover:text-on-surface" href="index.html">Report</a>
+      <a class="font-mono-data-sm text-mono-data-sm text-on-surface-variant hover:text-on-surface" href="scan.html">Scanner</a>
+      <a class="font-mono-data-sm text-mono-data-sm text-on-surface-variant hover:text-on-surface" href="https://github.com/aaditripi18/leakcheck/blob/main/docs/FINDINGS.md" rel="noopener noreferrer">Findings</a>
+      <a class="font-mono-data-sm text-mono-data-sm text-on-surface-variant hover:text-on-surface" href="https://github.com/aaditripi18/leakcheck/blob/main/data/README.md" rel="noopener noreferrer">Data provenance</a>
+      <a class="font-mono-data-sm text-mono-data-sm text-on-surface-variant hover:text-on-surface" href="https://github.com/aaditripi18/leakcheck" rel="noopener noreferrer">GitHub</a>
+    </nav>
+  </div>
+  <div class="max-w-[1100px] mx-auto px-margin-mobile md:px-gutter mt-space-lg pt-space-md border-t border-surface-container-highest flex flex-col sm:flex-row gap-space-xs justify-between text-on-surface-variant font-mono-data-sm text-mono-data-sm">
+    <span>Every number on this site is generated from <code>results/ledger.jsonl</code>.</span>
+    <span>Generated 2026-10-15</span>
+  </div>
+</footer>
+<script src="assets/site.js"></script>

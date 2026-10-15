@@ -88,6 +88,35 @@ reason.
 Speed on a laptop CPU: L1 + L3 + L5 on 1M train / 300k test rows in 31 s; L2
 tabular with 20k sampled test rows in 59 s; L2 text on 160k URLs in 16 s.
 
+## Website and in-browser scanner
+
+`site/` is a static site: the project page (`index.html`) and a scanner
+(`scan.html`) where anyone can drop a train/test CSV pair and get the same
+report, without installing anything.
+
+- **The scanner cannot send your files anywhere.** Both pages carry a
+  Content-Security-Policy with `connect-src 'none'`, and the scan runs in a
+  worker started from a `blob:` URL, so it inherits that policy. Verified in
+  Chromium: `fetch` and `WebSocket` are refused from the page and from the
+  worker. Example datasets ship as scripts, so even they need no request.
+- **Same answers as Python.** `site/engine/` is a JavaScript port of every
+  check, including scikit-learn's one-feature tree. `tests/test_js_parity.py`
+  runs both engines on the same files and requires identical counts, and
+  single-feature scores within 0.005.
+- **No hand-typed numbers.** `python scripts/build_site.py` generates both
+  pages from `site/data.json`, which `scripts/report.py` generates from the
+  ledger. `tests/test_site.py` checks this, along with the CSP.
+
+```
+python scripts/report.py
+python scripts/build_site.py --examples    # pages, example datasets, CSS (needs Node for Tailwind)
+python -m http.server 8765 --directory site
+```
+
+Deploy the `site/` folder to any static host. `vercel.json` and `_headers`
+send the same policy as an HTTP header. Design from Stitch; content and
+wiring are generated.
+
 ## Limitations
 
 - **A copy is not always a bug.** Real traffic repeats. The finding is that a
