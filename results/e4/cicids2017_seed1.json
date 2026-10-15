@@ -1,0 +1,76 @@
+{
+ "dataset": "cicids2017",
+ "seed": 1,
+ "commit": "ad29867",
+ "conditions": {
+  "full": {
+   "dropped": [],
+   "models": {
+    "lr": {
+     "n": 566149,
+     "accuracy": 0.9815596247630924,
+     "macro_f1": 0.9708405756010976,
+     "balanced_accuracy": 0.9705761408990253,
+     "fit_seconds": 9.8
+    },
+    "rf": {
+     "n": 566149,
+     "accuracy": 0.9984562367857225,
+     "macro_f1": 0.997558974980655,
+     "balanced_accuracy": 0.9972997315312762,
+     "fit_seconds": 10.2
+    },
+    "hgb": {
+     "n": 566149,
+     "accuracy": 0.9991380361000373,
+     "macro_f1": 0.998638366101428,
+     "balanced_accuracy": 0.9988610571880414,
+     "fit_seconds": 7.4
+    },
+    "mlp": {
+     "n": 566149,
+     "accuracy": 0.9979016124730415,
+     "macro_f1": 0.9966873298495572,
+     "balanced_accuracy": 0.9972284370296697,
+     "fit_seconds": 39.3
+    }
+   }
+  },
+  "minus_top": {
+   "dropped": [
+    "Destination Port"
+   ],
+   "models": {
+    "lr": {
+     "n": 566149,
+     "accuracy": 0.9701968916310018,
+     "macro_f1": 0.952378293726712,
+     "balanced_accuracy": 0.9474539178533592,
+     "fit_seconds": 13.3
+    },
+    "rf": {
+     "n": 566149,
+     "accuracy": 0.9981930551851191,
+     "macro_f1": 0.99714426839507,
+     "balanced_accuracy": 0.9971358584064686,
+     "fit_seconds": 10.1
+    },
+    "hgb": {
+     "n": 566149,
+     "accuracy": 0.9987512121367343,
+     "macro_f1": 0.9980276316765235,
+     "balanced_accuracy": 0.9983326145499416,
+     "fit_seconds": 8.9
+    },
+    "mlp": {
+     "n": 566149,
+     "accuracy": 0.9963878766897054,
+     "macro_f1": 0.9942926798993399,
+     "balanced_accuracy": 0.9944013827653954,
+     "fit_seconds": 39.2
+    }
+   }
+  }
+ },
+ "seconds": 157.5
+}

@@ -1,0 +1,156 @@
+{
+ "dataset": "phiusiil",
+ "seed": 0,
+ "commit": "ad29867",
+ "conditions": {
+  "full": {
+   "dropped": [],
+   "models": {
+    "lr": {
+     "n": 47159,
+     "accuracy": 0.9997879513984606,
+     "macro_f1": 0.9997834611105172,
+     "balanced_accuracy": 0.999752340383377,
+     "fit_seconds": 6.2
+    },
+    "rf": {
+     "n": 47159,
+     "accuracy": 0.9998939756992302,
+     "macro_f1": 0.9998917339299769,
+     "balanced_accuracy": 0.9998761701916885,
+     "fit_seconds": 10.6
+    },
+    "hgb": {
+     "n": 47159,
+     "accuracy": 1.0,
+     "macro_f1": 1.0,
+     "balanced_accuracy": 1.0,
+     "fit_seconds": 50.3
+    },
+    "mlp": {
+     "n": 47159,
+     "accuracy": 0.9998939756992302,
+     "macro_f1": 0.9998917339299769,
+     "balanced_accuracy": 0.9998761701916885,
+     "fit_seconds": 235.9
+    }
+   },
+   "best_single_feature_after": [
+    {
+     "feature": "URLSimilarityIndex",
+     "balanced_acc": 0.9959879142107089
+    },
+    {
+     "feature": "LineOfCode",
+     "balanced_acc": 0.9617048755776267
+    },
+    {
+     "feature": "NoOfExternalRef",
+     "balanced_acc": 0.961213356179359
+    }
+   ]
+  },
+  "minus_top": {
+   "dropped": [
+    "URLSimilarityIndex"
+   ],
+   "models": {
+    "lr": {
+     "n": 47159,
+     "accuracy": 0.9997455416781527,
+     "macro_f1": 0.9997401533326207,
+     "balanced_accuracy": 0.9997090353041768,
+     "fit_seconds": 5.4
+    },
+    "rf": {
+     "n": 47159,
+     "accuracy": 0.9998303611187684,
+     "macro_f1": 0.9998267710487512,
+     "balanced_accuracy": 0.9998018723067017,
+     "fit_seconds": 10.2
+    },
+    "hgb": {
+     "n": 47159,
+     "accuracy": 0.9998515659789223,
+     "macro_f1": 0.9998484256125784,
+     "balanced_accuracy": 0.999826638268364,
+     "fit_seconds": 55.9
+    },
+    "mlp": {
+     "n": 47159,
+     "accuracy": 0.9999151805593842,
+     "macro_f1": 0.9999133876836775,
+     "balanced_accuracy": 0.9999009361533508,
+     "fit_seconds": 213.3
+    }
+   },
+   "best_single_feature_after": [
+    {
+     "feature": "LineOfCode",
+     "balanced_acc": 0.9617048755776267
+    },
+    {
+     "feature": "NoOfExternalRef",
+     "balanced_acc": 0.961213356179359
+    },
+    {
+     "feature": "NoOfSelfRef",
+     "balanced_acc": 0.953603531903453
+    }
+   ]
+  },
+  "minus_flagged": {
+   "dropped": [
+    "URLSimilarityIndex",
+    "LineOfCode",
+    "NoOfExternalRef",
+    "NoOfSelfRef"
+   ],
+   "models": {
+    "lr": {
+     "n": 47159,
+     "accuracy": 0.9994274687758434,
+     "macro_f1": 0.9994153632218749,
+     "balanced_accuracy": 0.9993998143204853,
+     "fit_seconds": 5.5
+    },
+    "rf": {
+     "n": 47159,
+     "accuracy": 0.999618312517229,
+     "macro_f1": 0.9996102494326494,
+     "balanced_accuracy": 0.9996040274430731,
+     "fit_seconds": 11.4
+    },
+    "hgb": {
+     "n": 47159,
+     "accuracy": 0.9997455416781527,
+     "macro_f1": 0.9997401500910794,
+     "balanced_accuracy": 0.9997028084600525,
+     "fit_seconds": 53.8
+    },
+    "mlp": {
+     "n": 47159,
+     "accuracy": 0.9995546979367671,
+     "macro_f1": 0.9995453221323611,
+     "balanced_accuracy": 0.9995733174669562,
+     "fit_seconds": 244.5
+    }
+   },
+   "best_single_feature_after": [
+    {
+     "feature": "NoOfImage",
+     "balanced_acc": 0.9397985863401754
+    },
+    {
+     "feature": "NoOfJS",
+     "balanced_acc": 0.9303065627521075
+    },
+    {
+     "feature": "HasSocialNet",
+     "balanced_acc": 0.8948290049466359
+    }
+   ]
+  }
+ },
+ "seconds": 1065.5
+}

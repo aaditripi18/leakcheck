@@ -1,0 +1,122 @@
+{
+ "dataset": "phiusiil",
+ "seed": 4,
+ "commit": "ad29867",
+ "n_train": 188636,
+ "n_test": 47159,
+ "leak_rate": {
+  "exact": 0.0,
+  "near": 0.04624779999575903
+ },
+ "models": {
+  "lr": {
+   "original": {
+    "n": 47159,
+    "accuracy": 0.9998939756992302,
+    "macro_f1": 0.9998917339299769,
+    "balanced_accuracy": 0.9998761701916885
+   },
+   "no_exact": {
+    "n": 47159,
+    "accuracy": 0.9998939756992302,
+    "macro_f1": 0.9998917339299769,
+    "balanced_accuracy": 0.9998761701916885
+   },
+   "no_near": {
+    "n": 44978,
+    "accuracy": 0.9998888345413314,
+    "macro_f1": 0.999884750424338,
+    "balanced_accuracy": 0.9998630737211085
+   },
+   "leaked": {
+    "n": 2181,
+    "accuracy": 1.0,
+    "macro_f1": 1.0,
+    "balanced_accuracy": 1.0
+   },
+   "fit_seconds": 5.9
+  },
+  "rf": {
+   "original": {
+    "n": 47159,
+    "accuracy": 0.9999575902796921,
+    "macro_f1": 0.9999566943814056,
+    "balanced_accuracy": 0.9999504680766754
+   },
+   "no_exact": {
+    "n": 47159,
+    "accuracy": 0.9999575902796921,
+    "macro_f1": 0.9999566943814056,
+    "balanced_accuracy": 0.9999504680766754
+   },
+   "no_near": {
+    "n": 44978,
+    "accuracy": 0.9999555338165326,
+    "macro_f1": 0.9999539013696794,
+    "balanced_accuracy": 0.9999452294884434
+   },
+   "leaked": {
+    "n": 2181,
+    "accuracy": 1.0,
+    "macro_f1": 1.0,
+    "balanced_accuracy": 1.0
+   },
+   "fit_seconds": 10.2
+  },
+  "hgb": {
+   "original": {
+    "n": 47159,
+    "accuracy": 1.0,
+    "macro_f1": 1.0,
+    "balanced_accuracy": 1.0
+   },
+   "no_exact": {
+    "n": 47159,
+    "accuracy": 1.0,
+    "macro_f1": 1.0,
+    "balanced_accuracy": 1.0
+   },
+   "no_near": {
+    "n": 44978,
+    "accuracy": 1.0,
+    "macro_f1": 1.0,
+    "balanced_accuracy": 1.0
+   },
+   "leaked": {
+    "n": 2181,
+    "accuracy": 1.0,
+    "macro_f1": 1.0,
+    "balanced_accuracy": 1.0
+   },
+   "fit_seconds": 51.8
+  },
+  "mlp": {
+   "original": {
+    "n": 47159,
+    "accuracy": 0.9999151805593842,
+    "macro_f1": 0.9999133876836775,
+    "balanced_accuracy": 0.9999009361533508
+   },
+   "no_exact": {
+    "n": 47159,
+    "accuracy": 0.9999151805593842,
+    "macro_f1": 0.9999133876836775,
+    "balanced_accuracy": 0.9999009361533508
+   },
+   "no_near": {
+    "n": 44978,
+    "accuracy": 0.999911067633065,
+    "macro_f1": 0.9999078011395417,
+    "balanced_accuracy": 0.9998904589768869
+   },
+   "leaked": {
+    "n": 2181,
+    "accuracy": 1.0,
+    "macro_f1": 1.0,
+    "balanced_accuracy": 1.0
+   },
+   "fit_seconds": 224.1
+  }
+ },
+ "seconds": 319.0
+}

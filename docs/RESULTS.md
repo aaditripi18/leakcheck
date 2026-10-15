@@ -143,6 +143,19 @@ Training rows used: 300,000; test rows: 566,149; leaked test rows: exact 7.06%, 
 | hgb | 0.9985 ± 0.0001 | 0.9984 ± 0.0001 | 0.9994 ± 0.0001 | 0.9982 ± 0.0001 | +0.01 | -0.08 | 0.4619 ± 0.1204 | +53.67 |
 | mlp | 0.9963 ± 0.0003 | 0.9962 ± 0.0003 | 0.9983 ± 0.0002 | 0.9954 ± 0.0004 | +0.01 | -0.20 | 0.5159 ± 0.0361 | +48.04 |
 
+### ember2018
+
+_ledger: `e2_retrain:ember2018` @ `ad29867`, 2026-10-15T10:19:10+00:00_
+
+Training rows used: 300,000; test rows: 200,000; leaked test rows: exact 0.01%, exact or near 23.60%.
+
+| Model | original | no_exact | no_near | leaked | gap no_exact | gap no_near | time | gap time |
+|---|---|---|---|---|---|---|---|---|
+| lr | 0.8671 ± 0.0005 | 0.8671 ± 0.0005 | 0.8432 ± 0.0004 | 0.9062 ± 0.0020 | +0.00 | +2.39 | 0.8406 ± 0.0004 | +2.65 |
+| rf | 0.9579 ± 0.0004 | 0.9579 ± 0.0004 | 0.9432 ± 0.0006 | 0.9991 ± 0.0001 | +0.00 | +1.47 | 0.9378 ± 0.0011 | +2.00 |
+| hgb | 0.9536 ± 0.0004 | 0.9536 ± 0.0004 | 0.9406 ± 0.0005 | 0.9854 ± 0.0005 | +0.00 | +1.30 | 0.9349 ± 0.0020 | +1.87 |
+| mlp | 0.9562 ± 0.0010 | 0.9562 ± 0.0010 | 0.9424 ± 0.0011 | 0.9927 ± 0.0021 | +0.00 | +1.38 | 0.9335 ± 0.0023 | +2.27 |
+
 ### uci_phishing
 
 _ledger: `e2_retrain:uci_phishing` @ `42caa56`, 2026-10-15T05:47:07+00:00_
@@ -155,6 +168,19 @@ Training rows used: 8,844; test rows: 2,211; leaked test rows: exact 65.36%, exa
 | rf | 0.9703 ± 0.0047 | 0.9598 ± 0.0116 | 0.9598 ± 0.0116 | 0.9741 ± 0.0052 | +1.05 | +1.05 |
 | hgb | 0.9688 ± 0.0033 | 0.9608 ± 0.0076 | 0.9608 ± 0.0076 | 0.9712 ± 0.0051 | +0.81 | +0.81 |
 | mlp | 0.9615 ± 0.0059 | 0.9448 ± 0.0154 | 0.9448 ± 0.0154 | 0.9682 ± 0.0063 | +1.67 | +1.67 |
+
+### phiusiil
+
+_ledger: `e2_retrain:phiusiil` @ `ad29867`, 2026-10-15T07:05:13+00:00_
+
+Training rows used: 188,636; test rows: 47,159; leaked test rows: exact 0.00%, exact or near 4.47%.
+
+| Model | original | no_exact | no_near | leaked | gap no_exact | gap no_near |
+|---|---|---|---|---|---|---|
+| lr | 0.9999 ± 0.0001 | 0.9999 ± 0.0001 | 0.9999 ± 0.0001 | 1.0000 ± 0.0000 | +0.00 | +0.00 |
+| rf | 0.9999 ± 0.0000 | 0.9999 ± 0.0000 | 0.9999 ± 0.0000 | 1.0000 ± 0.0000 | +0.00 | +0.00 |
+| hgb | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | +0.00 | +0.00 |
+| mlp | 0.9999 ± 0.0000 | 0.9999 ± 0.0000 | 0.9999 ± 0.0000 | 1.0000 ± 0.0000 | +0.00 | +0.00 |
 
 ### sms_spam
 
@@ -172,5 +198,32 @@ Training rows used: 4,459; test rows: 1,115; leaked test rows: exact 11.43%, exa
 ### Hypotheses (rules fixed in PLAN.md before any E2 run)
 
 - **H2** (cleaning costs >= 5 macro-F1 points on the two most affected datasets): kdd99: 4/4 models with gap >= 5 pt; uci_phishing: 0/4 models with gap >= 5 pt -> **not supported**.
-- **H3** (a time split costs more than deduplication): cicids2017: time gap > no_near gap for 4/4 models -> supported.
-- **H4** (the leakage gap is larger for LR than for HistGB): LR gap > HGB gap on 5 of 5 eligible datasets (kdd99, nslkdd, unsw_nb15, uci_phishing, sms_spam) -> **supported** (provisional until all 8 datasets are in).
+- **H3** (a time split costs more than deduplication): cicids2017: time gap > no_near gap for 4/4 models -> supported; ember2018: time gap > no_near gap for 4/4 models -> supported.
+- **H4** (the leakage gap is larger for LR than for HistGB): LR gap > HGB gap on 6 of 6 eligible datasets (kdd99, nslkdd, unsw_nb15, ember2018, uci_phishing, sms_spam) -> **supported**.
+
+## E4: shortcut ablation
+
+Retrain without the features E1 flagged (drop sets read from the E1 ledger). Macro-F1 on the full test set, mean over 5 seeds. A shortcut carries the score if removing it costs >= 5 points for at least 3 of 4 models (PLAN.md, week 6).
+
+### cicids2017
+
+_ledger: `e4_ablation:cicids2017` @ `ad29867`, 2026-10-15T08:41:38+00:00_
+
+| Condition | Dropped | lr | rf | hgb | mlp | Best single feature afterwards |
+|---|---|---|---|---|---|---|
+| full | (none) | 0.9707 | 0.9975 | 0.9985 | 0.9963 | Destination Port 89.89% |
+| minus_top | Destination Port | 0.9516 (+1.91) | 0.9971 (+0.04) | 0.9979 (+0.07) | 0.9946 (+0.17) | Average Packet Size 86.38% |
+
+Shortcut carries the score: minus_top: 0/4 models drop >= 5 pt -> **no**
+
+### phiusiil
+
+_ledger: `e4_ablation:phiusiil` @ `ad29867`, 2026-10-15T08:27:03+00:00_
+
+| Condition | Dropped | lr | rf | hgb | mlp | Best single feature afterwards |
+|---|---|---|---|---|---|---|
+| full | (none) | 0.9999 | 0.9999 | 1.0000 | 0.9999 | URLSimilarityIndex 99.60% |
+| minus_top | URLSimilarityIndex | 0.9998 (+0.01) | 0.9999 (+0.01) | 0.9999 (+0.01) | 0.9999 (+0.00) | LineOfCode 96.17% |
+| minus_flagged | URLSimilarityIndex, LineOfCode, NoOfExternalRef, NoOfSelfRef | 0.9995 (+0.03) | 0.9997 (+0.03) | 0.9998 (+0.02) | 0.9997 (+0.02) | NoOfImage 93.98% |
+
+Shortcut carries the score: minus_top: 0/4 models drop >= 5 pt -> **no**; minus_flagged: 0/4 models drop >= 5 pt -> **no**

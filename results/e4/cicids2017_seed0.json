@@ -1,0 +1,104 @@
+{
+ "dataset": "cicids2017",
+ "seed": 0,
+ "commit": "ad29867",
+ "conditions": {
+  "full": {
+   "dropped": [],
+   "models": {
+    "lr": {
+     "n": 566149,
+     "accuracy": 0.9812681820510148,
+     "macro_f1": 0.9703742035756031,
+     "balanced_accuracy": 0.9700225055387988,
+     "fit_seconds": 10.6
+    },
+    "rf": {
+     "n": 566149,
+     "accuracy": 0.9983643881734314,
+     "macro_f1": 0.9974130589396923,
+     "balanced_accuracy": 0.9970226251570155,
+     "fit_seconds": 10.4
+    },
+    "hgb": {
+     "n": 566149,
+     "accuracy": 0.9990126274178706,
+     "macro_f1": 0.9984403807890788,
+     "balanced_accuracy": 0.9987017703315021,
+     "fit_seconds": 8.5
+    },
+    "mlp": {
+     "n": 566149,
+     "accuracy": 0.9977037846927223,
+     "macro_f1": 0.9963808369205018,
+     "balanced_accuracy": 0.9977210213410197,
+     "fit_seconds": 27.4
+    }
+   },
+   "best_single_feature_after": [
+    {
+     "feature": "Destination Port",
+     "balanced_acc": 0.8988768858023838
+    },
+    {
+     "feature": "Average Packet Size",
+     "balanced_acc": 0.8638441216934605
+    },
+    {
+     "feature": "Packet Length Std",
+     "balanced_acc": 0.8627769395894995
+    }
+   ]
+  },
+  "minus_top": {
+   "dropped": [
+    "Destination Port"
+   ],
+   "models": {
+    "lr": {
+     "n": 566149,
+     "accuracy": 0.9697641433615533,
+     "macro_f1": 0.9516632775782959,
+     "balanced_accuracy": 0.9465314814221144,
+     "fit_seconds": 11.1
+    },
+    "rf": {
+     "n": 566149,
+     "accuracy": 0.998125935045368,
+     "macro_f1": 0.9970382905940204,
+     "balanced_accuracy": 0.9970466987905551,
+     "fit_seconds": 10.1
+    },
+    "hgb": {
+     "n": 566149,
+     "accuracy": 0.9986258034545676,
+     "macro_f1": 0.9978296679288061,
+     "balanced_accuracy": 0.9981597944162623,
+     "fit_seconds": 8.6
+    },
+    "mlp": {
+     "n": 566149,
+     "accuracy": 0.996629862456703,
+     "macro_f1": 0.9946868226911609,
+     "balanced_accuracy": 0.9958952358107777,
+     "fit_seconds": 50.1
+    }
+   },
+   "best_single_feature_after": [
+    {
+     "feature": "Average Packet Size",
+     "balanced_acc": 0.8638441216934605
+    },
+    {
+     "feature": "Packet Length Std",
+     "balanced_acc": 0.8627769395894995
+    },
+    {
+     "feature": "Packet Length Variance",
+     "balanced_acc": 0.8627769395894995
+    }
+   ]
+  }
+ },
+ "seconds": 249.1
+}

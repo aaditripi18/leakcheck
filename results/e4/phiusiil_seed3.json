@@ -1,0 +1,114 @@
+{
+ "dataset": "phiusiil",
+ "seed": 3,
+ "commit": "ad29867",
+ "conditions": {
+  "full": {
+   "dropped": [],
+   "models": {
+    "lr": {
+     "n": 47159,
+     "accuracy": 0.9999363854195381,
+     "macro_f1": 0.9999350411674655,
+     "balanced_accuracy": 0.9999257021150132,
+     "fit_seconds": 6.4
+    },
+    "rf": {
+     "n": 47159,
+     "accuracy": 0.9999575902796921,
+     "macro_f1": 0.9999566943814056,
+     "balanced_accuracy": 0.9999504680766754,
+     "fit_seconds": 10.0
+    },
+    "hgb": {
+     "n": 47159,
+     "accuracy": 1.0,
+     "macro_f1": 1.0,
+     "balanced_accuracy": 1.0,
+     "fit_seconds": 76.6
+    },
+    "mlp": {
+     "n": 47159,
+     "accuracy": 0.999978795139846,
+     "macro_f1": 0.9999783473255621,
+     "balanced_accuracy": 0.9999752340383377,
+     "fit_seconds": 225.2
+    }
+   }
+  },
+  "minus_top": {
+   "dropped": [
+    "URLSimilarityIndex"
+   ],
+   "models": {
+    "lr": {
+     "n": 47159,
+     "accuracy": 0.9998515659789223,
+     "macro_f1": 0.999848429390753,
+     "balanced_accuracy": 0.9998390919566125,
+     "fit_seconds": 6.4
+    },
+    "rf": {
+     "n": 47159,
+     "accuracy": 0.9998727708390763,
+     "macro_f1": 0.9998700815255164,
+     "balanced_accuracy": 0.9998576310741505,
+     "fit_seconds": 10.9
+    },
+    "hgb": {
+     "n": 47159,
+     "accuracy": 0.999978795139846,
+     "macro_f1": 0.9999783473255621,
+     "balanced_accuracy": 0.9999752340383377,
+     "fit_seconds": 58.6
+    },
+    "mlp": {
+     "n": 47159,
+     "accuracy": 0.9999151805593842,
+     "macro_f1": 0.9999133909200428,
+     "balanced_accuracy": 0.9999196166857237,
+     "fit_seconds": 249.1
+    }
+   }
+  },
+  "minus_flagged": {
+   "dropped": [
+    "URLSimilarityIndex",
+    "LineOfCode",
+    "NoOfExternalRef",
+    "NoOfSelfRef"
+   ],
+   "models": {
+    "lr": {
+     "n": 47159,
+     "accuracy": 0.999618312517229,
+     "macro_f1": 0.999610244576549,
+     "balanced_accuracy": 0.9995978005989488,
+     "fit_seconds": 6.3
+    },
+    "rf": {
+     "n": 47159,
+     "accuracy": 0.9997667465383065,
+     "macro_f1": 0.9997618176140404,
+     "balanced_accuracy": 0.999752481798212,
+     "fit_seconds": 12.1
+    },
+    "hgb": {
+     "n": 47159,
+     "accuracy": 0.9997031319578448,
+     "macro_f1": 0.999696841772926,
+     "balanced_accuracy": 0.9996595033808522,
+     "fit_seconds": 57.7
+    },
+    "mlp": {
+     "n": 47159,
+     "accuracy": 0.9998727708390763,
+     "macro_f1": 0.9998700847623991,
+     "balanced_accuracy": 0.9998700847623991,
+     "fit_seconds": 377.2
+    }
+   }
+  }
+ },
+ "seconds": 1098.5
+}

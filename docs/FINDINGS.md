@@ -1,9 +1,10 @@
-# Findings (preliminary: E0, E1, E2 on 5 of 8 datasets)
+# Findings (E0, E1, E2 on all 8 datasets, E4)
 
 Every number here is in [RESULTS.md](RESULTS.md), which is generated from
 `results/ledger.jsonl`. E0 ran at commit `0f452ad`, E1 at `6780929`. This file
-is the narrative. E2 (week 5) ran at `42caa56` on the five leakiest datasets,
-with H2–H4 decision rules committed in PLAN.md before any E2 run.
+is the narrative. E2 ran at `42caa56` (week 5: five leakiest datasets),
+`8821fdf` (NSL-KDD) and `ad29867` (PhiUSIIL, EMBER, E4). All H2–H4 decision
+rules were committed in PLAN.md before the runs they govern.
 
 ## 1. leakcheck recovers planted leakage exactly
 
@@ -241,3 +242,87 @@ differences are modest. CIC-IDS2017 is excluded by the rule (both gaps below
   random split looks like this anyway.
 - **UNSW-NB15 official split**: 10.4% exact copies cost 1–2 points. Real, but
   small next to KDD99.
+
+# Week 6: the remaining datasets, H3 on EMBER, and the shortcut ablation
+
+## 16. NSL-KDD: clean on paper, still a 8–12 point gap
+
+NSL-KDD removed KDD99's within-split repeats and has only 2.95% exact
+cross-split copies. But a third of KDDTest+ (33.07%) has an exact or near copy
+in KDDTrain+, and on those rows all four models score 0.98 macro-F1, against
+0.63–0.73 on the rest. Removing them costs **+8.36 to +11.86 points**. The
+overall L2 ratio (×0.60, FINDINGS §5) was correct about the test set *as a
+whole*, but the near-copy third still carries a large share of the headline
+score.
+
+## 17. H3 supported, on its decisive test, by a small margin
+
+On EMBER, the cleaner test, every model loses more to the official temporal
+split than to removing near-copies from a random split:
+
+| Model | Random split | no_near gap | Temporal split | time gap |
+|---|---|---|---|---|
+| LR | 0.8671 | +2.39 | 0.8406 | **+2.65** |
+| RF | 0.9579 | +1.47 | 0.9378 | **+2.00** |
+| HistGB | 0.9536 | +1.30 | 0.9349 | **+1.87** |
+| MLP | 0.9562 | +1.38 | 0.9335 | **+2.27** |
+
+4 of 4 models, so **H3 is supported** under the pre-registered rule (which
+required EMBER). The margins are small: 0.26–0.89 points, against seed
+standard deviations of 0.0005–0.0023, so they exceed the noise but are not
+large. The honest summary: on EMBER, two months of drift cost about 2–2.7
+points, slightly more than removing near-copies does. On CIC-IDS2017 the
+"time" drop (40–54 points) is really an unseen-attack effect (§13).
+
+EMBER's random split has almost no exact copies (0.01%) but 23.6% near-copies
+in leakcheck's numeric view, and on those the forest scores 0.9991. A random
+split of EMBER would overstate a model by about 1.3–2.4 points.
+
+## 18. H4 supported: weaker models lean harder on leaked rows
+
+All eight datasets are in. On every dataset where the LR or HistGB gap reaches
+1 point (6 of 8: KDD99, NSL-KDD, UNSW-NB15, EMBER, UCI Phishing, SMS Spam),
+LR's gap exceeds HistGB's. **6 of 6, H4 supported.** CIC-IDS2017 and PhiUSIIL
+are excluded by the rule (both gaps below 1 point).
+
+## 19. PhiUSIIL: there is nothing for leakage to inflate
+
+PhiUSIIL has no exact copies and 4.47% near-copies (mostly by URL text). Every
+model scores **0.9999–1.0000 macro-F1** on the full set, on the cleaned set and
+on the leaked rows, so every gap is +0.00.
+
+## 20. E4: removing the shortcut does not remove the separability
+
+| Dataset | Dropped | Macro-F1 change (LR / RF / HGB / MLP) | Best single feature afterwards |
+|---|---|---|---|
+| PhiUSIIL | URLSimilarityIndex | −0.01 / −0.01 / −0.01 / −0.00 | LineOfCode 96.17% |
+| PhiUSIIL | + LineOfCode, NoOfExternalRef, NoOfSelfRef | −0.03 / −0.03 / −0.02 / −0.02 | NoOfImage 93.98% |
+| CIC-IDS2017 | Destination Port | −1.91 / −0.04 / −0.07 / −0.17 | Average Packet Size 86.38% |
+
+No shortcut "carries" the score under the pre-registered rule (≥ 5 points for
+3 of 4 models). What this says about PhiUSIIL is stronger than the shortcut
+finding itself: **the classes are separable by many independent features**.
+Remove the four features that each reach ≥ 95% on their own, and 0.9995+
+macro-F1 remains. A test that easy cannot rank models: every baseline is at
+the ceiling. A plausible cause is that legitimate and phishing pages were
+collected from different sources and differ in page size, link counts and
+images. That is a hypothesis for the dataset's documentation to confirm. It is
+not shown here.
+
+For CIC-IDS2017, Destination Port is a context shortcut that the strong models
+do not need. Only LR loses (1.91 points); the tree models find the same
+information in packet-size statistics.
+
+## Open items before any of this is published
+
+- How the PhiUSIIL paper defines URLSimilarityIndex. Neither the UCI page nor
+  the Mendeley entry describes it; it is in the paywalled paper
+  (doi:10.1016/j.cose.2023.103545).
+- Whether Tavallaee et al. meant NSL-KDD's de-duplication to cover train/test
+  overlap (§4).
+- The origin of EMBER 2018's 50,000 pre-2018 training files (§11).
+- **Pipeline fix found in week 6:** scikit-learn's RandomForest takes NaN only
+  in dense input. With a text column, the input is sparse, so missing values
+  are now a sentinel for RF on text datasets. This affected only PhiUSIIL, the
+  first dataset with both text and missing values, and it was fixed before its
+  recorded run (`ad29867`).

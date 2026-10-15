@@ -46,6 +46,11 @@ rows against a 1M-row training set.
 
 ## Status
 
+- Week 6 done: E2 on all 8 datasets, E4 shortcut ablation. Final verdicts:
+  H1 supported, H2 not supported, H3 supported (EMBER: temporal drift costs
+  slightly more than near-copy removal, by 0.3–0.9 points), H4 supported
+  (6/6), H5 supported. PhiUSIIL stays at 0.9995+ macro-F1 even without its
+  four ≥ 95% single features: it is too easy to rank models.
 - Week 5 done: E2 retraining on the five leakiest datasets. Removing leaked
   test rows costs 15–17.5 macro-F1 points on KDD99 but under 2 points on UCI
   Phishing despite equal duplication (H2 not supported: copy rate alone does
@@ -68,7 +73,8 @@ python scripts/fetch.py
 python -m experiments.e0_sources && python -m experiments.e0_sources_week4
 python -m experiments.e0_synthetic && python -m experiments.e0_kdd
 python -m experiments.e1_audit      # ~45 min on a laptop CPU, EMBER is 30 of them
-python -m experiments.e2_retrain uci_phishing sms_spam unsw_nb15 kdd99 cicids2017   # ~45 min
+python -m experiments.e2_retrain uci_phishing sms_spam unsw_nb15 kdd99 cicids2017 nslkdd phiusiil ember2018
+python -m experiments.e4_ablation phiusiil cicids2017
 python scripts/report.py
 ```
 
