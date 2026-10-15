@@ -7,6 +7,8 @@ name = "leakcheck"
 version = "0.1.0"
 description = "Find train/test leakage in security ML datasets and measure what it inflates."
 requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Aaditya Tripathi" }]
 dependencies = ["numpy", "pandas", "scikit-learn"]
 
 [project.optional-dependencies]

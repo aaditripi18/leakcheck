@@ -169,3 +169,9 @@ every decision rule, with the date each was fixed.
 Tests use synthetic splits (`leakcheck/synth.py`) where every planted
 duplicate, conflict and shortcut is counted, and the checks must recover the
 counts exactly.
+
+## Licence
+
+Code: MIT, see [LICENSE](LICENSE). The datasets are not redistributed, except
+the small example samples in `site/examples/`. Those come from UCI datasets
+under CC BY 4.0, with the source named in each file.
