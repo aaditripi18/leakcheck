@@ -229,6 +229,33 @@ def e2(runs: dict) -> list[str]:
     return out
 
 
+def e4(runs: dict) -> list[str]:
+    done = [n for n in E1_ORDER if f"e4_ablation:{n}" in runs]
+    if not done:
+        return []
+    out = ["## E4: shortcut ablation", "",
+           "Retrain without the features E1 flagged (drop sets read from the E1 ledger). Macro-F1 on the full test set, "
+           "mean over 5 seeds. A shortcut carries the score if removing it costs >= 5 points for at least 3 of 4 models "
+           "(PLAN.md, week 6).", ""]
+    for n in done:
+        d = runs[f"e4_ablation:{n}"]
+        r = d["results"]
+        out += [f"### {n}", "", src(d), "",
+                "| Condition | Dropped | " + " | ".join(MODELS) + " | Best single feature afterwards |",
+                "|---|---|" + "---|" * len(MODELS) + "---|"]
+        for c, v in r["conditions"].items():
+            cells = " | ".join(f"{v['models'][m]['macro_f1_mean']:.4f}" + (
+                f" ({pt(r['macro_f1_drop_vs_full'][c][m])})" if c in r["macro_f1_drop_vs_full"] else "")
+                for m in MODELS)
+            after = v.get("best_single_feature_after") or []
+            best = f"{after[0]['feature']} {pct(after[0]['balanced_acc'])}" if after else "n/a"
+            out.append(f"| {c} | {', '.join(v['dropped']) or '(none)'} | {cells} | {best} |")
+        carried = {c: sum(x >= 0.05 for x in dr.values()) for c, dr in r["macro_f1_drop_vs_full"].items()}
+        out += ["", "Shortcut carries the score: " + "; ".join(
+            f"{c}: {k}/4 models drop >= 5 pt -> **{'yes' if k >= 3 else 'no'}**" for c, k in carried.items()), ""]
+    return out
+
+
 def main() -> None:
     runs = latest()
     lines = ["# Results", "",
@@ -238,6 +265,7 @@ def main() -> None:
             lines += fn(runs[name])
     lines += e1(runs)
     lines += e2(runs)
+    lines += e4(runs)
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text("\n".join(lines), encoding="utf-8")
     print(f"wrote {OUT}")

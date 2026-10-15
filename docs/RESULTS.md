@@ -104,6 +104,19 @@ Training rows used: 300,000; test rows: 311,029; leaked test rows: exact 55.92%,
 | hgb | 0.8965 ± 0.0021 | 0.8541 ± 0.0041 | 0.7466 ± 0.0067 | 0.9238 ± 0.0002 | +4.24 | +15.00 |
 | mlp | 0.8928 ± 0.0020 | 0.8480 ± 0.0083 | 0.7333 ± 0.0104 | 0.9238 ± 0.0002 | +4.47 | +15.95 |
 
+### nslkdd
+
+_ledger: `e2_retrain:nslkdd` @ `8821fdf`, 2026-10-15T06:33:42+00:00_
+
+Training rows used: 125,973; test rows: 22,544; leaked test rows: exact 2.95%, exact or near 33.07%.
+
+| Model | original | no_exact | no_near | leaked | gap no_exact | gap no_near |
+|---|---|---|---|---|---|---|
+| lr | 0.7465 ± 0.0000 | 0.7405 ± 0.0000 | 0.6279 ± 0.0000 | 0.9802 ± 0.0000 | +0.60 | +11.86 |
+| rf | 0.7688 ± 0.0082 | 0.7632 ± 0.0086 | 0.6592 ± 0.0131 | 0.9817 ± 0.0001 | +0.56 | +10.96 |
+| hgb | 0.8055 ± 0.0065 | 0.8016 ± 0.0067 | 0.7174 ± 0.0095 | 0.9818 ± 0.0001 | +0.40 | +8.81 |
+| mlp | 0.8136 ± 0.0107 | 0.8100 ± 0.0111 | 0.7300 ± 0.0162 | 0.9818 ± 0.0002 | +0.36 | +8.36 |
+
 ### unsw_nb15
 
 _ledger: `e2_retrain:unsw_nb15` @ `42caa56`, 2026-10-15T05:52:46+00:00_
@@ -160,4 +173,4 @@ Training rows used: 4,459; test rows: 1,115; leaked test rows: exact 11.43%, exa
 
 - **H2** (cleaning costs >= 5 macro-F1 points on the two most affected datasets): kdd99: 4/4 models with gap >= 5 pt; uci_phishing: 0/4 models with gap >= 5 pt -> **not supported**.
 - **H3** (a time split costs more than deduplication): cicids2017: time gap > no_near gap for 4/4 models -> supported.
-- **H4** (the leakage gap is larger for LR than for HistGB): LR gap > HGB gap on 4 of 4 eligible datasets (kdd99, unsw_nb15, uci_phishing, sms_spam) -> **supported** (provisional until all 8 datasets are in).
+- **H4** (the leakage gap is larger for LR than for HistGB): LR gap > HGB gap on 5 of 5 eligible datasets (kdd99, nslkdd, unsw_nb15, uci_phishing, sms_spam) -> **supported** (provisional until all 8 datasets are in).

@@ -31,6 +31,7 @@ MODELS = ("lr", "rf", "hgb", "mlp")
 MAX_CATEGORIES = 50
 TFIDF_FEATURES = 20_000
 TFIDF_FEATURES_DENSE = 2_000
+MISSING_SENTINEL = -1e9  # rf + text only, see preprocessor()
 
 
 def _slog(x):
@@ -67,11 +68,21 @@ def preprocessor(model: str, num: list[str], cat: list[str], text: str | None) -
             parts.append(("cat", OneHotEncoder(handle_unknown="infrequent_if_exist", max_categories=MAX_CATEGORIES,
                                                sparse_output=True), cat))
     else:
+        # A text column makes the matrix sparse, and RandomForest takes NaN only in
+        # dense input. In that case missing values become a sentinel far below any
+        # real value, which a tree can still split off. (Found in week 6 on
+        # PhiUSIIL; SMS Spam, the only earlier text dataset, has no other columns.)
+        sentinel = model == "rf" and text is not None
         if num:
-            parts.append(("num", FunctionTransformer(_finite), num))
+            num_steps = [("finite", FunctionTransformer(_finite))]
+            if sentinel:
+                num_steps.append(("missing", SimpleImputer(strategy="constant", fill_value=MISSING_SENTINEL,
+                                                           keep_empty_features=True)))
+            parts.append(("num", Pipeline(num_steps), num))
         if cat:
-            parts.append(("cat", OrdinalEncoder(handle_unknown="use_encoded_value", unknown_value=np.nan,
-                                                encoded_missing_value=np.nan, max_categories=250), cat))
+            fill = -1 if sentinel else np.nan  # category codes start at 0; must be an int here
+            parts.append(("cat", OrdinalEncoder(handle_unknown="use_encoded_value", unknown_value=fill,
+                                                encoded_missing_value=fill, max_categories=250), cat))
     if text:
         k = TFIDF_FEATURES_DENSE if model == "hgb" else TFIDF_FEATURES
         parts.append(("text", Pipeline([("str", FunctionTransformer(_as_text)),

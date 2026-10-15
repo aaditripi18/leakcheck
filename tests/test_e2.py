@@ -63,3 +63,18 @@ def test_run_one_end_to_end(tmp_path, monkeypatch):
     summary = e2.summarize([res])
     g = summary["macro_f1_gap"]["rf"]
     assert g["orig_minus_no_near"] > 0  # leaked rows inflate the score
+
+
+def test_rf_with_text_and_missing_values():
+    from experiments.models import MODELS, build
+
+    train, test, _ = make_split(n_train=400, n_test=100, seed=5)
+    for df in (train, test):
+        df["url"] = [f"http://site{i % 13}.example/{i}" for i in range(len(df))]
+        df["tld"] = np.where(df["f0"] > 0, "com", None)
+        df.loc[df.index[:7], "f1"] = np.nan
+    test.loc[0, "tld"] = "never-seen"
+    X, Xt = train.drop(columns="label"), test.drop(columns="label")
+    for m in MODELS:
+        pred = build(m, X, "url", 0).fit(X, train["label"]).predict(Xt)
+        assert len(pred) == len(test)
