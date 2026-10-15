@@ -755,7 +755,7 @@ def write_host_headers() -> None:
     (SITE / "vercel.json").write_text(json.dumps(config, indent=2) + "\n", encoding="utf-8")
     (SITE / "_headers").write_text("/*\n" + "".join(f"  {k}: {v}\n" for k, v in HEADERS.items()), encoding="utf-8")
     ignore = ["node_modules", "src", "package.json", "package-lock.json", "tailwind.config.cjs", "engine/cli.mjs",
-              "examples/examples.json"]
+              "examples/examples.json", ".env*", ".vercel"]
     (SITE / ".vercelignore").write_text("\n".join(ignore) + "\n", encoding="utf-8")
 
 

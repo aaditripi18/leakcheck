@@ -5,3 +5,5 @@ package-lock.json
 tailwind.config.cjs
 engine/cli.mjs
 examples/examples.json
+.env*
+.vercel
