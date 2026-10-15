@@ -1,92 +1,141 @@
 # leakcheck
 
-Security ML benchmarks report 99% accuracy. leakcheck measures how much of that
-comes from the test set overlapping the training set: exact and
+Security ML benchmarks report 99% accuracy. leakcheck measures how much of
+that comes from the test set overlapping the training set: exact and
 near-duplicates, contradictory labels, future data in training, and single
-columns that give the label away.
+columns that give the label away. It also removes the leakage, and proves the
+removal worked by re-scanning its own output.
+
+## Results
+
+8 benchmarks, 9.5M rows, 4 untuned baselines × 5 seeds. Every number below is
+generated from `results/ledger.jsonl` into [docs/RESULTS.md](docs/RESULTS.md);
+the narrative is in [docs/FINDINGS.md](docs/FINDINGS.md). The decision rules
+for each hypothesis were committed before the runs they govern.
+
+| Dataset | Test rows exactly copying a training row | Macro-F1 lost when leaked rows are removed (LR → HistGB) |
+|---|---|---|
+| KDD Cup 99 | **68.4%** | **17.5 → 15.0 points** |
+| NSL-KDD | 3.0% | 11.9 → 8.8 |
+| SMS Spam Collection | 11.0% | 3.1 → 2.5 |
+| EMBER 2018 (random split) | 0.01% | 2.4 → 1.3 |
+| UNSW-NB15 (official split) | 10.4% | 2.0 → 1.0 |
+| UCI Phishing Websites | **64.4%** | 1.5 → 0.8 |
+| CIC-IDS2017 | 14.1% | ≈ 0 |
+| PhiUSIIL | 0.0% | 0 (every model at 0.9999+) |
+
+| | Hypothesis | Verdict |
+|---|---|---|
+| H1 | At least half of the benchmarks have ≥ 5% of test rows copying a training row | **supported** (5 of 8) |
+| H2 | Removing the copies costs ≥ 5 macro-F1 points on the two most-copied benchmarks | **not supported**: KDD99 loses 15–17.5, UCI Phishing ≤ 1.7 |
+| H3 | A time-aware split costs more than deduplication | **supported** on EMBER, by a small margin (0.3–0.9 points) |
+| H4 | Weaker models lean harder on leaked rows | **supported** (LR gap > HistGB gap on 6 of 6 eligible datasets) |
+| H5 | Some benchmark has a single feature at ≥ 95% balanced accuracy | **supported** (PhiUSIIL `URLSimilarityIndex`, 99.6%) |
+
+What the numbers say:
+
+- **The copy rate alone does not predict inflation.** UCI Phishing has as many
+  copies as KDD99 but loses about a point: with 30 features of 2–3 values
+  each, a copy is a common pattern that a model would get right anyway. KDD99's
+  copies are memorised exceptions, and two thirds of its gap comes from
+  *near*-copies.
+- **Validated against the literature.** leakcheck reproduces the KDD99
+  redundancy tables of Tavallaee et al. (2009) exactly for the training set,
+  and to within 2 records for the test set. On synthetic data it recovers
+  planted leakage with zero error in 720 configurations.
+- **It does not flag everything.** EMBER's official temporal split comes back
+  clean: 0.009% exact copies and no training file newer than the test period.
+- **Some benchmarks are too easy to rank models.** PhiUSIIL stays at 0.9995+
+  macro-F1 even after removing the four features that each reach 95% alone.
+- **A random split can hide a collapse.** CIC-IDS2017 scores 0.97–0.999 on a
+  random split and 0.46–0.57 when tested on the later capture files, whose
+  attack types never appear in training.
+
+## Use it
 
 ```
-python -m leakcheck scan  --train train.csv --test test.csv --label label        [--time ts] [--group host] [--text url] [--ignore id] [--json report.json]
+pip install -e .
 
-python -m leakcheck clean --train train.csv --test test.csv --label label --out cleaned/        [--near-eps 0.01] [--text-tau 0.8] [--drop-group-overlap] [--dedup-within]        [--conflicts drop|majority|keep]
+python -m leakcheck scan --train train.csv --test test.csv --label label \
+    [--time ts] [--group host] [--text url] [--ignore id] [--json report.json]
+
+python -m leakcheck clean --train train.csv --test test.csv --label label --out cleaned/ \
+    [--near-eps 0.01] [--text-tau 0.8] [--drop-group-overlap] [--dedup-within] \
+    [--conflicts drop|majority|keep]
 ```
 
-`scan` exit code: 0 clean or minor, 1 medium findings, 2 high findings, 3 bad input.
+`scan` exits 0 when clean or minor, 1 on medium findings, 2 on high findings, 3
+on bad input.
 
 | Check | What it reports |
 |---|---|
 | L1 exact | rows repeated within train / within test; test rows identical to a training row (per class) |
-| L2 near (tabular) | test rows within an RMS distance of a training row, after signed-log + robust (median/IQR) scaling; categorical values must match exactly; exact nearest neighbour; 95% Wilson interval when sampled; same curve for held-out training rows as a baseline |
+| L2 near (tabular) | test rows within an RMS distance of a training row, after signed-log + robust (median/IQR) scaling; categorical values must match exactly; exact nearest neighbour; 95% Wilson interval when sampled; compared with the same curve for held-out training rows |
 | L2 near (text) | `--text` column: MinHash + LSH over 5-character shingles, every reported pair verified by exact Jaccard |
 | L3 conflict | identical features with different labels; the test-accuracy ceiling this forces; test rows whose training copies all disagree |
 | L4 temporal | training rows newer than the earliest / median / latest test row (TESSERACT constraint C1); per-class time ranges; timestamp as a one-feature classifier |
 | L5 shortcut | best one-feature classifier (balanced test accuracy); identifier-like columns |
 | L6 group | test rows whose host / family / session also appears in training |
 
-### `clean` proves its own output
-
-`clean` resolves conflicts, optionally removes within-split repeats, then drops
-test rows that leak from the final training set. It writes `train.csv`,
-`test.csv` and `clean_log.json`, then **re-reads the written files and
-re-checks every row** (no sampling). If any check it was asked to enforce still
-finds leakage, it exits with code 4. The log records SHA-256 of inputs and
+**`clean` proves its own output.** It resolves conflicts, optionally removes
+within-split repeats, then drops test rows that leak from the final training
+set. It writes `train.csv`, `test.csv` and `clean_log.json`, then re-reads the
+written files and re-checks every row. If anything it was asked to remove is
+still there, it exits with code 4. The log records SHA-256 of inputs and
 outputs, the options, and the input row number of every removed row with the
 reason.
 
-### Speed (laptop CPU)
+Speed on a laptop CPU: L1 + L3 + L5 on 1M train / 300k test rows in 31 s; L2
+tabular with 20k sampled test rows in 59 s; L2 text on 160k URLs in 16 s.
 
-| Workload | Time |
-|---|---|
-| L1 + L3 + L5, 1M train / 300k test, 40 features | 31 s |
-| L2 tabular, same split, 20k test rows sampled | 59 s |
-| L2 text, 120k / 40k URLs | 16 s |
+## Limitations
 
-`clean --near-eps` checks every test row, so expect roughly 30 s per 10k test
-rows against a 1M-row training set.
-
-## Status
-
-- Week 6 done: E2 on all 8 datasets, E4 shortcut ablation. Final verdicts:
-  H1 supported, H2 not supported, H3 supported (EMBER: temporal drift costs
-  slightly more than near-copy removal, by 0.3–0.9 points), H4 supported
-  (6/6), H5 supported. PhiUSIIL stays at 0.9995+ macro-F1 even without its
-  four ≥ 95% single features: it is too easy to rank models.
-- Week 5 done: E2 retraining on the five leakiest datasets. Removing leaked
-  test rows costs 15–17.5 macro-F1 points on KDD99 but under 2 points on UCI
-  Phishing despite equal duplication (H2 not supported: copy rate alone does
-  not predict inflation). LR leans on leaked rows more than HistGB on 4 of 4
-  eligible datasets (H4, provisional).
-- Weeks 1–4 done. E1 audit of 8 benchmarks (KDD99, NSL-KDD, UNSW-NB15,
-  CIC-IDS2017, EMBER 2018, UCI Phishing, PhiUSIIL, SMS Spam): 5 of 8 have
-  ≥ 5% of test rows exactly copying a training row (H1 supported); PhiUSIIL
-  has a single feature at 99.6% balanced accuracy (H5 supported); EMBER's
-  temporal split comes back clean (negative control).
-- Weeks 1–3: E0 validation: exact recovery of planted leakage (0 error
-  over 720 configurations), and the KDD99 redundancy figures of Tavallaee et
-  al. (2009) reproduced exactly for the training set and to within 2 records
-  for the test set. See [docs/RESULTS.md](docs/RESULTS.md) (generated) and
+- **A copy is not always a bug.** Real traffic repeats. The finding is that a
+  benchmark which rewards memorised repeats does not measure detection of new
+  attacks; both scores are reported.
+- **The cleaned test set is harder by construction**: it is the part unlike
+  the training data. The gap measures how much of a headline score was earned
+  on copies, not that a model is worse in every sense.
+- **Thresholds are choices.** Near-duplicate distance (0.01 RMS in scaled
+  space) and Jaccard (0.8) are fixed defaults; L2 also reports a curve and a
+  training-set baseline. The identifier heuristic is advisory, and has one
+  known false positive (KDD99 `dst_host_same_src_port_rate`).
+- **Baselines are untuned and training sets are capped at 300k rows**, so the
+  scores are typical, not state of the art.
+- **EMBER** is scanned on leakcheck's own ~680-column numeric view, not the
+  official 2,381-dimension vector (EMBER's code is AGPL and is not used); exact
+  duplicates use a digest of every raw feature instead.
+- **CIC-IDS2017's chronological split is confounded** with unseen attack types,
+  so H3 was decided on EMBER.
+- Open items before publication are listed at the end of
   [docs/FINDINGS.md](docs/FINDINGS.md).
-- Data provenance: [data/README.md](data/README.md).
 
-```
-python scripts/fetch.py
-python -m experiments.e0_sources && python -m experiments.e0_sources_week4
-python -m experiments.e0_synthetic && python -m experiments.e0_kdd
-python -m experiments.e1_audit      # ~45 min on a laptop CPU, EMBER is 30 of them
-python -m experiments.e2_retrain uci_phishing sms_spam unsw_nb15 kdd99 cicids2017 nslkdd phiusiil ember2018
-python -m experiments.e4_ablation phiusiil cicids2017
-python scripts/report.py
-```
+## Reproduce
 
-See [PLAN.md](PLAN.md) for hypotheses, datasets, experiments and timeline.
-
-## Development
+Everything runs on a laptop CPU; no GPU is needed. Downloads are verified
+against pinned SHA-256 hashes and resume after dropped connections. Where each
+dataset comes from, and how each copy was checked against an independent
+reference, is in [data/README.md](data/README.md).
 
 ```
 python -m venv .venv
 .venv/Scripts/python -m pip install -e ".[dev]"
-.venv/Scripts/python -m pytest
+.venv/Scripts/python -m pytest                       # 91 tests
+
+python scripts/fetch.py                              # ~2.1 GB, hash-verified
+python -m experiments.e0_sources && python -m experiments.e0_sources_week4
+python -m experiments.e0_synthetic && python -m experiments.e0_kdd
+python -m experiments.e1_audit                       # ~45 min, EMBER is 30 of them
+python -m experiments.e2_retrain uci_phishing sms_spam unsw_nb15 kdd99 cicids2017 nslkdd phiusiil ember2018
+python -m experiments.e4_ablation phiusiil cicids2017
+python scripts/report.py                             # docs/RESULTS.md + site/data.json
 ```
+
+Every run appends a line to `results/ledger.jsonl` with the git commit, dataset
+hashes, configuration and numbers. `docs/RESULTS.md` and `site/data.json` are
+generated from it and never edited by hand. Per-seed raw outputs are in
+`results/e2/` and `results/e4/`. [PLAN.md](PLAN.md) holds the hypotheses and
+every decision rule, with the date each was fixed.
 
 Tests use synthetic splits (`leakcheck/synth.py`) where every planted
 duplicate, conflict and shortcut is counted, and the checks must recover the

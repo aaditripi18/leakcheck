@@ -14,6 +14,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 LEDGER = ROOT / "results" / "ledger.jsonl"
 OUT = ROOT / "docs" / "RESULTS.md"
+SITE_DATA = ROOT / "site" / "data.json"
 
 
 def latest() -> dict[str, dict]:
@@ -124,7 +125,6 @@ def e1(runs: dict) -> list[str]:
            "| Dataset | Split | Test rows | Exact copies of train | Near-copies (x train baseline) | Text near-copies "
            "| Accuracy ceiling | Contradicted | Train after test start | Best single feature | Group overlap |",
            "|---|---|---|---|---|---|---|---|---|---|---|"]
-    h1, h5 = [], []
     for n in done:
         d = runs[f"e1_audit:{n}"]
         f, meta = _merged(d)
@@ -138,18 +138,7 @@ def e1(runs: dict) -> list[str]:
         out.append(f"| {n} | {split} | {meta['n_test']:,} | {v(f, 'L1.cross')} | {near} | {v(f, 'L2.near_text')} "
                    f"| {v(f, 'L3.ceiling')} | {v(f, 'L3.cross_contradict')} | {v(f, 'L4.after_test_start')} "
                    f"| {best} | {v(f, 'L6.group')} |")
-        h1.append(f["L1.cross"]["value"] >= 0.05)
-        if "L5.shortcut" in f:
-            h5.append((n, f["L5.shortcut"]["value"]))
     out += ["", "Ledger lines: " + ", ".join(f"`e1_audit:{n}` @ `{runs['e1_audit:' + n]['git']['commit']}`" for n in done), ""]
-    k = sum(h1)
-    out += ["### Hypotheses decided by E1 alone", "",
-            f"- **H1** (at least half of the audited benchmarks have >= 5% of test rows exactly duplicating a training "
-            f"row): {k} of {len(h1)} -> **{'supported' if 2 * k >= len(h1) else 'not supported'}**"
-            + ("" if len(h1) == len(E1_ORDER) else f" (provisional: {len(h1)} of {len(E1_ORDER)} datasets audited)") + ".",
-            f"- **H5** (at least one benchmark has a single feature reaching >= 0.95 balanced accuracy): "
-            + (", ".join(f"{n} {pct(x)}" for n, x in h5 if x >= 0.95) or "none")
-            + f" -> **{'supported' if any(x >= 0.95 for _, x in h5) else 'not supported'}**.", ""]
     return out
 
 
@@ -170,7 +159,6 @@ def e2(runs: dict) -> list[str]:
            "(original), on test rows with no exact training copy (no_exact), on rows with neither an exact nor a near "
            "copy (no_near), and on the removed rows alone (leaked). `time` = retrained on a chronological split. "
            "Gap = original minus cleaned, in points.", ""]
-    gaps = {}
     for n in done:
         d = runs[f"e2_retrain:{n}"]
         r = d["results"]
@@ -197,36 +185,72 @@ def e2(runs: dict) -> list[str]:
                 row += f" {cell('time')} | {pt(g.get('orig_minus_time'))} |"
             out.append(row)
         out.append("")
-        gaps[n] = r["macro_f1_gap"]
 
-    def verdict(ok: bool | None) -> str:
-        return "pending" if ok is None else ("supported" if ok else "not supported")
+    return out
 
-    # H2
-    h2_parts, h2 = [], None
+
+def _verdict(ok: bool | None) -> str:
+    return "pending" if ok is None else ("supported" if ok else "not supported")
+
+
+def hypotheses(runs: dict) -> list[dict]:
+    """H1-H5 under the rules in PLAN.md. Single source for RESULTS.md and site/data.json."""
+    e1 = {n: _merged(runs[f"e1_audit:{n}"])[0] for n in E1_ORDER if f"e1_audit:{n}" in runs}
+    gaps = {n: runs[f"e2_retrain:{n}"]["results"]["macro_f1_gap"] for n in E1_ORDER if f"e2_retrain:{n}" in runs}
+    complete_e1, complete_e2 = len(e1) == len(E1_ORDER), len(gaps) == len(E1_ORDER)
+    out = []
+
+    hit = [n for n, f in e1.items() if f["L1.cross"]["value"] >= 0.05]
+    out.append({"id": "H1", "statement": "At least half of the audited benchmarks have >= 5% of test rows exactly "
+                "duplicating a training row.",
+                "verdict": _verdict(2 * len(hit) >= len(e1) if complete_e1 else None),
+                "evidence": f"{len(hit)} of {len(e1)} datasets: " + ", ".join(
+                    f"{n} {pct(e1[n]['L1.cross']['value'])}" for n in sorted(hit, key=lambda n: -e1[n]['L1.cross']['value']))})
+
+    h2 = None
+    ev2 = "pending"
     if all(n in gaps for n in H2_DATASETS):
         per = {n: sum(gaps[n][m]["orig_minus_no_near"] >= 0.05 for m in MODELS) for n in H2_DATASETS}
         h2 = all(k >= 3 for k in per.values())
-        h2_parts = [f"{n}: {k}/4 models with gap >= 5 pt" for n, k in per.items()]
-    # H3
-    h3_lines = []
-    for n in done:
-        if all("orig_minus_time" in gaps[n][m] for m in MODELS):
-            k = sum(gaps[n][m]["orig_minus_time"] > gaps[n][m]["orig_minus_no_near"] for m in MODELS)
-            h3_lines.append(f"{n}: time gap > no_near gap for {k}/4 models -> {verdict(k >= 3)}")
-    # H4
-    eligible = [n for n in done if max(abs(gaps[n]["lr"]["orig_minus_no_near"]), abs(gaps[n]["hgb"]["orig_minus_no_near"])) >= 0.01]
-    lr_wins = [n for n in eligible if gaps[n]["lr"]["orig_minus_no_near"] > gaps[n]["hgb"]["orig_minus_no_near"]]
-    h4 = (2 * len(lr_wins) > len(eligible)) if eligible else None
-    out += ["### Hypotheses (rules fixed in PLAN.md before any E2 run)", "",
-            f"- **H2** (cleaning costs >= 5 macro-F1 points on the two most affected datasets): "
-            + ("; ".join(h2_parts) + " -> " if h2_parts else "") + f"**{verdict(h2)}**.",
-            "- **H3** (a time split costs more than deduplication): "
-            + ("; ".join(h3_lines) if h3_lines else "**pending**") + ".",
-            f"- **H4** (the leakage gap is larger for LR than for HistGB): LR gap > HGB gap on {len(lr_wins)} of "
-            f"{len(eligible)} eligible datasets ({', '.join(lr_wins) or 'none'}) -> **{verdict(h4)}**"
-            + (" (provisional until all 8 datasets are in)" if len(done) < len(E1_ORDER) else "") + ".", ""]
+        ev2 = "; ".join(f"{n}: {k}/4 models lose >= 5 macro-F1 points (gaps " + ", ".join(
+            pt(gaps[n][m]["orig_minus_no_near"]) for m in MODELS) + ")" for n, k in per.items())
+    out.append({"id": "H2", "statement": "On the most affected benchmarks, removing cross-split duplicates and "
+                "near-duplicates lowers macro-F1 of the standard baselines by >= 5 points.",
+                "verdict": _verdict(h2), "evidence": ev2})
+
+    h3_per = {}
+    for n, g in gaps.items():
+        if all("orig_minus_time" in g[m] for m in MODELS):
+            h3_per[n] = sum(g[m]["orig_minus_time"] > g[m]["orig_minus_no_near"] for m in MODELS)
+    h3 = (h3_per["ember2018"] >= 3) if "ember2018" in h3_per else None
+    out.append({"id": "H3", "statement": "A time-aware split costs more accuracy than deduplication (decided on EMBER; "
+                "CIC-IDS2017's chronological split is confounded with unseen attack types).",
+                "verdict": _verdict(h3),
+                "evidence": "; ".join(f"{n}: time gap > no_near gap for {k}/4 models" for n, k in h3_per.items()) or "pending"})
+
+    eligible = [n for n, g in gaps.items() if max(abs(g["lr"]["orig_minus_no_near"]), abs(g["hgb"]["orig_minus_no_near"])) >= 0.01]
+    wins = [n for n in eligible if gaps[n]["lr"]["orig_minus_no_near"] > gaps[n]["hgb"]["orig_minus_no_near"]]
+    out.append({"id": "H4", "statement": "The accuracy lost to leakage shrinks as model strength grows: the gap for "
+                "logistic regression exceeds the gap for gradient boosting.",
+                "verdict": _verdict((2 * len(wins) > len(eligible)) if eligible and complete_e2 else None),
+                "evidence": f"LR gap > HistGB gap on {len(wins)} of {len(eligible)} eligible datasets: " + ", ".join(
+                    f"{n} {pt(gaps[n]['lr']['orig_minus_no_near'])} vs {pt(gaps[n]['hgb']['orig_minus_no_near'])}" for n in eligible)})
+
+    flag = [(n, f["L5.shortcut"]["value"], f["L5.shortcut"]["top"][0]["feature"]) for n, f in e1.items()
+            if "L5.shortcut" in f and f["L5.shortcut"]["value"] >= 0.95]
+    out.append({"id": "H5", "statement": "At least one widely used benchmark has a single feature reaching >= 0.95 "
+                "balanced accuracy on its own.",
+                "verdict": _verdict(bool(flag) if complete_e1 else None),
+                "evidence": ", ".join(f"{n}: {feat} {pct(x)}" for n, x, feat in flag) or "none"})
     return out
+
+
+def hypotheses_md(runs: dict) -> list[str]:
+    hs = hypotheses(runs)
+    out = ["## Hypothesis verdicts", "", "Decision rules were committed in PLAN.md before the runs they govern.", "",
+           "| | Hypothesis | Verdict | Evidence |", "|---|---|---|---|"]
+    out += [f"| {h['id']} | {h['statement']} | **{h['verdict']}** | {h['evidence']} |" for h in hs]
+    return out + [""]
 
 
 def e4(runs: dict) -> list[str]:
@@ -256,10 +280,111 @@ def e4(runs: dict) -> list[str]:
     return out
 
 
+DISPLAY = {
+    "kdd99": ("KDD Cup 99", "Network intrusion"), "nslkdd": ("NSL-KDD", "Network intrusion"),
+    "unsw_nb15": ("UNSW-NB15", "Network intrusion"), "cicids2017": ("CIC-IDS2017", "Network intrusion"),
+    "ember2018": ("EMBER 2018", "Malware (PE files)"), "uci_phishing": ("UCI Phishing Websites", "Phishing"),
+    "phiusiil": ("PhiUSIIL", "Phishing URLs"), "sms_spam": ("SMS Spam Collection", "Spam"),
+}
+CHECKS = [
+    {"id": "L1", "name": "Exact copies", "what": "Test rows identical to a training row, after canonical hashing."},
+    {"id": "L2", "name": "Near copies", "what": "Test rows within a tiny distance of a training row (tabular), or "
+     "Jaccard >= 0.8 (text, MinHash + exact check), compared with how close training rows sit to each other."},
+    {"id": "L3", "name": "Label conflicts", "what": "Identical features with different labels, and the accuracy "
+     "ceiling they impose."},
+    {"id": "L4", "name": "Time leakage", "what": "Training rows newer than test rows, and the timestamp as a "
+     "one-feature classifier."},
+    {"id": "L5", "name": "Shortcuts", "what": "A single feature that predicts the label on its own, and "
+     "identifier-like columns."},
+    {"id": "L6", "name": "Group overlap", "what": "The same host, family or session on both sides of the split."},
+]
+
+
+def _num(x):
+    return None if x is None or x != x else round(float(x), 6)
+
+
+def site_data(runs: dict) -> dict:
+    """Every number the project page shows, straight from the ledger."""
+    used = []
+
+    def ref(key):
+        used.append(f"{key} @ {runs[key]['git']['commit']}")
+        return {"ledger": key, "commit": runs[key]["git"]["commit"]}
+
+    audit, retrain, ablation = [], [], []
+    for n in E1_ORDER:
+        name, domain = DISPLAY[n]
+        if f"e1_audit:{n}" in runs:
+            d = runs[f"e1_audit:{n}"]
+            f, meta = _merged(d)
+            g = lambda c, k="value": _num(f[c].get(k)) if c in f else None  # noqa: E731
+            top = f.get("L5.shortcut", {}).get("top", [{}])[0]
+            audit.append({
+                "id": n, "name": name, "domain": domain,
+                "split": "official" if d["results"]["split_policy"].startswith("official") else "random 80/20",
+                "n_train": meta["n_train"], "n_test": meta["n_test"],
+                "exact_copies": g("L1.cross"), "near_copies": g("L2.near"), "near_vs_baseline": g("L2.near", "vs_train_baseline"),
+                "text_near_copies": g("L2.near_text"), "accuracy_ceiling": g("L3.ceiling"),
+                "contradicted": g("L3.cross_contradict"), "train_after_test_start": g("L4.after_test_start"),
+                "best_single_feature": top.get("feature"), "best_single_feature_bacc": g("L5.shortcut"),
+                "group_overlap": g("L6.group"), "source": ref(f"e1_audit:{n}"),
+            })
+        if f"e2_retrain:{n}" in runs:
+            d = runs[f"e2_retrain:{n}"]
+            r = d["results"]
+            models = {}
+            for m in MODELS:
+                bm, gp = r["by_model"][m], r["macro_f1_gap"][m]
+                models[m] = {
+                    "original": _num(bm["original"]["macro_f1_mean"]), "no_exact": _num(bm["no_exact"]["macro_f1_mean"]),
+                    "no_near": _num(bm["no_near"]["macro_f1_mean"]),
+                    "leaked": _num(bm["leaked"]["macro_f1_mean"]) if "leaked" in bm else None,
+                    "gap_no_exact": _num(gp["orig_minus_no_exact"]), "gap_no_near": _num(gp["orig_minus_no_near"]),
+                    "time": _num(bm["time"]["macro_f1_mean"]) if "time" in bm else None,
+                    "gap_time": _num(gp.get("orig_minus_time")),
+                }
+            retrain.append({"id": n, "name": name, "leaked_exact": _num(r["leak_rate_mean"]["exact"]),
+                            "leaked_near": _num(r["leak_rate_mean"]["near"]), "n_train_used": r["n_train"],
+                            "models": models, "source": ref(f"e2_retrain:{n}")})
+        if f"e4_ablation:{n}" in runs:
+            d = runs[f"e4_ablation:{n}"]
+            r = d["results"]
+            for c, v in r["conditions"].items():
+                after = (v.get("best_single_feature_after") or [{}])[0]
+                ablation.append({"id": n, "name": name, "condition": c, "dropped": v["dropped"],
+                                 "macro_f1": {m: _num(v["models"][m]["macro_f1_mean"]) for m in MODELS},
+                                 "drop_vs_full": {m: _num(r["macro_f1_drop_vs_full"].get(c, {}).get(m)) for m in MODELS},
+                                 "best_single_feature_after": after.get("feature"),
+                                 "best_single_feature_after_bacc": _num(after.get("balanced_acc")),
+                                 "source": ref(f"e4_ablation:{n}")})
+    validation = {}
+    if "e0_kdd" in runs:
+        validation["tavallaee"] = {"rows": runs["e0_kdd"]["results"]["tavallaee_comparison"], "source": ref("e0_kdd")}
+    if "e0_synthetic" in runs:
+        r = runs["e0_synthetic"]["results"]
+        validation["synthetic"] = {"configurations": r["exact_recovery"]["cells"],
+                                   "max_abs_error": r["exact_recovery"]["max_abs_error"],
+                                   "interval_coverage": r["interval_coverage"]["coverage"],
+                                   "minhash_recall": {k: v["recall"] for k, v in r["minhash"]["recall_by_jaccard"].items()},
+                                   "source": ref("e0_synthetic")}
+    rows = sum(a["n_train"] + a["n_test"] for a in audit)
+    return {
+        "generated_from": "results/ledger.jsonl via scripts/report.py",
+        "ledger_lines": sorted(set(used)),
+        "summary": {"datasets": len(audit), "rows_audited": rows,
+                    "datasets_with_5pct_exact_copies": sum((a["exact_copies"] or 0) >= 0.05 for a in audit),
+                    "models": list(MODELS), "seeds": 5},
+        "checks": CHECKS, "hypotheses": hypotheses(runs), "audit": audit, "retrain": retrain,
+        "ablation": ablation, "validation": validation,
+    }
+
+
 def main() -> None:
     runs = latest()
     lines = ["# Results", "",
              "Generated by `scripts/report.py` from `results/ledger.jsonl`. Do not edit by hand.", ""]
+    lines += hypotheses_md(runs)
     for name, fn in (("e0_sources", e0_sources), ("e0_synthetic", e0_synthetic), ("e0_kdd", e0_kdd)):
         if name in runs:
             lines += fn(runs[name])
@@ -269,6 +394,9 @@ def main() -> None:
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text("\n".join(lines), encoding="utf-8")
     print(f"wrote {OUT}")
+    SITE_DATA.parent.mkdir(parents=True, exist_ok=True)
+    SITE_DATA.write_text(json.dumps(site_data(runs), indent=1), encoding="utf-8")
+    print(f"wrote {SITE_DATA}")
 
 
 if __name__ == "__main__":

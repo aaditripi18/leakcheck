@@ -48,8 +48,15 @@ overlap across sets, using features only on the binary attack/normal task:
 
 **2.95% of KDDTest+ rows (664) are feature-identical to a KDDTrain+ row**
 (4.36% of attack rows, 1.08% of normal rows). That is far below KDD99's 68%,
-but not zero. Re-checking the paper's wording on whether cross-set repeats were
-meant to be removed is a to-do before stating this publicly.
+but not zero.
+
+This matches what the paper says it did. Section V: "we first removed all the
+redundant records in **both** train and test sets", meaning within each set.
+KDDTrain+ and KDDTest+ were then sampled separately from the distinct KDD99
+train and test records (Tables III and IV). The paper never mentions overlap
+*between* the two sets. So this is a gap the construction does not address, not
+a broken promise: NSL-KDD fixed within-set redundancy and left cross-set
+copies in place.
 
 ## 5. Calibration note: L2 near-duplicate severity needs its baseline
 
@@ -318,8 +325,8 @@ information in packet-size statistics.
 - How the PhiUSIIL paper defines URLSimilarityIndex. Neither the UCI page nor
   the Mendeley entry describes it; it is in the paywalled paper
   (doi:10.1016/j.cose.2023.103545).
-- Whether Tavallaee et al. meant NSL-KDD's de-duplication to cover train/test
-  overlap (§4).
+- ~~Whether Tavallaee et al. meant NSL-KDD's de-duplication to cover train/test
+  overlap.~~ Resolved: the paper removes redundancy within each set only (§4).
 - The origin of EMBER 2018's 50,000 pre-2018 training files (§11).
 - **Pipeline fix found in week 6:** scikit-learn's RandomForest takes NaN only
   in dense input. With a text column, the input is sparse, so missing values

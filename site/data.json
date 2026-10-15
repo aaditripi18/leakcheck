@@ -1,0 +1,954 @@
+{
+ "generated_from": "results/ledger.jsonl via scripts/report.py",
+ "ledger_lines": [
+  "e0_kdd @ 0f452ad",
+  "e0_synthetic @ 0f452ad",
+  "e1_audit:cicids2017 @ 6780929",
+  "e1_audit:ember2018 @ 5074849",
+  "e1_audit:kdd99 @ 6780929",
+  "e1_audit:nslkdd @ 6780929",
+  "e1_audit:phiusiil @ 6780929",
+  "e1_audit:sms_spam @ 6780929",
+  "e1_audit:uci_phishing @ 6780929",
+  "e1_audit:unsw_nb15 @ 6780929",
+  "e2_retrain:cicids2017 @ 42caa56",
+  "e2_retrain:ember2018 @ ad29867",
+  "e2_retrain:kdd99 @ 42caa56",
+  "e2_retrain:nslkdd @ 8821fdf",
+  "e2_retrain:phiusiil @ ad29867",
+  "e2_retrain:sms_spam @ 42caa56",
+  "e2_retrain:uci_phishing @ 42caa56",
+  "e2_retrain:unsw_nb15 @ 42caa56",
+  "e4_ablation:cicids2017 @ ad29867",
+  "e4_ablation:phiusiil @ ad29867"
+ ],
+ "summary": {
+  "datasets": 8,
+  "rows_audited": 9498817,
+  "datasets_with_5pct_exact_copies": 5,
+  "models": [
+   "lr",
+   "rf",
+   "hgb",
+   "mlp"
+  ],
+  "seeds": 5
+ },
+ "checks": [
+  {
+   "id": "L1",
+   "name": "Exact copies",
+   "what": "Test rows identical to a training row, after canonical hashing."
+  },
+  {
+   "id": "L2",
+   "name": "Near copies",
+   "what": "Test rows within a tiny distance of a training row (tabular), or Jaccard >= 0.8 (text, MinHash + exact check), compared with how close training rows sit to each other."
+  },
+  {
+   "id": "L3",
+   "name": "Label conflicts",
+   "what": "Identical features with different labels, and the accuracy ceiling they impose."
+  },
+  {
+   "id": "L4",
+   "name": "Time leakage",
+   "what": "Training rows newer than test rows, and the timestamp as a one-feature classifier."
+  },
+  {
+   "id": "L5",
+   "name": "Shortcuts",
+   "what": "A single feature that predicts the label on its own, and identifier-like columns."
+  },
+  {
+   "id": "L6",
+   "name": "Group overlap",
+   "what": "The same host, family or session on both sides of the split."
+  }
+ ],
+ "hypotheses": [
+  {
+   "id": "H1",
+   "statement": "At least half of the audited benchmarks have >= 5% of test rows exactly duplicating a training row.",
+   "verdict": "supported",
+   "evidence": "5 of 8 datasets: kdd99 68.36%, uci_phishing 64.41%, cicids2017 14.09%, sms_spam 11.03%, unsw_nb15 10.37%"
+  },
+  {
+   "id": "H2",
+   "statement": "On the most affected benchmarks, removing cross-split duplicates and near-duplicates lowers macro-F1 of the standard baselines by >= 5 points.",
+   "verdict": "not supported",
+   "evidence": "kdd99: 4/4 models lose >= 5 macro-F1 points (gaps +17.51, +16.27, +15.00, +15.95); uci_phishing: 0/4 models lose >= 5 macro-F1 points (gaps +1.51, +1.05, +0.81, +1.67)"
+  },
+  {
+   "id": "H3",
+   "statement": "A time-aware split costs more accuracy than deduplication (decided on EMBER; CIC-IDS2017's chronological split is confounded with unseen attack types).",
+   "verdict": "supported",
+   "evidence": "cicids2017: time gap > no_near gap for 4/4 models; ember2018: time gap > no_near gap for 4/4 models"
+  },
+  {
+   "id": "H4",
+   "statement": "The accuracy lost to leakage shrinks as model strength grows: the gap for logistic regression exceeds the gap for gradient boosting.",
+   "verdict": "supported",
+   "evidence": "LR gap > HistGB gap on 6 of 6 eligible datasets: kdd99 +17.51 vs +15.00, nslkdd +11.86 vs +8.81, unsw_nb15 +2.01 vs +1.02, ember2018 +2.39 vs +1.30, uci_phishing +1.51 vs +0.81, sms_spam +3.07 vs +2.49"
+  },
+  {
+   "id": "H5",
+   "statement": "At least one widely used benchmark has a single feature reaching >= 0.95 balanced accuracy on its own.",
+   "verdict": "supported",
+   "evidence": "phiusiil: URLSimilarityIndex 99.60%"
+  }
+ ],
+ "audit": [
+  {
+   "id": "kdd99",
+   "name": "KDD Cup 99",
+   "domain": "Network intrusion",
+   "split": "official",
+   "n_train": 4898431,
+   "n_test": 311029,
+   "exact_copies": 0.683576,
+   "near_copies": 0.14805,
+   "near_vs_baseline": 1.365145,
+   "text_near_copies": null,
+   "accuracy_ceiling": 0.981651,
+   "contradicted": 0.010542,
+   "train_after_test_start": null,
+   "best_single_feature": "src_bytes",
+   "best_single_feature_bacc": 0.938033,
+   "group_overlap": null,
+   "source": {
+    "ledger": "e1_audit:kdd99",
+    "commit": "6780929"
+   }
+  },
+  {
+   "id": "nslkdd",
+   "name": "NSL-KDD",
+   "domain": "Network intrusion",
+   "split": "official",
+   "n_train": 125973,
+   "n_test": 22544,
+   "exact_copies": 0.029454,
+   "near_copies": 0.3013,
+   "near_vs_baseline": 0.597225,
+   "text_near_copies": null,
+   "accuracy_ceiling": 0.997605,
+   "contradicted": 0.002085,
+   "train_after_test_start": null,
+   "best_single_feature": "src_bytes",
+   "best_single_feature_bacc": 0.83008,
+   "group_overlap": null,
+   "source": {
+    "ledger": "e1_audit:nslkdd",
+    "commit": "6780929"
+   }
+  },
+  {
+   "id": "unsw_nb15",
+   "name": "UNSW-NB15",
+   "domain": "Network intrusion",
+   "split": "official",
+   "n_train": 175341,
+   "n_test": 82332,
+   "exact_copies": 0.103739,
+   "near_copies": 0.07465,
+   "near_vs_baseline": 1.354809,
+   "text_near_copies": null,
+   "accuracy_ceiling": 0.999927,
+   "contradicted": 0.003595,
+   "train_after_test_start": null,
+   "best_single_feature": "smean",
+   "best_single_feature_bacc": 0.791312,
+   "group_overlap": null,
+   "source": {
+    "ledger": "e1_audit:unsw_nb15",
+    "commit": "6780929"
+   }
+  },
+  {
+   "id": "cicids2017",
+   "name": "CIC-IDS2017",
+   "domain": "Network intrusion",
+   "split": "random 80/20",
+   "n_train": 2264594,
+   "n_test": 566149,
+   "exact_copies": 0.140899,
+   "near_copies": 0.62665,
+   "near_vs_baseline": 0.981748,
+   "text_near_copies": null,
+   "accuracy_ceiling": 0.999901,
+   "contradicted": 0.000332,
+   "train_after_test_start": 0.812881,
+   "best_single_feature": "Destination Port",
+   "best_single_feature_bacc": 0.901697,
+   "group_overlap": null,
+   "source": {
+    "ledger": "e1_audit:cicids2017",
+    "commit": "6780929"
+   }
+  },
+  {
+   "id": "ember2018",
+   "name": "EMBER 2018",
+   "domain": "Malware (PE files)",
+   "split": "official",
+   "n_train": 600000,
+   "n_test": 200000,
+   "exact_copies": 9e-05,
+   "near_copies": 0.1995,
+   "near_vs_baseline": 0.794346,
+   "text_near_copies": null,
+   "accuracy_ceiling": 1.0,
+   "contradicted": 0.0,
+   "train_after_test_start": 0.0,
+   "best_single_feature": "sec_entropy_max",
+   "best_single_feature_bacc": 0.716925,
+   "group_overlap": 0.49479,
+   "source": {
+    "ledger": "e1_audit:ember2018",
+    "commit": "5074849"
+   }
+  },
+  {
+   "id": "uci_phishing",
+   "name": "UCI Phishing Websites",
+   "domain": "Phishing",
+   "split": "random 80/20",
+   "n_train": 8844,
+   "n_test": 2211,
+   "exact_copies": 0.644052,
+   "near_copies": 0.0,
+   "near_vs_baseline": null,
+   "text_near_copies": null,
+   "accuracy_ceiling": 0.993216,
+   "contradicted": 0.010403,
+   "train_after_test_start": null,
+   "best_single_feature": "SSLfinal_State",
+   "best_single_feature_bacc": 0.903344,
+   "group_overlap": null,
+   "source": {
+    "ledger": "e1_audit:uci_phishing",
+    "commit": "6780929"
+   }
+  },
+  {
+   "id": "phiusiil",
+   "name": "PhiUSIIL",
+   "domain": "Phishing URLs",
+   "split": "random 80/20",
+   "n_train": 188636,
+   "n_test": 47159,
+   "exact_copies": 0.0,
+   "near_copies": 0.0031,
+   "near_vs_baseline": 1.319149,
+   "text_near_copies": 0.03985,
+   "accuracy_ceiling": 1.0,
+   "contradicted": 0.0,
+   "train_after_test_start": null,
+   "best_single_feature": "URLSimilarityIndex",
+   "best_single_feature_bacc": 0.995988,
+   "group_overlap": null,
+   "source": {
+    "ledger": "e1_audit:phiusiil",
+    "commit": "6780929"
+   }
+  },
+  {
+   "id": "sms_spam",
+   "name": "SMS Spam Collection",
+   "domain": "Spam",
+   "split": "random 80/20",
+   "n_train": 4459,
+   "n_test": 1115,
+   "exact_copies": 0.110314,
+   "near_copies": null,
+   "near_vs_baseline": null,
+   "text_near_copies": 0.022422,
+   "accuracy_ceiling": 1.0,
+   "contradicted": 0.0,
+   "train_after_test_start": null,
+   "best_single_feature": "message",
+   "best_single_feature_bacc": 0.580537,
+   "group_overlap": null,
+   "source": {
+    "ledger": "e1_audit:sms_spam",
+    "commit": "6780929"
+   }
+  }
+ ],
+ "retrain": [
+  {
+   "id": "kdd99",
+   "name": "KDD Cup 99",
+   "leaked_exact": 0.559223,
+   "leaked_near": 0.780271,
+   "n_train_used": 300000,
+   "models": {
+    "lr": {
+     "original": 0.888593,
+     "no_exact": 0.840594,
+     "no_near": 0.713485,
+     "leaked": 0.92378,
+     "gap_no_exact": 0.047999,
+     "gap_no_near": 0.175108,
+     "time": null,
+     "gap_time": null
+    },
+    "rf": {
+     "original": 0.893945,
+     "no_exact": 0.848995,
+     "no_near": 0.731238,
+     "leaked": 0.923814,
+     "gap_no_exact": 0.04495,
+     "gap_no_near": 0.162707,
+     "time": null,
+     "gap_time": null
+    },
+    "hgb": {
+     "original": 0.896514,
+     "no_exact": 0.854091,
+     "no_near": 0.746551,
+     "leaked": 0.923805,
+     "gap_no_exact": 0.042423,
+     "gap_no_near": 0.149962,
+     "time": null,
+     "gap_time": null
+    },
+    "mlp": {
+     "original": 0.892774,
+     "no_exact": 0.848045,
+     "no_near": 0.733299,
+     "leaked": 0.9238,
+     "gap_no_exact": 0.044729,
+     "gap_no_near": 0.159475,
+     "time": null,
+     "gap_time": null
+    }
+   },
+   "source": {
+    "ledger": "e2_retrain:kdd99",
+    "commit": "42caa56"
+   }
+  },
+  {
+   "id": "nslkdd",
+   "name": "NSL-KDD",
+   "leaked_exact": 0.029454,
+   "leaked_near": 0.330687,
+   "n_train_used": 125973,
+   "models": {
+    "lr": {
+     "original": 0.746471,
+     "no_exact": 0.740484,
+     "no_near": 0.627853,
+     "leaked": 0.980204,
+     "gap_no_exact": 0.005987,
+     "gap_no_near": 0.118618,
+     "time": null,
+     "gap_time": null
+    },
+    "rf": {
+     "original": 0.76881,
+     "no_exact": 0.763195,
+     "no_near": 0.659248,
+     "leaked": 0.981713,
+     "gap_no_exact": 0.005615,
+     "gap_no_near": 0.109562,
+     "time": null,
+     "gap_time": null
+    },
+    "hgb": {
+     "original": 0.805523,
+     "no_exact": 0.80157,
+     "no_near": 0.71741,
+     "leaked": 0.981767,
+     "gap_no_exact": 0.003953,
+     "gap_no_near": 0.088113,
+     "time": null,
+     "gap_time": null
+    },
+    "mlp": {
+     "original": 0.813621,
+     "no_exact": 0.810031,
+     "no_near": 0.729992,
+     "leaked": 0.981848,
+     "gap_no_exact": 0.00359,
+     "gap_no_near": 0.083629,
+     "time": null,
+     "gap_time": null
+    }
+   },
+   "source": {
+    "ledger": "e2_retrain:nslkdd",
+    "commit": "8821fdf"
+   }
+  },
+  {
+   "id": "unsw_nb15",
+   "name": "UNSW-NB15",
+   "leaked_exact": 0.103739,
+   "leaked_near": 0.178873,
+   "n_train_used": 175341,
+   "models": {
+    "lr": {
+     "original": 0.827017,
+     "no_exact": 0.818669,
+     "no_near": 0.806924,
+     "leaked": 0.92675,
+     "gap_no_exact": 0.008348,
+     "gap_no_near": 0.020093,
+     "time": null,
+     "gap_time": null
+    },
+    "rf": {
+     "original": 0.866334,
+     "no_exact": 0.860748,
+     "no_near": 0.854755,
+     "leaked": 0.919137,
+     "gap_no_exact": 0.005586,
+     "gap_no_near": 0.011579,
+     "time": null,
+     "gap_time": null
+    },
+    "hgb": {
+     "original": 0.867534,
+     "no_exact": 0.862883,
+     "no_near": 0.857333,
+     "leaked": 0.91203,
+     "gap_no_exact": 0.004652,
+     "gap_no_near": 0.010201,
+     "time": null,
+     "gap_time": null
+    },
+    "mlp": {
+     "original": 0.861304,
+     "no_exact": 0.854945,
+     "no_near": 0.846171,
+     "leaked": 0.93371,
+     "gap_no_exact": 0.006359,
+     "gap_no_near": 0.015133,
+     "time": null,
+     "gap_time": null
+    }
+   },
+   "source": {
+    "ledger": "e2_retrain:unsw_nb15",
+    "commit": "42caa56"
+   }
+  },
+  {
+   "id": "cicids2017",
+   "name": "CIC-IDS2017",
+   "leaked_exact": 0.070576,
+   "leaked_near": 0.66913,
+   "n_train_used": 300000,
+   "models": {
+    "lr": {
+     "original": 0.970747,
+     "no_exact": 0.968734,
+     "no_near": 0.973277,
+     "leaked": 0.969556,
+     "gap_no_exact": 0.002013,
+     "gap_no_near": -0.00253,
+     "time": 0.56543,
+     "gap_time": 0.405316
+    },
+    "rf": {
+     "original": 0.997464,
+     "no_exact": 0.99726,
+     "no_near": 0.998846,
+     "leaked": 0.996827,
+     "gap_no_exact": 0.000204,
+     "gap_no_near": -0.001382,
+     "time": 0.562171,
+     "gap_time": 0.435293
+    },
+    "hgb": {
+     "original": 0.998547,
+     "no_exact": 0.998447,
+     "no_near": 0.999372,
+     "leaked": 0.998167,
+     "gap_no_exact": 0.0001,
+     "gap_no_near": -0.000825,
+     "time": 0.461895,
+     "gap_time": 0.536652
+    },
+    "mlp": {
+     "original": 0.996309,
+     "no_exact": 0.996171,
+     "no_near": 0.998322,
+     "leaked": 0.995382,
+     "gap_no_exact": 0.000138,
+     "gap_no_near": -0.002013,
+     "time": 0.515907,
+     "gap_time": 0.480402
+    }
+   },
+   "source": {
+    "ledger": "e2_retrain:cicids2017",
+    "commit": "42caa56"
+   }
+  },
+  {
+   "id": "ember2018",
+   "name": "EMBER 2018",
+   "leaked_exact": 0.000139,
+   "leaked_near": 0.235957,
+   "n_train_used": 300000,
+   "models": {
+    "lr": {
+     "original": 0.867079,
+     "no_exact": 0.867072,
+     "no_near": 0.843187,
+     "leaked": 0.906184,
+     "gap_no_exact": 7e-06,
+     "gap_no_near": 0.023892,
+     "time": 0.840602,
+     "gap_time": 0.026477
+    },
+    "rf": {
+     "original": 0.957874,
+     "no_exact": 0.957868,
+     "no_near": 0.943171,
+     "leaked": 0.999149,
+     "gap_no_exact": 6e-06,
+     "gap_no_near": 0.014704,
+     "time": 0.937835,
+     "gap_time": 0.02004
+    },
+    "hgb": {
+     "original": 0.95357,
+     "no_exact": 0.953564,
+     "no_near": 0.940583,
+     "leaked": 0.985364,
+     "gap_no_exact": 6e-06,
+     "gap_no_near": 0.012987,
+     "time": 0.934858,
+     "gap_time": 0.018713
+    },
+    "mlp": {
+     "original": 0.956184,
+     "no_exact": 0.956179,
+     "no_near": 0.942384,
+     "leaked": 0.992679,
+     "gap_no_exact": 4e-06,
+     "gap_no_near": 0.0138,
+     "time": 0.933473,
+     "gap_time": 0.02271
+    }
+   },
+   "source": {
+    "ledger": "e2_retrain:ember2018",
+    "commit": "ad29867"
+   }
+  },
+  {
+   "id": "uci_phishing",
+   "name": "UCI Phishing Websites",
+   "leaked_exact": 0.653641,
+   "leaked_near": 0.653641,
+   "n_train_used": 8844,
+   "models": {
+    "lr": {
+     "original": 0.927782,
+     "no_exact": 0.912655,
+     "no_near": 0.912655,
+     "leaked": 0.931726,
+     "gap_no_exact": 0.015126,
+     "gap_no_near": 0.015126,
+     "time": null,
+     "gap_time": null
+    },
+    "rf": {
+     "original": 0.97029,
+     "no_exact": 0.959822,
+     "no_near": 0.959822,
+     "leaked": 0.974135,
+     "gap_no_exact": 0.010468,
+     "gap_no_near": 0.010468,
+     "time": null,
+     "gap_time": null
+    },
+    "hgb": {
+     "original": 0.968836,
+     "no_exact": 0.960758,
+     "no_near": 0.960758,
+     "leaked": 0.971198,
+     "gap_no_exact": 0.008078,
+     "gap_no_near": 0.008078,
+     "time": null,
+     "gap_time": null
+    },
+    "mlp": {
+     "original": 0.961489,
+     "no_exact": 0.944803,
+     "no_near": 0.944803,
+     "leaked": 0.968215,
+     "gap_no_exact": 0.016687,
+     "gap_no_near": 0.016687,
+     "time": null,
+     "gap_time": null
+    }
+   },
+   "source": {
+    "ledger": "e2_retrain:uci_phishing",
+    "commit": "42caa56"
+   }
+  },
+  {
+   "id": "phiusiil",
+   "name": "PhiUSIIL",
+   "leaked_exact": 0.0,
+   "leaked_near": 0.044696,
+   "n_train_used": 188636,
+   "models": {
+    "lr": {
+     "original": 0.999896,
+     "no_exact": 0.999896,
+     "no_near": 0.99989,
+     "leaked": 1.0,
+     "gap_no_exact": 0.0,
+     "gap_no_near": 6e-06,
+     "time": null,
+     "gap_time": null
+    },
+    "rf": {
+     "original": 0.999944,
+     "no_exact": 0.999944,
+     "no_near": 0.99994,
+     "leaked": 1.0,
+     "gap_no_exact": 0.0,
+     "gap_no_near": 3e-06,
+     "time": null,
+     "gap_time": null
+    },
+    "hgb": {
+     "original": 1.0,
+     "no_exact": 1.0,
+     "no_near": 1.0,
+     "leaked": 1.0,
+     "gap_no_exact": 0.0,
+     "gap_no_near": 0.0,
+     "time": null,
+     "gap_time": null
+    },
+    "mlp": {
+     "original": 0.999939,
+     "no_exact": 0.999939,
+     "no_near": 0.999936,
+     "leaked": 1.0,
+     "gap_no_exact": 0.0,
+     "gap_no_near": 4e-06,
+     "time": null,
+     "gap_time": null
+    }
+   },
+   "source": {
+    "ledger": "e2_retrain:phiusiil",
+    "commit": "ad29867"
+   }
+  },
+  {
+   "id": "sms_spam",
+   "name": "SMS Spam Collection",
+   "leaked_exact": 0.11426,
+   "leaked_near": 0.140448,
+   "n_train_used": 4459,
+   "models": {
+    "lr": {
+     "original": 0.925956,
+     "no_exact": 0.911789,
+     "no_near": 0.895247,
+     "leaked": 0.969012,
+     "gap_no_exact": 0.014167,
+     "gap_no_near": 0.030708,
+     "time": null,
+     "gap_time": null
+    },
+    "rf": {
+     "original": 0.938585,
+     "no_exact": 0.920393,
+     "no_near": 0.89911,
+     "leaked": 1.0,
+     "gap_no_exact": 0.018192,
+     "gap_no_near": 0.039475,
+     "time": null,
+     "gap_time": null
+    },
+    "hgb": {
+     "original": 0.958483,
+     "no_exact": 0.946846,
+     "no_near": 0.933617,
+     "leaked": 1.0,
+     "gap_no_exact": 0.011637,
+     "gap_no_near": 0.024866,
+     "time": null,
+     "gap_time": null
+    },
+    "mlp": {
+     "original": 0.968074,
+     "no_exact": 0.959402,
+     "no_near": 0.949851,
+     "leaked": 1.0,
+     "gap_no_exact": 0.008672,
+     "gap_no_near": 0.018223,
+     "time": null,
+     "gap_time": null
+    }
+   },
+   "source": {
+    "ledger": "e2_retrain:sms_spam",
+    "commit": "42caa56"
+   }
+  }
+ ],
+ "ablation": [
+  {
+   "id": "cicids2017",
+   "name": "CIC-IDS2017",
+   "condition": "full",
+   "dropped": [],
+   "macro_f1": {
+    "lr": 0.970747,
+    "rf": 0.997464,
+    "hgb": 0.998547,
+    "mlp": 0.996309
+   },
+   "drop_vs_full": {
+    "lr": null,
+    "rf": null,
+    "hgb": null,
+    "mlp": null
+   },
+   "best_single_feature_after": "Destination Port",
+   "best_single_feature_after_bacc": 0.898877,
+   "source": {
+    "ledger": "e4_ablation:cicids2017",
+    "commit": "ad29867"
+   }
+  },
+  {
+   "id": "cicids2017",
+   "name": "CIC-IDS2017",
+   "condition": "minus_top",
+   "dropped": [
+    "Destination Port"
+   ],
+   "macro_f1": {
+    "lr": 0.95161,
+    "rf": 0.997081,
+    "hgb": 0.997853,
+    "mlp": 0.994575
+   },
+   "drop_vs_full": {
+    "lr": 0.019136,
+    "rf": 0.000383,
+    "hgb": 0.000694,
+    "mlp": 0.001734
+   },
+   "best_single_feature_after": "Average Packet Size",
+   "best_single_feature_after_bacc": 0.863844,
+   "source": {
+    "ledger": "e4_ablation:cicids2017",
+    "commit": "ad29867"
+   }
+  },
+  {
+   "id": "phiusiil",
+   "name": "PhiUSIIL",
+   "condition": "full",
+   "dropped": [],
+   "macro_f1": {
+    "lr": 0.999896,
+    "rf": 0.999944,
+    "hgb": 1.0,
+    "mlp": 0.999939
+   },
+   "drop_vs_full": {
+    "lr": null,
+    "rf": null,
+    "hgb": null,
+    "mlp": null
+   },
+   "best_single_feature_after": "URLSimilarityIndex",
+   "best_single_feature_after_bacc": 0.995988,
+   "source": {
+    "ledger": "e4_ablation:phiusiil",
+    "commit": "ad29867"
+   }
+  },
+  {
+   "id": "phiusiil",
+   "name": "PhiUSIIL",
+   "condition": "minus_top",
+   "dropped": [
+    "URLSimilarityIndex"
+   ],
+   "macro_f1": {
+    "lr": 0.999831,
+    "rf": 0.999861,
+    "hgb": 0.999913,
+    "mlp": 0.999892
+   },
+   "drop_vs_full": {
+    "lr": 6.5e-05,
+    "rf": 8.2e-05,
+    "hgb": 8.7e-05,
+    "mlp": 4.8e-05
+   },
+   "best_single_feature_after": "LineOfCode",
+   "best_single_feature_after_bacc": 0.961705,
+   "source": {
+    "ledger": "e4_ablation:phiusiil",
+    "commit": "ad29867"
+   }
+  },
+  {
+   "id": "phiusiil",
+   "name": "PhiUSIIL",
+   "condition": "minus_flagged",
+   "dropped": [
+    "URLSimilarityIndex",
+    "LineOfCode",
+    "NoOfExternalRef",
+    "NoOfSelfRef"
+   ],
+   "macro_f1": {
+    "lr": 0.99955,
+    "rf": 0.999662,
+    "hgb": 0.999753,
+    "mlp": 0.999736
+   },
+   "drop_vs_full": {
+    "lr": 0.000346,
+    "rf": 0.000281,
+    "hgb": 0.000247,
+    "mlp": 0.000204
+   },
+   "best_single_feature_after": "NoOfImage",
+   "best_single_feature_after_bacc": 0.939799,
+   "source": {
+    "ledger": "e4_ablation:phiusiil",
+    "commit": "ad29867"
+   }
+  }
+ ],
+ "validation": {
+  "tavallaee": {
+   "rows": {
+    "train": {
+     "attack": {
+      "ours": [
+       3925650,
+       262178
+      ],
+      "paper": [
+       3925650,
+       262178
+      ],
+      "diff": [
+       0,
+       0
+      ]
+     },
+     "normal": {
+      "ours": [
+       972781,
+       812814
+      ],
+      "paper": [
+       972781,
+       812814
+      ],
+      "diff": [
+       0,
+       0
+      ]
+     },
+     "total": {
+      "ours": [
+       4898431,
+       1074992
+      ],
+      "paper": [
+       4898431,
+       1074992
+      ],
+      "diff": [
+       0,
+       0
+      ]
+     }
+    },
+    "test": {
+     "attack": {
+      "ours": [
+       250436,
+       29378
+      ],
+      "paper": [
+       250436,
+       29378
+      ],
+      "diff": [
+       0,
+       0
+      ]
+     },
+     "normal": {
+      "ours": [
+       60593,
+       47913
+      ],
+      "paper": [
+       60591,
+       47911
+      ],
+      "diff": [
+       2,
+       2
+      ]
+     },
+     "total": {
+      "ours": [
+       311029,
+       77291
+      ],
+      "paper": [
+       311027,
+       77289
+      ],
+      "diff": [
+       2,
+       2
+      ]
+     }
+    }
+   },
+   "source": {
+    "ledger": "e0_kdd",
+    "commit": "0f452ad"
+   }
+  },
+  "synthetic": {
+   "configurations": 720,
+   "max_abs_error": {
+    "err_cross": 0,
+    "err_near": 0,
+    "err_conflict_groups": 0,
+    "err_within_train": 0
+   },
+   "interval_coverage": 0.97,
+   "minhash_recall": {
+    "0.80-0.85": 1.0,
+    "0.85-0.90": 1.0,
+    "0.90-0.95": 1.0,
+    "0.95-1.00": 1.0
+   },
+   "source": {
+    "ledger": "e0_synthetic",
+    "commit": "0f452ad"
+   }
+  }
+ }
+}
