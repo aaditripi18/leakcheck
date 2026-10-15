@@ -201,8 +201,9 @@ The contrast is the finding. UCI Phishing has as many copies as KDD99, but its
 that any model that generalises also gets right. KDD99's copies are a few
 traffic patterns repeated hundreds of thousands of times, and its clean
 remainder is dominated by the rare attacks a copy-trained model never learned.
-**The exact-copy rate alone does not predict inflation.** On KDD99, two thirds
-of the gap comes from *near*-copies (+4.2–4.8 points from exact copies alone).
+**The exact-copy rate alone does not predict inflation.** On KDD99, nearly three
+quarters of the gap (72%, 71.7–72.6% across the four models) comes from
+*near*-copies; exact copies alone account for 4.2–4.8 points.
 
 Caveat on reading the gap: the no_near subset is, by construction, the part of
 the test set unlike the training data, so it is harder than the full set. The

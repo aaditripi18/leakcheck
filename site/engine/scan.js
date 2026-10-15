@@ -82,6 +82,13 @@ export function makeSplit(trainParsed, testParsed, opts) {
   }
   const drop = new Set([label, time, group, ...ignore]);
   const features = train.columns.filter((c) => !drop.has(c));
+  if (!features.length) {
+    throw Object.assign(new Error("there are no feature columns left to compare: every column is the label, time, group or left out"),
+      { code: "features" });
+  }
+  for (const [name, t] of [["training", train], ["test", test]]) {
+    if (t.n === 0) throw Object.assign(new Error(`the ${name} file has a header but no data rows`), { code: "rows" });
+  }
   const s = { train, test, raw, label, time, group, text, ignore, features };
   s.yTrain = labelStrings(train.cols.get(label));
   s.yTest = labelStrings(test.cols.get(label));

@@ -118,7 +118,7 @@ def nav(active: str) -> str:
     </div>
     <nav class="hidden md:flex items-center gap-space-lg" aria-label="Main">{"".join(items)}</nav>
     <div class="flex items-center gap-space-sm">
-      <a class="md:hidden font-mono-data-sm text-mono-data-sm text-on-surface-variant hover:text-on-surface" href="{"index.html" if active == "scanner" else "scan.html"}">{"Report" if active == "scanner" else "Scanner"}</a>
+      <a class="md:hidden inline-block py-2 px-1 font-mono-data-sm text-mono-data-sm text-on-surface-variant hover:text-on-surface" href="{"index.html" if active == "scanner" else "scan.html"}">{"Report" if active == "scanner" else "Scanner"}</a>
       <button type="button" data-theme-toggle aria-label="Toggle dark mode" class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors">
         <span class="dark:hidden">{icon("moon", "text-[18px]")}</span><span class="hidden dark:inline">{icon("sun", "text-[18px]")}</span>
       </button>
@@ -138,11 +138,11 @@ def footer(generated: str) -> str:
       <p class="font-mono-data-sm text-mono-data-sm text-on-surface-variant">Built with a ledger, not a slide deck.</p>
     </div>
     <nav class="flex flex-wrap items-center gap-space-md" aria-label="Footer">
-      <a class="font-mono-data-sm text-mono-data-sm text-on-surface-variant hover:text-on-surface" href="index.html">Report</a>
-      <a class="font-mono-data-sm text-mono-data-sm text-on-surface-variant hover:text-on-surface" href="scan.html">Scanner</a>
-      <a class="font-mono-data-sm text-mono-data-sm text-on-surface-variant hover:text-on-surface" href="{REPO_URL}/blob/main/docs/FINDINGS.md" rel="noopener noreferrer">Findings</a>
-      <a class="font-mono-data-sm text-mono-data-sm text-on-surface-variant hover:text-on-surface" href="{REPO_URL}/blob/main/data/README.md" rel="noopener noreferrer">Data provenance</a>
-      <a class="font-mono-data-sm text-mono-data-sm text-on-surface-variant hover:text-on-surface" href="{REPO_URL}" rel="noopener noreferrer">GitHub</a>
+      <a class="inline-block py-2 font-mono-data-sm text-mono-data-sm text-on-surface-variant hover:text-on-surface" href="index.html">Report</a>
+      <a class="inline-block py-2 font-mono-data-sm text-mono-data-sm text-on-surface-variant hover:text-on-surface" href="scan.html">Scanner</a>
+      <a class="inline-block py-2 font-mono-data-sm text-mono-data-sm text-on-surface-variant hover:text-on-surface" href="{REPO_URL}/blob/main/docs/FINDINGS.md" rel="noopener noreferrer">Findings</a>
+      <a class="inline-block py-2 font-mono-data-sm text-mono-data-sm text-on-surface-variant hover:text-on-surface" href="{REPO_URL}/blob/main/data/README.md" rel="noopener noreferrer">Data provenance</a>
+      <a class="inline-block py-2 font-mono-data-sm text-mono-data-sm text-on-surface-variant hover:text-on-surface" href="{REPO_URL}" rel="noopener noreferrer">GitHub</a>
     </nav>
   </div>
   <div class="max-w-[1100px] mx-auto px-margin-mobile md:px-gutter mt-space-lg pt-space-md border-t border-surface-container-highest flex flex-col sm:flex-row gap-space-xs justify-between text-on-surface-variant font-mono-data-sm text-mono-data-sm">
@@ -277,6 +277,8 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
     rt = {r["id"]: r for r in d["retrain"]}
     kdd, uci = au["kdd99"], au["uci_phishing"]
     kdd_gap = rt["kdd99"]["models"]["lr"]["gap_no_near"]
+    kl = rt["kdd99"]["models"]["lr"]
+    near_share = 1 - kl["gap_no_exact"] / kl["gap_no_near"]  # part of the LR gap that exact copies do not explain
     uci_gap = rt["uci_phishing"]["models"]["lr"]["gap_no_near"]
     syn = d["validation"]["synthetic"]
     syn_err = sum(syn["max_abs_error"].values())
@@ -369,7 +371,7 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
          f"UCI Phishing copies about as much as KDD Cup 99 ({fpct(uci['exact_copies'])} vs {fpct(kdd['exact_copies'])} of test rows) "
          f"but loses only {fpt(uci_gap)} macro-F1 points when the copies go, against {fpt(kdd_gap)} for KDD Cup 99. "
          "With 30 features of 2–3 values each, a UCI Phishing copy is just a common pattern a model gets right anyway; "
-         "KDD Cup 99's copies are memorised exceptions, and two thirds of its gap comes from near-copies.",
+         f"KDD Cup 99's copies are memorised exceptions, and {near_share * 100:.0f}% of its gap comes from near-copies rather than exact ones.",
          f"Logistic regression: KDD99 −{fpt(kdd_gap)} vs UCI −{fpt(uci_gap)}"),
         ("The control comes back clean.",
          f"EMBER 2018's official split is by time. leakcheck finds {fpct(ember_audit['exact_copies'])} exact copies, "
@@ -421,15 +423,25 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
     ]
     lim = "".join(f"<li>{e(x)}</li>" for x in limitations)
 
-    commands = ("python -m venv .venv\n.venv/Scripts/python -m pip install -e \".[dev]\"\n"
-                "python scripts/fetch.py\npython -m experiments.e1_audit\n"
-                "python -m experiments.e2_retrain kdd99 nslkdd unsw_nb15 cicids2017 ember2018 uci_phishing phiusiil sms_spam\n"
-                "python -m experiments.e4_ablation phiusiil cicids2017\npython scripts/report.py")
+    commands = [
+        "python -m venv .venv",
+        "# then activate it: .venv\\Scripts\\activate (Windows) or source .venv/bin/activate",
+        "python -m pip install -e \".[dev]\"",
+        "python scripts/fetch.py",
+        "python -m experiments.e0_sources && python -m experiments.e0_sources_week4",
+        "python -m experiments.e0_synthetic && python -m experiments.e0_kdd",
+        "python -m experiments.e1_audit",
+        "python -m experiments.e2_retrain kdd99 nslkdd unsw_nb15 cicids2017 ember2018 uci_phishing phiusiil sms_spam",
+        "python -m experiments.e4_ablation phiusiil cicids2017",
+        "python scripts/report.py",
+    ]
+    shown = ["# 1. Install, then fetch every dataset (SHA-256 verified)", *commands[:4],
+             "# 2. Validate, audit, retrain, ablate", *commands[4:9],
+             "# 3. Regenerate the report and this page's numbers", commands[9]]
     code_lines = "".join(
-        (f'<span class="text-[#8c8c88]">{e(c)}</span>\n' if c.startswith("#") else f'<span class="text-[#f59e0b] font-bold">&gt;</span> {e(c)}\n')
-        for c in ["# 1. Install, then fetch every dataset (SHA-256 verified)", *commands.splitlines()[:3],
-                  "# 2. Audit, retrain, ablate", *commands.splitlines()[3:6], "# 3. Regenerate the report and this page's numbers",
-                  commands.splitlines()[6]])
+        (f'<span class="text-[#8c8c88]">{e(c)}</span>\n' if c.startswith("#")
+         else f'<span class="text-[#f59e0b] font-bold">&gt;</span> {e(c)}\n') for c in shown)
+    commands = "\n".join(commands)
 
     return head("leakcheck: how much of a 99% score is the test set copying the training set?",
                 "An audit of eight security ML benchmarks for train/test leakage, with an in-browser scanner.") + nav("report") + f"""
@@ -452,8 +464,8 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
       <span class="font-mono-data-sm text-mono-data-sm text-primary font-medium">same features, both sides</span>
     </figcaption>
     <div class="grid grid-cols-2 gap-space-md font-mono-data-sm text-[10px] leading-tight text-on-surface-variant py-1">
-      <div class="flex flex-col gap-1.5 min-w-0"><div class="sec-label pb-1 text-on-surface border-b border-surface-container-high">TRAIN · {kdd['n_train']:,} rows</div>{"".join(tr_rows)}</div>
-      <div class="flex flex-col gap-1.5 min-w-0"><div class="sec-label pb-1 text-on-surface border-b border-surface-container-high">TEST · {kdd['n_test']:,} rows</div>{"".join(te_rows)}</div>
+      <div class="flex flex-col gap-1.5 min-w-0"><div class="sec-label pb-1 text-on-surface border-b border-surface-container-high">TRAIN · sample of {kx['n_train']:,}</div>{"".join(tr_rows)}</div>
+      <div class="flex flex-col gap-1.5 min-w-0"><div class="sec-label pb-1 text-on-surface border-b border-surface-container-high">TEST · sample of {kx['n_test']:,}</div>{"".join(te_rows)}</div>
     </div>
     <p class="font-body-sm text-body-sm text-on-surface-variant mt-space-xs">Row numbers from the KDD sample you can load in the <a class="underline underline-offset-2 hover:text-on-surface" href="scan.html">scanner</a>.</p>
     <div class="mt-space-md pt-space-sm border-t border-surface-container-high flex flex-col bg-surface-container-lowest p-space-md">
@@ -473,7 +485,7 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
   <div class="lg:col-span-5 flex flex-col gap-space-md">
     {sec_head("01", "The problem", "A high score can be a lookup, not a detector")}
     <div class="font-body-md text-body-md text-on-surface-variant flex flex-col gap-space-sm">
-      <p>Papers report 97–99.9% accuracy on intrusion, malware, phishing and spam benchmarks. Many of those benchmarks put identical or near-identical rows on both sides of the train/test split, mix future data into training, or contain a single column that gives the label away.</p>
+      <p>Security benchmarks make high scores easy: on a random split of CIC-IDS2017, untuned baseline models reach {min(cic_orig) * 100:.1f}–{max(cic_orig) * 100:.1f}% macro-F1. Many benchmarks put identical or near-identical rows on both sides of the train/test split, mix future data into training, or contain a single column that gives the label away.</p>
       <p>A model can then score by recognising rows it has already seen. That says little about how it handles traffic or files it has not seen, which is the thing a deployment needs.</p>
     </div>
     <div class="p-space-md bg-surface-container-low border-l-2 border-primary">
@@ -740,7 +752,7 @@ def write_host_headers() -> None:
     (SITE / "vercel.json").write_text(json.dumps({"headers": [{"source": "/(.*)", "headers": rules}]}, indent=2) + "\n",
                                       encoding="utf-8")
     (SITE / "_headers").write_text("/*\n" + "".join(f"  {k}: {v}\n" for k, v in HEADERS.items()), encoding="utf-8")
-    ignore = ["node_modules", "src", "package.json", "package-lock.json", "tailwind.config.js", "engine/cli.mjs",
+    ignore = ["node_modules", "src", "package.json", "package-lock.json", "tailwind.config.cjs", "engine/cli.mjs",
               "examples/examples.json"]
     (SITE / ".vercelignore").write_text("\n".join(ignore) + "\n", encoding="utf-8")
 
@@ -760,7 +772,7 @@ def main() -> None:
     print("wrote site/index.html, site/scan.html, site/vercel.json, site/_headers")
     if not a.skip_css:
         npx = "npx.cmd" if sys.platform == "win32" else "npx"
-        subprocess.run([npx, "tailwindcss", "-c", "tailwind.config.js", "-i", "src/input.css", "-o", "assets/site.css",
+        subprocess.run([npx, "tailwindcss", "-c", "tailwind.config.cjs", "-i", "src/input.css", "-o", "assets/site.css",
                         "--minify"], cwd=SITE, check=True)
         print("wrote site/assets/site.css")
 

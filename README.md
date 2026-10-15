@@ -37,8 +37,8 @@ What the numbers say:
 - **The copy rate alone does not predict inflation.** UCI Phishing has as many
   copies as KDD99 but loses about a point: with 30 features of 2–3 values
   each, a copy is a common pattern that a model would get right anyway. KDD99's
-  copies are memorised exceptions, and two thirds of its gap comes from
-  *near*-copies.
+  copies are memorised exceptions, and nearly three quarters of its gap (72%)
+  comes from *near*-copies.
 - **Validated against the literature.** leakcheck reproduces the KDD99
   redundancy tables of Tavallaee et al. (2009) exactly for the training set,
   and to within 2 records for the test set. On synthetic data it recovers

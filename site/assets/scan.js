@@ -112,6 +112,11 @@ $$("[data-example]").forEach((btn) => btn.addEventListener("click", () => {
     updateSettings();
   };
   if (window.LEAKCHECK_EXAMPLES && window.LEAKCHECK_EXAMPLES[key]) return go();
+  // the old files must not stay runnable while the example script loads
+  clearError();
+  hideResults();
+  for (const which of ["train", "test"]) { state.files[which] = null; setZoneLoading(which, `${key} example`); }
+  updateSettings();
   const s = document.createElement("script");
   s.src = `examples/${key}.js`;
   s.onload = go;
@@ -364,7 +369,8 @@ function onCleaned(m) {
 
 function setErrorText(message) {
   const el = $("[data-error]");
-  el.textContent = message;
+  const text = String(message);
+  el.textContent = text.charAt(0).toUpperCase() + text.slice(1) + (/[.!?]$/.test(text) ? "" : ".");
   el.classList.remove("hidden");
 }
 function showError(message) {
