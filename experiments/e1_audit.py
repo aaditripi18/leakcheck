@@ -41,68 +41,68 @@ class Prepared:
     datasets: tuple[str, ...] = ()
 
 
-def random_split(df: pd.DataFrame, stratify: pd.Series) -> tuple[pd.DataFrame, pd.DataFrame]:
-    tr, te = train_test_split(df, test_size=TEST_SIZE, random_state=SEED, stratify=stratify)
+def random_split(df: pd.DataFrame, stratify: pd.Series, seed: int = SEED) -> tuple[pd.DataFrame, pd.DataFrame]:
+    tr, te = train_test_split(df, test_size=TEST_SIZE, random_state=seed, stratify=stratify)
     return tr.reset_index(drop=True), te.reset_index(drop=True)
 
 
 ALL = ("L1", "L2", "L3", "L4", "L5", "L6")
 
 
-def prep_kdd99() -> Prepared:
+def prep_kdd99(seed: int = SEED) -> Prepared:
     tr, te = data.load_kdd99("full"), data.load_kdd99("test")
     s = Split(tr.drop(columns=["label"]), te.drop(columns=["label"]), "is_attack")
     return Prepared([("all", s, ALL)], "official (kddcup.data vs corrected)", {"excluded": ["label (attack name)"]},
                     ("kdd99", "kdd99_test"))
 
 
-def prep_nslkdd() -> Prepared:
+def prep_nslkdd(seed: int = SEED) -> Prepared:
     tr, te = data.load_nslkdd("train"), data.load_nslkdd("test")
     s = Split(tr.drop(columns=["label"]), te.drop(columns=["label"]), "is_attack", ignore=["difficulty"])
     return Prepared([("all", s, ALL)], "official (KDDTrain+ vs KDDTest+)",
                     {"excluded": ["label (attack name)", "difficulty"]}, ("nslkdd",))
 
 
-def prep_unsw() -> Prepared:
+def prep_unsw(seed: int = SEED) -> Prepared:
     s = Split(data.load_unsw("train"), data.load_unsw("test"), "label", ignore=["id", "attack_cat"])
     return Prepared([("all", s, ALL)], "official (training-set vs testing-set)",
                     {"excluded": ["id (row number)", "attack_cat (attack name)"]}, ("unsw_nb15",))
 
 
-def prep_cic() -> Prepared:
-    df = data.load_cicids2017()
+def prep_cic(seed: int = SEED) -> Prepared:
+    df = data.cached(data.load_cicids2017)
     df["is_attack"] = (df["Label"] != "BENIGN").astype("int8")
-    tr, te = random_split(df, df["Label"])
+    tr, te = random_split(df, df["Label"], seed)
     s = Split(tr.drop(columns=["Label"]), te.drop(columns=["Label"]), "is_attack", time="capture_order")
-    return Prepared([("all", s, ALL)], f"stratified random {1 - TEST_SIZE:.0%}/{TEST_SIZE:.0%} by Label, seed {SEED}",
+    return Prepared([("all", s, ALL)], f"stratified random {1 - TEST_SIZE:.0%}/{TEST_SIZE:.0%} by Label, seed {seed}",
                     {"excluded": ["Label (attack name)"], "time": "capture_order = index of the capture file (Mon..Fri)"},
                     ("cicids2017",))
 
 
-def prep_uci_phishing() -> Prepared:
-    df = data.load_uci_phishing()
-    tr, te = random_split(df, df["Result"])
+def prep_uci_phishing(seed: int = SEED) -> Prepared:
+    df = data.cached(data.load_uci_phishing)
+    tr, te = random_split(df, df["Result"], seed)
     return Prepared([("all", Split(tr, te, "Result"), ALL)],
-                    f"stratified random {1 - TEST_SIZE:.0%}/{TEST_SIZE:.0%}, seed {SEED}", {}, ("uci_phishing",))
+                    f"stratified random {1 - TEST_SIZE:.0%}/{TEST_SIZE:.0%}, seed {seed}", {}, ("uci_phishing",))
 
 
-def prep_phiusiil() -> Prepared:
-    df = data.load_phiusiil()
-    tr, te = random_split(df, df["label"])
+def prep_phiusiil(seed: int = SEED) -> Prepared:
+    df = data.cached(data.load_phiusiil)
+    tr, te = random_split(df, df["label"], seed)
     s = Split(tr, te, "label", ignore=["FILENAME"], text="URL")
-    return Prepared([("all", s, ALL)], f"stratified random {1 - TEST_SIZE:.0%}/{TEST_SIZE:.0%}, seed {SEED}",
+    return Prepared([("all", s, ALL)], f"stratified random {1 - TEST_SIZE:.0%}/{TEST_SIZE:.0%}, seed {seed}",
                     {"excluded": ["FILENAME (row identifier)"], "text": "URL"}, ("phiusiil",))
 
 
-def prep_sms() -> Prepared:
-    df = data.load_sms_spam()
-    tr, te = random_split(df, df["label"])
+def prep_sms(seed: int = SEED) -> Prepared:
+    df = data.cached(data.load_sms_spam)
+    tr, te = random_split(df, df["label"], seed)
     s = Split(tr, te, "label", text="message")
-    return Prepared([("all", s, ALL)], f"stratified random {1 - TEST_SIZE:.0%}/{TEST_SIZE:.0%}, seed {SEED}",
+    return Prepared([("all", s, ALL)], f"stratified random {1 - TEST_SIZE:.0%}/{TEST_SIZE:.0%}, seed {seed}",
                     {"text": "message"}, ("sms_spam",))
 
 
-def prep_ember() -> Prepared:
+def prep_ember(seed: int = SEED) -> Prepared:
     from experiments.ember import CATEGORICAL, columns, load_ember
 
     df = load_ember()

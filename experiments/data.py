@@ -37,6 +37,17 @@ class HashMismatch(RuntimeError):
     pass
 
 
+_CACHE: dict = {}
+
+
+def cached(loader, *args) -> pd.DataFrame:
+    """Load once per process; hand out copies so callers may modify them."""
+    key = (loader.__name__, args)
+    if key not in _CACHE:
+        _CACHE[key] = loader(*args)
+    return _CACHE[key].copy()
+
+
 def sha256_file(path: Path) -> str:
     h = hashlib.sha256()
     with open(path, "rb") as f:

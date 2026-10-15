@@ -127,3 +127,31 @@ Everything runs on a laptop CPU. No GPU and no Kaggle quota.
 - Near-duplicate thresholds are a choice. Results are reported for several
   thresholds, not one tuned value.
 - Retraining reproduces the *standard* baselines, not every paper's exact model.
+
+## E2 operationalisation (fixed 2026-10-15, before any E2 run)
+
+The hypotheses above leave some choices open. These are fixed in code
+(`experiments/e2_retrain.py`, `experiments/models.py`) before any E2 result
+exists:
+
+- **Seeds** 0–4. Random-split datasets are re-split per seed; official splits
+  stay fixed. Training sets over 300,000 rows are stratified-subsampled per
+  seed, and "leaked" always means "has a copy in the training rows the model
+  actually saw".
+- **Models**: untuned standard baselines (LR, RF-100, HistGB-200, MLP 128-64),
+  inputs as described in `models.py`.
+- **Metric**: macro-F1 on the binary task, mean over 5 seeds. "Gap" = original
+  minus cleaned, in percentage points.
+- **H2** is supported if, on **both** of the two most affected datasets by
+  E1's exact cross-split rate (KDD99 68.4%, UCI Phishing 64.4%), the
+  original → no_near macro-F1 gap is ≥ 5 points for at least 3 of the 4
+  models.
+- **H3** is supported on a dataset if the original → time gap exceeds the
+  original → no_near gap for at least 3 of the 4 models. Tested on CIC-IDS2017
+  (time = capture file; train = files up to the boundary closest to 80% of
+  rows) and, in week 6, on EMBER (official temporal split vs a random split).
+- **H4** is supported if the LR gap exceeds the HistGB gap (original → no_near)
+  on a majority of the datasets where either gap is at least 1 point.
+- Week 5 runs the five leakiest datasets (KDD99, UCI Phishing, CIC-IDS2017,
+  SMS Spam, UNSW-NB15). NSL-KDD, PhiUSIIL and EMBER follow in week 6. The
+  final H4 verdict waits for all eight.
