@@ -6,7 +6,7 @@ import { labelStrings, parseCSV, typedPair } from "./table.js";
 import { rowHashes, strHash } from "./canon.js";
 import { balancedAccuracy, fitTree } from "./tree1d.js";
 
-export const VERSION = "0.1.0-js";
+export const VERSION = "0.2.0-js";
 const SEVERITIES = ["high", "medium", "low", "info", "ok"];
 const RANK = Object.fromEntries(SEVERITIES.map((s, i) => [s, i]));
 const N_EXAMPLES = 5;

@@ -115,7 +115,7 @@ def nav(active: str) -> str:
   <div class="h-14 max-w-[1100px] mx-auto px-margin-mobile md:px-gutter flex items-center justify-between gap-space-md">
     <div class="flex items-center gap-space-sm">
       <a class="font-mono-data-lg text-mono-data-lg text-on-surface tracking-tight font-medium hover:text-primary transition-colors" href="index.html">leakcheck</a>
-      <span class="hidden sm:inline-flex items-center border border-outline-variant px-space-xs py-0.5 bg-surface-container-low sec-label text-on-surface-variant">v0.1</span>
+      <span class="hidden sm:inline-flex items-center border border-outline-variant px-space-xs py-0.5 bg-surface-container-low sec-label text-on-surface-variant">v0.2</span>
     </div>
     <nav class="hidden md:flex items-center gap-space-lg" aria-label="Main">{"".join(items)}</nav>
     <div class="flex items-center gap-space-sm">
