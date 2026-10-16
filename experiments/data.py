@@ -128,6 +128,9 @@ def fetch(name: str, registry: dict | None = None, raw: Path = RAW, manifest: Pa
         if dest.exists() and expected and sha256_file(dest) == expected:
             paths.append(dest)
             continue
+        if entry.get("manual_download"):
+            raise HashMismatch(f"{f['path']}: download it by hand from {f['url']} into {dest.parent} "
+                               f"(the share serves a page, not the file); it must have SHA-256 {expected}")
         dest.parent.mkdir(parents=True, exist_ok=True)
         tmp = dest.with_name(dest.name + ".part")
         download(f["url"], tmp)
