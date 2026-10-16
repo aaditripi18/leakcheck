@@ -53,6 +53,39 @@ What the numbers say:
   random split and 0.46–0.57 when tested on the later capture files, whose
   attack types never appear in training.
 
+## Install
+
+```
+pip install "git+https://github.com/aaditripi18/leakcheck"
+docker build -t leakcheck https://github.com/aaditripi18/leakcheck.git
+docker run --rm -v "$PWD:/data" leakcheck scan --train /data/train.csv --test /data/test.csv --label label
+```
+
+Python 3.10–3.13 on Linux, Windows and macOS (CI). The supported Python API,
+exit statuses and every check code are in [docs/API.md](docs/API.md); changes are
+in [CHANGELOG.md](CHANGELOG.md). Distributed from GitHub only.
+
+## How it relates to existing tools
+
+[Deepchecks](https://github.com/deepchecks/deepchecks)' train/test validation
+already flags samples shared by train and test, conflicting labels, date-based
+leakage and features or identifiers that predict the label, and
+[cleanlab](https://github.com/cleanlab/cleanlab) finds near-duplicates and label
+issues. If you use those, you have much of the detection. What leakcheck adds:
+
+- **The number the duplicates are worth.** The audit retrains standard models on
+  the cleaned split and reports the gap, with intervals; on these benchmarks the
+  copy rate alone does not predict it (KDD Cup 99 and UCI Phishing copy about as
+  much; one loses 17.5 macro-F1 points, the other 1.5).
+- **Near-copies judged against a baseline**: how close test rows sit to training
+  rows compared with how close training rows sit to each other, plus the
+  accuracy ceiling that conflicting labels impose.
+- **Group overlap** (the same host, family or session on both sides).
+- **`clean` that proves itself**: the cleaned files are read back and re-scanned,
+  with a log of every removed row.
+- **A browser scanner that cannot upload** (`connect-src 'none'`), with the same
+  counts as Python.
+
 ## Use it
 
 ```
