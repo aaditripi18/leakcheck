@@ -1,3 +1,12 @@
+
+# The experiments (not the leakcheck tool) need scikit-learn >= 1.8: in 1.7,
+# MLPClassifier's early stopping fails on string class labels (it calls isnan on
+# the predictions). scikit-learn 1.8 needs Python >= 3.11; the published runs used 1.9.
+import sklearn as _sk
+from sklearn.utils.fixes import parse_version as _pv
+import pytest as _pytest
+pytestmark = _pytest.mark.skipif(_pv(_sk.__version__) < _pv("1.8"),
+                                 reason="experiments need scikit-learn >= 1.8 (Python >= 3.11)")
 import numpy as np
 import pandas as pd
 import pytest

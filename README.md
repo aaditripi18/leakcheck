@@ -61,7 +61,8 @@ docker build -t leakcheck https://github.com/aaditripi18/leakcheck.git
 docker run --rm -v "$PWD:/data" leakcheck scan --train /data/train.csv --test /data/test.csv --label label
 ```
 
-Python 3.10–3.13 on Linux, Windows and macOS (CI). The supported Python API,
+Python 3.10–3.13 on Linux, Windows and macOS (CI); the research harness in
+`experiments/` needs Python 3.11+ (scikit-learn 1.8+). The supported Python API,
 exit statuses and every check code are in [docs/API.md](docs/API.md); changes are
 in [CHANGELOG.md](CHANGELOG.md). Distributed from GitHub only.
 
