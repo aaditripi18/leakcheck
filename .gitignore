@@ -8,3 +8,4 @@ data/processed/
 *.log
 node_modules/
 .vercel/
+results/e5/*.npz
