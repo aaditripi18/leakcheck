@@ -1,0 +1,27 @@
+{
+ "dataset": "sms_spam",
+ "seed": 1,
+ "commit": "eccf554",
+ "n_train": 4459,
+ "n_test": 1115,
+ "npz": "sms_spam_seed1.npz",
+ "fit_seconds": {
+  "lr": 0.2,
+  "rf": 0.4,
+  "hgb": 11.7,
+  "mlp": 10.4,
+  "hgb_tuned": 8.4
+ },
+ "evidence_seconds": 0.6,
+ "hgb_tuned": {
+  "params": {
+   "max_leaf_nodes": 31,
+   "max_iter": 400,
+   "max_depth": 6,
+   "learning_rate": 0.05,
+   "l2_regularization": 0.1
+  },
+  "cv_macro_f1": 0.9557661695487286
+ },
+ "seconds": 266.6
+}

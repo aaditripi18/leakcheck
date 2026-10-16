@@ -16,6 +16,7 @@ the analysis (experiments/e6_analysis.py) reads. Cached by git commit, as E2.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import sys
 import time
@@ -88,17 +89,34 @@ def row_evidence(split: Split) -> dict[str, np.ndarray]:
     return {"exact": exact, "dist": dist, "sim": sim}
 
 
+# The code that determines E5's predictions. Results are reused while these
+# files are unchanged, so unrelated commits do not force hours of retraining.
+CODE = ["experiments/e5_predictions.py", "experiments/e2_retrain.py", "experiments/models.py",
+        "experiments/data.py", "experiments/e1_audit.py", "experiments/ember.py",
+        "leakcheck/split.py", "leakcheck/checks/near.py", "leakcheck/checks/near_text.py"]
+
+
+def code_fingerprint() -> str:
+    h = hashlib.sha256()
+    for rel in CODE:
+        f = data.ROOT / rel
+        body = f.read_bytes().replace(b"\r\n", b"\n") if f.exists() else b""
+        h.update(rel.encode() + b"\0" + body + b"\0")
+    return h.hexdigest()[:16]
+
+
 def run_one(name: str, seed: int) -> dict:
     meta_path = OUT / f"{name}_seed{seed}.json"
     commit = git_state()["commit"]
+    fp = code_fingerprint()
     if meta_path.exists():
         meta = json.loads(meta_path.read_text(encoding="utf-8"))
-        if meta.get("commit") == commit and (OUT / meta["npz"]).exists():
+        if meta.get("code") == fp and (OUT / meta["npz"]).exists():
             return meta
     t0 = time.time()
     split = original_split(name, seed)  # full training set: no subsample
     arrays = {"y": np.asarray(split.y_test), **row_evidence(split)}
-    meta = {"dataset": name, "seed": seed, "commit": commit, "n_train": len(split.train), "n_test": len(split.test),
+    meta = {"dataset": name, "seed": seed, "commit": commit, "code": fp, "n_train": len(split.train), "n_test": len(split.test),
             "npz": f"{name}_seed{seed}.npz", "fit_seconds": {}, "evidence_seconds": round(time.time() - t0, 1)}
     print(f"   {name} seed {seed}: evidence in {meta['evidence_seconds']} s "
           f"(train {len(split.train):,}, test {len(split.test):,})", flush=True)
