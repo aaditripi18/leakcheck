@@ -55,8 +55,11 @@ def tune_hgb(split: Split, seed: int) -> tuple[dict, float]:
         idx, _ = train_test_split(np.arange(len(X)), train_size=TUNE_ROWS, random_state=seed, stratify=y)
         X, y = X.iloc[np.sort(idx)], y[np.sort(idx)]
     search = RandomizedSearchCV(build("hgb", X, split.text, seed), HGB_SPACE, n_iter=TUNE_ITER, scoring="f1_macro",
-                                cv=StratifiedKFold(3, shuffle=True, random_state=seed), random_state=seed, n_jobs=-1,
-                                refit=False)
+                                cv=StratifiedKFold(3, shuffle=True, random_state=seed), random_state=seed,
+                                # One fit at a time: HistGradientBoosting already uses every core, and
+                                # parallel fits on the dense TF-IDF views ran out of memory (a failed fit
+                                # would otherwise be scored NaN and silently dropped from the search).
+                                n_jobs=1, error_score="raise", refit=False)
     search.fit(X, y)
     return search.best_params_, float(search.best_score_)
 
