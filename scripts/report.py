@@ -289,6 +289,108 @@ def hypotheses(runs: dict) -> list[dict]:
     return out
 
 
+# --- phase 2 (PLAN.md): E5 predictions, E6 sweeps and bootstrap -----------------------
+
+PHASE2_LARGE = ("kdd99", "nslkdd", "unsw_nb15", "ember2018")
+
+
+def _cells(runs: dict) -> dict:
+    return runs.get("e6_analysis", {}).get("results", {}).get("_cells", {})
+
+
+def phase2_hypotheses(runs: dict) -> list[dict]:
+    """H6-H8 under the rules in PLAN.md, phase 2. Single source for RESULTS.md and the site."""
+    if "e6_analysis" not in runs:
+        return []
+    r = runs["e6_analysis"]["results"]
+    cells = _cells(runs)
+    out = []
+
+    def cell(d, m, sweep="eps", value=0.01):
+        return cells.get(f"{d}|{sweep}|{value}|{m}")
+
+    ev6, ok6 = [], None
+    if all(cell(d, "hgb_tuned") for d in ("kdd99", "nslkdd")):
+        ok6 = True
+        for d in ("kdd99", "nslkdd"):
+            c = cell(d, "hgb_tuned")
+            above = sum(lo > 0.05 for lo in c["lo"])
+            ok6 &= c["gap_mean"] >= 0.05 and above >= 2
+            ev6.append(f"{d}: tuned HistGB loses {pt(c['gap_mean'])} (interval above 5 points in {above}/3 seeds)")
+    out.append({"id": "H6", "statement": "Tuning and full training data do not remove the leakage gap (tuned HistGB "
+                "loses >= 5 macro-F1 points on KDD99 and NSL-KDD).", "verdict": _verdict(ok6),
+                "evidence": "; ".join(ev6) or "pending"})
+
+    ev7, wins = [], 0
+    done = [d for d in PHASE2_LARGE if d in r]
+    for d in done:
+        seeds = r[d]["seeds"].values()
+        k = sum(s["lr_minus_hgb_tuned"]["lo"] > 0 for s in seeds)
+        wins += k >= 2
+        diffs = [s["lr_minus_hgb_tuned"]["diff"] for s in seeds]
+        ev7.append(f"{d}: LR - tuned HistGB {pt(sum(diffs) / len(diffs))}, interval above zero in {k}/3 seeds")
+    ok7 = (wins >= 3) if len(done) == len(PHASE2_LARGE) else None
+    out.append({"id": "H7", "statement": "LR's leakage gap exceeds tuned HistGB's, with a bootstrap interval above zero, "
+                "on at least 3 of the 4 large benchmarks.", "verdict": _verdict(ok7),
+                "evidence": "; ".join(ev7) or "pending"})
+
+    total = same = 0
+    flips = []
+    for key, c in cells.items():
+        d, sweep, value, m = key.split("|")
+        if sweep != "eps" or float(value) != 0.01:
+            continue
+        states = [cells.get(f"{d}|eps|{v}|{m}") for v in (0.003, 0.01, 0.03)]
+        if any(x is None for x in states):
+            continue
+        total += 1
+        big = {x["gap_mean"] >= 0.01 for x in states}
+        if len(big) == 1:
+            same += 1
+        else:
+            flips.append(f"{d}/{m}")
+    ok8 = (same >= 0.9 * total) if total else None
+    out.append({"id": "H8", "statement": "Conclusions do not hinge on the near-copy threshold: whether a gap is >= 1 "
+                "point is the same at eps 0.003, 0.01 and 0.03 in >= 90% of dataset x model cells.",
+                "verdict": _verdict(ok8),
+                "evidence": f"same in {same} of {total} cells" + (f"; changes: {', '.join(flips)}" if flips else "")})
+    return out
+
+
+def e6(runs: dict) -> list[str]:
+    if "e6_analysis" not in runs:
+        return []
+    d = runs["e6_analysis"]
+    cells = _cells(runs)
+    models = d["config"]["models"]
+    out = ["## E5/E6: uncapped and tuned models, threshold sweeps, bootstrap intervals", "", src(d), "",
+           "Full training sets (no cap), 3 seeds, plus `hgb_tuned` (randomised search, PLAN.md phase 2). "
+           "Macro-F1 gap original - clean in points, mean over seeds; the bracket is the range of the seeds' "
+           "95% bootstrap intervals (1,000 resamples over test rows).", "",
+           "### At the default threshold (eps 0.01, Jaccard 0.8)", "",
+           "| Dataset | Leaked share | " + " | ".join(models) + " |", "|---|--:|" + "--:|" * len(models)]
+    for n in E1_ORDER:
+        row = [cells.get(f"{n}|eps|0.01|{m}") for m in models]
+        if not all(row):
+            continue
+        out.append(f"| {n} | {pct(row[0]['leaked_share_mean'])} | " + " | ".join(
+            f"{pt(c['gap_mean'])} [{pt(min(c['lo']))}, {pt(max(c['hi']))}]" for c in row) + " |")
+    out += ["", "### Gap against the near-copy threshold (tuned HistGB, then LR)", "",
+            "| Dataset | " + " | ".join(f"eps {v}" for v in (0.001, 0.003, 0.01, 0.03, 0.1)) + " |",
+            "|---|" + "--:|" * 5]
+    for n in E1_ORDER:
+        for m in ("hgb_tuned", "lr"):
+            cs = [cells.get(f"{n}|eps|{v}|{m}") for v in (0.001, 0.003, 0.01, 0.03, 0.1)]
+            if all(cs):
+                out.append(f"| {n} ({m}) | " + " | ".join(
+                    f"{pt(c['gap_mean'])} ({pct(c['leaked_share_mean'])} leaked)" for c in cs) + " |")
+    hs = phase2_hypotheses(runs)
+    out += ["", "### Phase 2 verdicts", "", "| | Hypothesis | Verdict | Evidence |", "|---|---|---|---|"]
+    out += [f"| {h['id']} | {h['statement']} | **{h['verdict']}** | {h['evidence']} |" for h in hs]
+    return out + [""]
+
+
+
 def hypotheses_md(runs: dict) -> list[str]:
     hs = hypotheses(runs)
     out = ["## Hypothesis verdicts", "", "Decision rules were committed in PLAN.md before the runs they govern.", "",
@@ -442,6 +544,7 @@ def main() -> None:
     lines += e1(runs)
     lines += e2(runs)
     lines += e2_stats(runs)
+    lines += e6(runs)
     lines += e4(runs)
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text("\n".join(lines), encoding="utf-8")
