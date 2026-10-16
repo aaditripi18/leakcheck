@@ -11,7 +11,7 @@ Decision rules were committed in PLAN.md before the runs they govern.
 | H1 | At least half of the audited benchmarks have >= 5% of test rows exactly duplicating a training row. | **supported** | 5 of 8 datasets: kdd99 68.36%, uci_phishing 64.41%, cicids2017 14.09%, sms_spam 11.03%, unsw_nb15 10.37% |
 | H2 | On the most affected benchmarks, removing cross-split duplicates and near-duplicates lowers macro-F1 of the standard baselines by >= 5 points. | **not supported** | kdd99: 4/4 models lose >= 5 macro-F1 points (gaps +17.51, +16.27, +15.00, +15.95); uci_phishing: 0/4 models lose >= 5 macro-F1 points (gaps +1.51, +1.05, +0.81, +1.67) |
 | H3 | A time-aware split costs more accuracy than deduplication (decided on EMBER; CIC-IDS2017's chronological split is confounded with unseen attack types). | **supported** | cicids2017: time gap > no_near gap for 4/4 models; ember2018: time gap > no_near gap for 4/4 models |
-| H4 | The accuracy lost to leakage shrinks as model strength grows: the gap for logistic regression exceeds the gap for gradient boosting. | **supported** | LR gap > HistGB gap on 6 of 6 eligible datasets: kdd99 +17.51 vs +15.00, nslkdd +11.86 vs +8.81, unsw_nb15 +2.01 vs +1.02, ember2018 +2.39 vs +1.30, uci_phishing +1.51 vs +0.81, sms_spam +3.07 vs +2.49 |
+| H4 | The accuracy lost to leakage shrinks as model strength grows: the gap for logistic regression exceeds the gap for gradient boosting. | **supported** | LR gap > HistGB gap on 6 of 6 eligible datasets: kdd99 +17.51 vs +15.00, nslkdd +11.86 vs +8.81, unsw_nb15 +2.01 vs +1.02, ember2018 +2.39 vs +1.30, uci_phishing +1.51 vs +0.81, sms_spam +3.07 vs +2.49. Post hoc (E2 uncertainty): the paired 95% interval lies above zero on 4 of 6 (kdd99, nslkdd, unsw_nb15, ember2018) |
 | H5 | At least one widely used benchmark has a single feature reaching >= 0.95 balanced accuracy on its own. | **supported** | phiusiil: URLSimilarityIndex 99.60% |
 
 ## E0-src: third-party copies checked against verified originals
@@ -201,6 +201,60 @@ Training rows used: 4,459; test rows: 1,115; leaked test rows: exact 11.43%, exa
 | rf | 0.9386 ± 0.0102 | 0.9204 ± 0.0113 | 0.8991 ± 0.0127 | 1.0000 ± 0.0000 | +1.82 | +3.95 |
 | hgb | 0.9585 ± 0.0038 | 0.9468 ± 0.0036 | 0.9336 ± 0.0042 | 1.0000 ± 0.0000 | +1.16 | +2.49 |
 | mlp | 0.9681 ± 0.0097 | 0.9594 ± 0.0112 | 0.9499 ± 0.0125 | 1.0000 ± 0.0000 | +0.87 | +1.82 |
+
+## E2 uncertainty (post hoc)
+
+_ledger: `e2_stats` @ `347deca`, 2026-10-16T10:10:47+00:00_
+
+Added after the E2 verdicts, so it changes none of them; it says which gaps the data can tell from zero. `seeds`: macro-F1 gap original - no_near, mean and 95% t interval over the 5 seeds (official splits keep the test set fixed, so this is model and subsample variation only). `rows`: seed 0, accuracy on leaked minus clean (no_near) test rows, 95% Newcombe interval, with the two-proportion p-value; it treats test rows as independent, which near-copy clusters are not, so it is optimistic. Points.
+
+| Dataset | Model | seeds: macro-F1 gap [95%] | rows: leaked n / clean n | rows: accuracy leaked - clean [95%] | p |
+|---|---|---|---|---|---|
+| kdd99 | lr | +17.51 [+16.87, +18.15] | 242,492 / 68,537 | +21.79 [+21.46, +22.12] | < 1e-6 |
+| kdd99 | rf | +16.27 [+15.84, +16.70] | 242,492 / 68,537 | +20.72 [+20.40, +21.05] | < 1e-6 |
+| kdd99 | hgb | +15.00 [+14.40, +15.60] | 242,492 / 68,537 | +19.44 [+19.13, +19.77] | < 1e-6 |
+| kdd99 | mlp | +15.95 [+14.90, +17.00] | 242,492 / 68,537 | +20.40 [+20.08, +20.72] | < 1e-6 |
+| nslkdd | lr | +11.86 [+11.86, +11.86] | 7,455 / 15,089 | +34.84 [+34.00, +35.67] | < 1e-6 |
+| nslkdd | rf | +10.96 [+10.34, +11.57] | 7,455 / 15,089 | +31.15 [+30.33, +31.95] | < 1e-6 |
+| nslkdd | hgb | +8.81 [+8.43, +9.19] | 7,455 / 15,089 | +25.26 [+24.49, +26.03] | < 1e-6 |
+| nslkdd | mlp | +8.36 [+7.68, +9.04] | 7,455 / 15,089 | +24.98 [+24.20, +25.74] | < 1e-6 |
+| unsw_nb15 | lr | +2.01 [+2.01, +2.01] | 14,727 / 67,605 | +12.86 [+12.37, +13.32] | < 1e-6 |
+| unsw_nb15 | rf | +1.16 [+1.13, +1.18] | 14,727 / 67,605 | +7.85 [+7.36, +8.31] | < 1e-6 |
+| unsw_nb15 | hgb | +1.02 [+0.98, +1.06] | 14,727 / 67,605 | +7.32 [+6.83, +7.79] | < 1e-6 |
+| unsw_nb15 | mlp | +1.51 [+1.34, +1.69] | 14,727 / 67,605 | +8.71 [+8.26, +9.14] | < 1e-6 |
+| cicids2017 | lr | -0.25 [-0.30, -0.20] | 378,662 / 187,487 | -0.42 [-0.49, -0.34] | < 1e-6 |
+| cicids2017 | rf | -0.14 [-0.15, -0.13] | 378,662 / 187,487 | -0.13 [-0.15, -0.11] | < 1e-6 |
+| cicids2017 | hgb | -0.08 [-0.10, -0.07] | 378,662 / 187,487 | -0.08 [-0.10, -0.07] | < 1e-6 |
+| cicids2017 | mlp | -0.20 [-0.22, -0.18] | 378,662 / 187,487 | -0.18 [-0.20, -0.16] | < 1e-6 |
+| ember2018 | lr | +2.39 [+2.35, +2.43] | 47,211 / 152,789 | +8.47 [+8.18, +8.76] | < 1e-6 |
+| ember2018 | rf | +1.47 [+1.45, +1.49] | 47,211 / 152,789 | +5.40 [+5.28, +5.51] | < 1e-6 |
+| ember2018 | hgb | +1.30 [+1.28, +1.32] | 47,211 / 152,789 | +4.74 [+4.59, +4.88] | < 1e-6 |
+| ember2018 | mlp | +1.38 [+1.35, +1.41] | 47,211 / 152,789 | +5.13 [+5.00, +5.25] | < 1e-6 |
+| uci_phishing | lr | +1.51 [+0.21, +2.81] | 1,424 / 787 | +2.66 [+0.41, +5.11] | 0.019 |
+| uci_phishing | rf | +1.05 [-0.05, +2.14] | 1,424 / 787 | +0.81 [-0.69, +2.53] | 0.300 |
+| uci_phishing | hgb | +0.81 [-0.06, +1.67] | 1,424 / 787 | -0.25 [-1.70, +1.41] | 0.749 |
+| uci_phishing | mlp | +1.67 [+0.20, +3.14] | 1,424 / 787 | +0.95 [-0.79, +2.92] | 0.293 |
+| phiusiil | lr | +0.00 [+0.00, +0.00] | 2,091 / 45,068 | +0.02 [-0.16, +0.04] | 0.496 |
+| phiusiil | rf | +0.00 [+0.00, +0.00] | 2,091 / 45,068 | +0.01 [-0.17, +0.03] | 0.630 |
+| phiusiil | hgb | +0.00 [+0.00, +0.00] | 2,091 / 45,068 | +0.00 [-0.18, +0.01] | 1.000 |
+| phiusiil | mlp | +0.00 [+0.00, +0.00] | 2,091 / 45,068 | +0.01 [-0.17, +0.03] | 0.630 |
+| sms_spam | lr | +3.07 [+2.38, +3.77] | 148 / 967 | +1.23 [-2.95, +3.40] | 0.465 |
+| sms_spam | rf | +3.95 [+3.36, +4.53] | 148 / 967 | +3.62 [+0.90, +4.99] | 0.019 |
+| sms_spam | hgb | +2.49 [+2.13, +2.84] | 148 / 967 | +2.28 [-0.37, +3.42] | 0.064 |
+| sms_spam | mlp | +1.82 [+1.47, +2.18] | 148 / 967 | +2.38 [-0.27, +3.54] | 0.058 |
+
+H4, paired by seed: LR gap minus HistGB gap (macro-F1 points), 95% t interval.
+
+| Dataset | LR - HistGB [95%] | Excludes 0 |
+|---|---|---|
+| kdd99 | +2.51 [+1.76, +3.27] | yes |
+| nslkdd | +3.05 [+2.67, +3.43] | yes |
+| unsw_nb15 | +0.99 [+0.95, +1.03] | yes |
+| cicids2017 | -0.17 [-0.22, -0.12] | yes |
+| ember2018 | +1.09 [+1.05, +1.13] | yes |
+| uci_phishing | +0.70 [-0.47, +1.88] | no |
+| phiusiil | +0.00 [+0.00, +0.00] | n/a (no gap) |
+| sms_spam | +0.58 [-0.26, +1.43] | no |
 
 ## E4: shortcut ablation
 

@@ -189,6 +189,46 @@ def e2(runs: dict) -> list[str]:
     return out
 
 
+def e2_stats(runs: dict) -> list[str]:
+    if "e2_stats" not in runs:
+        return []
+    d = runs["e2_stats"]
+    r = d["results"]
+    out = ["## E2 uncertainty (post hoc)", "", src(d), "",
+           "Added after the E2 verdicts, so it changes none of them; it says which gaps the data can tell from zero. "
+           "`seeds`: macro-F1 gap original - no_near, mean and 95% t interval over the 5 seeds (official splits keep "
+           "the test set fixed, so this is model and subsample variation only). `rows`: seed 0, accuracy on leaked "
+           "minus clean (no_near) test rows, 95% Newcombe interval, with the two-proportion p-value; it treats test rows "
+           "as independent, which near-copy clusters are not, so it is optimistic. Points.", "",
+           "| Dataset | Model | seeds: macro-F1 gap [95%] | rows: leaked n / clean n | rows: accuracy leaked - clean [95%] | p |",
+           "|---|---|---|---|---|---|"]
+    for n in E1_ORDER:
+        if n not in r:
+            continue
+        for m in MODELS:
+            v = r[n]["models"][m]
+            rows_ci = (f"{pt(v['acc_diff'])} [{pt(v['acc_diff_lo'])}, {pt(v['acc_diff_hi'])}]" if "acc_diff" in v else "n/a")
+            p = v.get("p_two_prop")
+            ptxt = "n/a" if p is None else ("< 1e-6" if p < 1e-6 else f"{p:.3f}")
+            out.append(f"| {n} | {m} | {pt(v['f1_gap_mean'])} [{pt(v['f1_gap_lo'])}, {pt(v['f1_gap_hi'])}] | "
+                       f"{v['n_leaked']:,} / {v['n_clean']:,} | {rows_ci} | {ptxt} |")
+    out += ["", "H4, paired by seed: LR gap minus HistGB gap (macro-F1 points), 95% t interval.", "",
+            "| Dataset | LR - HistGB [95%] | Excludes 0 |", "|---|---|---|"]
+    for n in E1_ORDER:
+        h = r.get(n, {}).get("h4_paired")
+        if h:
+            excl = ("n/a (no gap)" if abs(h["lr_minus_hgb"]) < 1e-4
+                    else "yes" if h["lo"] > 0 or h["hi"] < 0 else "no")
+            out.append(f"| {n} | {pt(h['lr_minus_hgb'])} [{pt(h['lo'])}, {pt(h['hi'])}] | {excl} |")
+    return out + [""]
+
+
+def h4_paired(runs: dict, eligible: list[str]) -> list[str]:
+    """Eligible H4 datasets whose paired LR - HistGB interval lies above zero (post hoc)."""
+    r = runs.get("e2_stats", {}).get("results", {})
+    return [n for n in eligible if n in r and r[n].get("h4_paired", {}).get("lo", 0) > 0]
+
+
 def _verdict(ok: bool | None) -> str:
     return "pending" if ok is None else ("supported" if ok else "not supported")
 
@@ -234,7 +274,11 @@ def hypotheses(runs: dict) -> list[dict]:
                 "logistic regression exceeds the gap for gradient boosting.",
                 "verdict": _verdict((2 * len(wins) > len(eligible)) if eligible and complete_e2 else None),
                 "evidence": f"LR gap > HistGB gap on {len(wins)} of {len(eligible)} eligible datasets: " + ", ".join(
-                    f"{n} {pt(gaps[n]['lr']['orig_minus_no_near'])} vs {pt(gaps[n]['hgb']['orig_minus_no_near'])}" for n in eligible)})
+                    f"{n} {pt(gaps[n]['lr']['orig_minus_no_near'])} vs {pt(gaps[n]['hgb']['orig_minus_no_near'])}" for n in eligible)
+                + (f". Post hoc (E2 uncertainty): the paired 95% interval lies above zero on {len(h4_paired(runs, wins))}"
+                   f" of {len(wins)} ({', '.join(h4_paired(runs, wins))})" if "e2_stats" in runs else ""),
+                "paired_above_zero": h4_paired(runs, wins) if "e2_stats" in runs else None,
+                "wins": wins})
 
     flag = [(n, f["L5.shortcut"]["value"], f["L5.shortcut"]["top"][0]["feature"]) for n, f in e1.items()
             if "L5.shortcut" in f and f["L5.shortcut"]["value"] >= 0.95]
@@ -344,9 +388,16 @@ def site_data(runs: dict) -> dict:
                     "time": _num(bm["time"]["macro_f1_mean"]) if "time" in bm else None,
                     "gap_time": _num(gp.get("orig_minus_time")),
                 }
+            st = runs.get("e2_stats", {}).get("results", {}).get(n)
+            if st:
+                for m in MODELS:
+                    v = st["models"][m]
+                    models[m]["gap_no_near_ci"] = [_num(v["f1_gap_lo"]), _num(v["f1_gap_hi"])]
             retrain.append({"id": n, "name": name, "leaked_exact": _num(r["leak_rate_mean"]["exact"]),
                             "leaked_near": _num(r["leak_rate_mean"]["near"]), "n_train_used": r["n_train"],
-                            "models": models, "source": ref(f"e2_retrain:{n}")})
+                            "models": models, "source": ref(f"e2_retrain:{n}"),
+                            **({"h4_paired": {k: _num(x) for k, x in st["h4_paired"].items()},
+                                "stats_source": ref("e2_stats")} if st and "h4_paired" in st else {})})
         if f"e4_ablation:{n}" in runs:
             d = runs[f"e4_ablation:{n}"]
             r = d["results"]
@@ -390,6 +441,7 @@ def main() -> None:
             lines += fn(runs[name])
     lines += e1(runs)
     lines += e2(runs)
+    lines += e2_stats(runs)
     lines += e4(runs)
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text("\n".join(lines), encoding="utf-8")

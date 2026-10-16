@@ -293,6 +293,29 @@ All eight datasets are in. On every dataset where the LR or HistGB gap reaches
 LR's gap exceeds HistGB's. **6 of 6, H4 supported.** CIC-IDS2017 and PhiUSIIL
 are excluded by the rule (both gaps below 1 point).
 
+**How sure is that? (E2 uncertainty, added after the verdict, changes none.)**
+The H4 rule compares two means and asks only which is bigger. Paired by seed,
+LR's gap minus HistGB's has a 95% interval above zero on 4 of the 6:
+
+| Dataset | LR gap − HistGB gap, macro-F1 points [95%, t over 5 seeds] |
+|---|---|
+| NSL-KDD | +3.05 [+2.67, +3.43] |
+| KDD99 | +2.51 [+1.76, +3.27] |
+| EMBER (random split) | +1.09 [+1.05, +1.13] |
+| UNSW-NB15 | +0.99 [+0.95, +1.03] |
+| UCI Phishing | +0.70 [−0.47, +1.88] |
+| SMS Spam | +0.58 [−0.26, +1.43] |
+
+So the claim that survives is narrower than "6 of 6": on the four large
+benchmarks the weaker model's extra inflation is measurable; on the two small
+ones (2,211 and 1,115 test rows) it cannot be told from seed noise. The same
+holds for the gaps themselves: UCI Phishing's HistGB gap (+0.81) has an
+interval of −0.1 to +1.7 points, and on seed 0 its leaked rows score 96.7%
+against 97.0% on clean rows (Newcombe interval −1.7 to +1.4). The KDD99, NSL-KDD,
+UNSW-NB15 and EMBER gaps sit far outside their intervals. The row-level
+interval treats test rows as independent, which clusters of near-copies are
+not, so it is if anything too narrow. Full table: RESULTS.md, "E2 uncertainty".
+
 ## 19. PhiUSIIL: there is nothing for leakage to inflate
 
 PhiUSIIL has no exact copies and 4.47% near-copies (mostly by URL text). Every

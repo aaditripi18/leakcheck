@@ -265,7 +265,13 @@ def short_evidence(h: dict, d: dict) -> str:
         return (f"EMBER: the time split costs {fpt(min(t))}–{fpt(max(t))} points vs {fpt(min(nn))}–{fpt(max(nn))} for "
                 f"removing near-copies; a margin of {fpt(min(diffs))}–{fpt(max(diffs))}.")
     if h["id"] == "H4":
-        return h["evidence"].split(":")[0] + "."
+        base = h["evidence"].split(":")[0] + "."
+        above = h.get("paired_above_zero")
+        if above is None:
+            return base
+        names = [rt[n]["name"] for n in above]
+        return (f"{base[:-1]}; the paired 95% interval is above zero on {len(above)} of {len(h['wins'])} "
+                f"({', '.join(names)}).")
     if h["id"] == "H5":
         a = max(d["audit"], key=lambda a: a["best_single_feature_bacc"] or 0)
         return f"{a['name']}: {a['best_single_feature']} alone reaches {fpct(a['best_single_feature_bacc'])} balanced accuracy."
@@ -340,6 +346,17 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
   </div>
   <span class="col-span-2 text-right tabular leading-tight"><span class="text-primary font-bold block">{fpt(lr)}</span><span class="text-on-surface-variant block">{fpt(hgb)}</span></span>
 </div>""")
+
+    # how sure the gaps are (E2 uncertainty, post hoc)
+    kci = rt["kdd99"]["models"]["lr"].get("gap_no_near_ci")
+    uci_m = rt["uci_phishing"]["models"]
+    uncertainty = ""
+    if kci and "gap_no_near_ci" in uci_m["hgb"]:
+        lo, hi = uci_m["hgb"]["gap_no_near_ci"]
+        uncertainty = (f"Over the five seeds the 95% interval for KDD Cup 99's logistic-regression gap is "
+                       f"{fpt(kci[0])}–{fpt(kci[1])} points; small gaps are less certain: UCI Phishing's "
+                       f"gradient-boosting gap of {fpt(uci_m['hgb']['gap_no_near'])} has an interval of "
+                       f"{fpt(lo)} to {fpt(hi)}, which includes zero.")
 
     hyps = []
     for h in d["hypotheses"]:
@@ -534,7 +551,7 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
       <span class="col-span-4 sm:col-span-3"></span><div class="col-span-6 sm:col-span-7 flex justify-between"><span>0</span><span>5</span><span>10</span><span>15</span><span>20 pts</span></div><span class="col-span-2"></span>
     </div>
   </div>
-  <p class="font-body-sm text-body-sm text-on-surface-variant">Four untuned baselines × 5 seeds; this chart shows two of them. All four models, with seed standard deviations, are in <a class="underline underline-offset-2 hover:text-on-surface" href="{REPO_URL}/blob/main/docs/RESULTS.md" rel="noopener noreferrer">RESULTS.md</a>.</p>
+  <p class="font-body-sm text-body-sm text-on-surface-variant">Four untuned baselines × 5 seeds; this chart shows two of them. {uncertainty} All four models, with 95% intervals, are in <a class="underline underline-offset-2 hover:text-on-surface" href="{REPO_URL}/blob/main/docs/RESULTS.md" rel="noopener noreferrer">RESULTS.md</a>.</p>
 </section>
 
 <section class="flex flex-col gap-space-md">

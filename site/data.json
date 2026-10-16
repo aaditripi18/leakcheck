@@ -19,6 +19,7 @@
   "e2_retrain:sms_spam @ 42caa56",
   "e2_retrain:uci_phishing @ 42caa56",
   "e2_retrain:unsw_nb15 @ 42caa56",
+  "e2_stats @ 347deca",
   "e4_ablation:cicids2017 @ ad29867",
   "e4_ablation:phiusiil @ ad29867"
  ],
@@ -89,7 +90,21 @@
    "id": "H4",
    "statement": "The accuracy lost to leakage shrinks as model strength grows: the gap for logistic regression exceeds the gap for gradient boosting.",
    "verdict": "supported",
-   "evidence": "LR gap > HistGB gap on 6 of 6 eligible datasets: kdd99 +17.51 vs +15.00, nslkdd +11.86 vs +8.81, unsw_nb15 +2.01 vs +1.02, ember2018 +2.39 vs +1.30, uci_phishing +1.51 vs +0.81, sms_spam +3.07 vs +2.49"
+   "evidence": "LR gap > HistGB gap on 6 of 6 eligible datasets: kdd99 +17.51 vs +15.00, nslkdd +11.86 vs +8.81, unsw_nb15 +2.01 vs +1.02, ember2018 +2.39 vs +1.30, uci_phishing +1.51 vs +0.81, sms_spam +3.07 vs +2.49. Post hoc (E2 uncertainty): the paired 95% interval lies above zero on 4 of 6 (kdd99, nslkdd, unsw_nb15, ember2018)",
+   "paired_above_zero": [
+    "kdd99",
+    "nslkdd",
+    "unsw_nb15",
+    "ember2018"
+   ],
+   "wins": [
+    "kdd99",
+    "nslkdd",
+    "unsw_nb15",
+    "ember2018",
+    "uci_phishing",
+    "sms_spam"
+   ]
   },
   {
    "id": "H5",
@@ -292,7 +307,11 @@
      "gap_no_exact": 0.047999,
      "gap_no_near": 0.175108,
      "time": null,
-     "gap_time": null
+     "gap_time": null,
+     "gap_no_near_ci": [
+      0.168708,
+      0.181507
+     ]
     },
     "rf": {
      "original": 0.893945,
@@ -302,7 +321,11 @@
      "gap_no_exact": 0.04495,
      "gap_no_near": 0.162707,
      "time": null,
-     "gap_time": null
+     "gap_time": null,
+     "gap_no_near_ci": [
+      0.158376,
+      0.167039
+     ]
     },
     "hgb": {
      "original": 0.896514,
@@ -312,7 +335,11 @@
      "gap_no_exact": 0.042423,
      "gap_no_near": 0.149962,
      "time": null,
-     "gap_time": null
+     "gap_time": null,
+     "gap_no_near_ci": [
+      0.143959,
+      0.155966
+     ]
     },
     "mlp": {
      "original": 0.892774,
@@ -322,12 +349,25 @@
      "gap_no_exact": 0.044729,
      "gap_no_near": 0.159475,
      "time": null,
-     "gap_time": null
+     "gap_time": null,
+     "gap_no_near_ci": [
+      0.148988,
+      0.169961
+     ]
     }
    },
    "source": {
     "ledger": "e2_retrain:kdd99",
     "commit": "42caa56"
+   },
+   "h4_paired": {
+    "lr_minus_hgb": 0.025146,
+    "lo": 0.017564,
+    "hi": 0.032727
+   },
+   "stats_source": {
+    "ledger": "e2_stats",
+    "commit": "347deca"
    }
   },
   {
@@ -345,7 +385,11 @@
      "gap_no_exact": 0.005987,
      "gap_no_near": 0.118618,
      "time": null,
-     "gap_time": null
+     "gap_time": null,
+     "gap_no_near_ci": [
+      0.118618,
+      0.118618
+     ]
     },
     "rf": {
      "original": 0.76881,
@@ -355,7 +399,11 @@
      "gap_no_exact": 0.005615,
      "gap_no_near": 0.109562,
      "time": null,
-     "gap_time": null
+     "gap_time": null,
+     "gap_no_near_ci": [
+      0.103449,
+      0.115675
+     ]
     },
     "hgb": {
      "original": 0.805523,
@@ -365,7 +413,11 @@
      "gap_no_exact": 0.003953,
      "gap_no_near": 0.088113,
      "time": null,
-     "gap_time": null
+     "gap_time": null,
+     "gap_no_near_ci": [
+      0.084329,
+      0.091897
+     ]
     },
     "mlp": {
      "original": 0.813621,
@@ -375,12 +427,25 @@
      "gap_no_exact": 0.00359,
      "gap_no_near": 0.083629,
      "time": null,
-     "gap_time": null
+     "gap_time": null,
+     "gap_no_near_ci": [
+      0.076839,
+      0.090419
+     ]
     }
    },
    "source": {
     "ledger": "e2_retrain:nslkdd",
     "commit": "8821fdf"
+   },
+   "h4_paired": {
+    "lr_minus_hgb": 0.030505,
+    "lo": 0.026722,
+    "hi": 0.034289
+   },
+   "stats_source": {
+    "ledger": "e2_stats",
+    "commit": "347deca"
    }
   },
   {
@@ -398,7 +463,11 @@
      "gap_no_exact": 0.008348,
      "gap_no_near": 0.020093,
      "time": null,
-     "gap_time": null
+     "gap_time": null,
+     "gap_no_near_ci": [
+      0.020093,
+      0.020093
+     ]
     },
     "rf": {
      "original": 0.866334,
@@ -408,7 +477,11 @@
      "gap_no_exact": 0.005586,
      "gap_no_near": 0.011579,
      "time": null,
-     "gap_time": null
+     "gap_time": null,
+     "gap_no_near_ci": [
+      0.011345,
+      0.011813
+     ]
     },
     "hgb": {
      "original": 0.867534,
@@ -418,7 +491,11 @@
      "gap_no_exact": 0.004652,
      "gap_no_near": 0.010201,
      "time": null,
-     "gap_time": null
+     "gap_time": null,
+     "gap_no_near_ci": [
+      0.009767,
+      0.010635
+     ]
     },
     "mlp": {
      "original": 0.861304,
@@ -428,12 +505,25 @@
      "gap_no_exact": 0.006359,
      "gap_no_near": 0.015133,
      "time": null,
-     "gap_time": null
+     "gap_time": null,
+     "gap_no_near_ci": [
+      0.013399,
+      0.016868
+     ]
     }
    },
    "source": {
     "ledger": "e2_retrain:unsw_nb15",
     "commit": "42caa56"
+   },
+   "h4_paired": {
+    "lr_minus_hgb": 0.009892,
+    "lo": 0.009458,
+    "hi": 0.010326
+   },
+   "stats_source": {
+    "ledger": "e2_stats",
+    "commit": "347deca"
    }
   },
   {
@@ -451,7 +541,11 @@
      "gap_no_exact": 0.002013,
      "gap_no_near": -0.00253,
      "time": 0.56543,
-     "gap_time": 0.405316
+     "gap_time": 0.405316,
+     "gap_no_near_ci": [
+      -0.003017,
+      -0.002043
+     ]
     },
     "rf": {
      "original": 0.997464,
@@ -461,7 +555,11 @@
      "gap_no_exact": 0.000204,
      "gap_no_near": -0.001382,
      "time": 0.562171,
-     "gap_time": 0.435293
+     "gap_time": 0.435293,
+     "gap_no_near_ci": [
+      -0.001477,
+      -0.001287
+     ]
     },
     "hgb": {
      "original": 0.998547,
@@ -471,7 +569,11 @@
      "gap_no_exact": 0.0001,
      "gap_no_near": -0.000825,
      "time": 0.461895,
-     "gap_time": 0.536652
+     "gap_time": 0.536652,
+     "gap_no_near_ci": [
+      -0.000954,
+      -0.000696
+     ]
     },
     "mlp": {
      "original": 0.996309,
@@ -481,12 +583,25 @@
      "gap_no_exact": 0.000138,
      "gap_no_near": -0.002013,
      "time": 0.515907,
-     "gap_time": 0.480402
+     "gap_time": 0.480402,
+     "gap_no_near_ci": [
+      -0.002244,
+      -0.001782
+     ]
     }
    },
    "source": {
     "ledger": "e2_retrain:cicids2017",
     "commit": "42caa56"
+   },
+   "h4_paired": {
+    "lr_minus_hgb": -0.001705,
+    "lo": -0.002217,
+    "hi": -0.001192
+   },
+   "stats_source": {
+    "ledger": "e2_stats",
+    "commit": "347deca"
    }
   },
   {
@@ -504,7 +619,11 @@
      "gap_no_exact": 7e-06,
      "gap_no_near": 0.023892,
      "time": 0.840602,
-     "gap_time": 0.026477
+     "gap_time": 0.026477,
+     "gap_no_near_ci": [
+      0.023499,
+      0.024285
+     ]
     },
     "rf": {
      "original": 0.957874,
@@ -514,7 +633,11 @@
      "gap_no_exact": 6e-06,
      "gap_no_near": 0.014704,
      "time": 0.937835,
-     "gap_time": 0.02004
+     "gap_time": 0.02004,
+     "gap_no_near_ci": [
+      0.01451,
+      0.014898
+     ]
     },
     "hgb": {
      "original": 0.95357,
@@ -524,7 +647,11 @@
      "gap_no_exact": 6e-06,
      "gap_no_near": 0.012987,
      "time": 0.934858,
-     "gap_time": 0.018713
+     "gap_time": 0.018713,
+     "gap_no_near_ci": [
+      0.012782,
+      0.013193
+     ]
     },
     "mlp": {
      "original": 0.956184,
@@ -534,12 +661,25 @@
      "gap_no_exact": 4e-06,
      "gap_no_near": 0.0138,
      "time": 0.933473,
-     "gap_time": 0.02271
+     "gap_time": 0.02271,
+     "gap_no_near_ci": [
+      0.013465,
+      0.014134
+     ]
     }
    },
    "source": {
     "ledger": "e2_retrain:ember2018",
     "commit": "ad29867"
+   },
+   "h4_paired": {
+    "lr_minus_hgb": 0.010905,
+    "lo": 0.010473,
+    "hi": 0.011337
+   },
+   "stats_source": {
+    "ledger": "e2_stats",
+    "commit": "347deca"
    }
   },
   {
@@ -557,7 +697,11 @@
      "gap_no_exact": 0.015126,
      "gap_no_near": 0.015126,
      "time": null,
-     "gap_time": null
+     "gap_time": null,
+     "gap_no_near_ci": [
+      0.002113,
+      0.028139
+     ]
     },
     "rf": {
      "original": 0.97029,
@@ -567,7 +711,11 @@
      "gap_no_exact": 0.010468,
      "gap_no_near": 0.010468,
      "time": null,
-     "gap_time": null
+     "gap_time": null,
+     "gap_no_near_ci": [
+      -0.000466,
+      0.021402
+     ]
     },
     "hgb": {
      "original": 0.968836,
@@ -577,7 +725,11 @@
      "gap_no_exact": 0.008078,
      "gap_no_near": 0.008078,
      "time": null,
-     "gap_time": null
+     "gap_time": null,
+     "gap_no_near_ci": [
+      -0.000572,
+      0.016728
+     ]
     },
     "mlp": {
      "original": 0.961489,
@@ -587,12 +739,25 @@
      "gap_no_exact": 0.016687,
      "gap_no_near": 0.016687,
      "time": null,
-     "gap_time": null
+     "gap_time": null,
+     "gap_no_near_ci": [
+      0.001968,
+      0.031406
+     ]
     }
    },
    "source": {
     "ledger": "e2_retrain:uci_phishing",
     "commit": "42caa56"
+   },
+   "h4_paired": {
+    "lr_minus_hgb": 0.007048,
+    "lo": -0.004728,
+    "hi": 0.018824
+   },
+   "stats_source": {
+    "ledger": "e2_stats",
+    "commit": "347deca"
    }
   },
   {
@@ -610,7 +775,11 @@
      "gap_no_exact": 0.0,
      "gap_no_near": 6e-06,
      "time": null,
-     "gap_time": null
+     "gap_time": null,
+     "gap_no_near_ci": [
+      1e-06,
+      1.2e-05
+     ]
     },
     "rf": {
      "original": 0.999944,
@@ -620,7 +789,11 @@
      "gap_no_exact": 0.0,
      "gap_no_near": 3e-06,
      "time": null,
-     "gap_time": null
+     "gap_time": null,
+     "gap_no_near_ci": [
+      1e-06,
+      6e-06
+     ]
     },
     "hgb": {
      "original": 1.0,
@@ -630,7 +803,11 @@
      "gap_no_exact": 0.0,
      "gap_no_near": 0.0,
      "time": null,
-     "gap_time": null
+     "gap_time": null,
+     "gap_no_near_ci": [
+      0.0,
+      0.0
+     ]
     },
     "mlp": {
      "original": 0.999939,
@@ -640,12 +817,25 @@
      "gap_no_exact": 0.0,
      "gap_no_near": 4e-06,
      "time": null,
-     "gap_time": null
+     "gap_time": null,
+     "gap_no_near_ci": [
+      1e-06,
+      7e-06
+     ]
     }
    },
    "source": {
     "ledger": "e2_retrain:phiusiil",
     "commit": "ad29867"
+   },
+   "h4_paired": {
+    "lr_minus_hgb": 6e-06,
+    "lo": 1e-06,
+    "hi": 1.2e-05
+   },
+   "stats_source": {
+    "ledger": "e2_stats",
+    "commit": "347deca"
    }
   },
   {
@@ -663,7 +853,11 @@
      "gap_no_exact": 0.014167,
      "gap_no_near": 0.030708,
      "time": null,
-     "gap_time": null
+     "gap_time": null,
+     "gap_no_near_ci": [
+      0.023763,
+      0.037654
+     ]
     },
     "rf": {
      "original": 0.938585,
@@ -673,7 +867,11 @@
      "gap_no_exact": 0.018192,
      "gap_no_near": 0.039475,
      "time": null,
-     "gap_time": null
+     "gap_time": null,
+     "gap_no_near_ci": [
+      0.033615,
+      0.045335
+     ]
     },
     "hgb": {
      "original": 0.958483,
@@ -683,7 +881,11 @@
      "gap_no_exact": 0.011637,
      "gap_no_near": 0.024866,
      "time": null,
-     "gap_time": null
+     "gap_time": null,
+     "gap_no_near_ci": [
+      0.02132,
+      0.028412
+     ]
     },
     "mlp": {
      "original": 0.968074,
@@ -693,12 +895,25 @@
      "gap_no_exact": 0.008672,
      "gap_no_near": 0.018223,
      "time": null,
-     "gap_time": null
+     "gap_time": null,
+     "gap_no_near_ci": [
+      0.01466,
+      0.021786
+     ]
     }
    },
    "source": {
     "ledger": "e2_retrain:sms_spam",
     "commit": "42caa56"
+   },
+   "h4_paired": {
+    "lr_minus_hgb": 0.005842,
+    "lo": -0.002587,
+    "hi": 0.014272
+   },
+   "stats_source": {
+    "ledger": "e2_stats",
+    "commit": "347deca"
    }
   }
  ],

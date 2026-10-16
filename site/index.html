@@ -272,7 +272,7 @@
       <span class="col-span-4 sm:col-span-3"></span><div class="col-span-6 sm:col-span-7 flex justify-between"><span>0</span><span>5</span><span>10</span><span>15</span><span>20 pts</span></div><span class="col-span-2"></span>
     </div>
   </div>
-  <p class="font-body-sm text-body-sm text-on-surface-variant">Four untuned baselines × 5 seeds; this chart shows two of them. All four models, with seed standard deviations, are in <a class="underline underline-offset-2 hover:text-on-surface" href="https://github.com/aaditripi18/leakcheck/blob/main/docs/RESULTS.md" rel="noopener noreferrer">RESULTS.md</a>.</p>
+  <p class="font-body-sm text-body-sm text-on-surface-variant">Four untuned baselines × 5 seeds; this chart shows two of them. Over the five seeds the 95% interval for KDD Cup 99's logistic-regression gap is 16.9–18.2 points; small gaps are less certain: UCI Phishing's gradient-boosting gap of 0.8 has an interval of -0.1 to 1.7, which includes zero. All four models, with 95% intervals, are in <a class="underline underline-offset-2 hover:text-on-surface" href="https://github.com/aaditripi18/leakcheck/blob/main/docs/RESULTS.md" rel="noopener noreferrer">RESULTS.md</a>.</p>
 </section>
 
 <section class="flex flex-col gap-space-md">
@@ -312,7 +312,7 @@
     <span class="font-mono-data-md text-mono-data-md font-bold text-on-surface bg-surface-container px-2 py-0.5">H4</span>
     <div class="flex flex-col">
       <span class="font-body-md text-body-md font-medium text-on-surface">Weaker models lean harder on leaked rows.</span>
-      <span class="font-mono-data-sm text-mono-data-sm text-secondary mt-0.5">LR gap &gt; HistGB gap on 6 of 6 eligible datasets.</span>
+      <span class="font-mono-data-sm text-mono-data-sm text-secondary mt-0.5">LR gap &gt; HistGB gap on 6 of 6 eligible datasets; the paired 95% interval is above zero on 4 of 6 (KDD Cup 99, NSL-KDD, UNSW-NB15, EMBER 2018).</span>
     </div>
   </div>
   <div class="self-start md:self-center shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 font-mono-data-sm text-mono-data-sm font-semibold bg-success/10 text-success border border-success/30">SUPPORTED</span></div>
@@ -456,7 +456,7 @@ python -m experiments.e4_ablation phiusiil cicids2017
 python scripts/report.py</pre>
     <div class="mt-space-md pt-space-sm border-t border-[#2f312f] flex flex-col md:flex-row md:items-center justify-between gap-1 font-mono-data-sm text-mono-data-sm text-[#8c8c88]">
       <span>Every run appends a line to an append-only ledger; this page is generated from it.</span>
-      <span class="text-white font-medium">20 ledger lines behind this page</span>
+      <span class="text-white font-medium">21 ledger lines behind this page</span>
     </div>
   </div>
 </section>
@@ -487,7 +487,7 @@ python scripts/report.py</pre>
   </div>
   <div class="max-w-[1100px] mx-auto px-margin-mobile md:px-gutter mt-space-lg pt-space-md border-t border-surface-container-highest flex flex-col sm:flex-row gap-space-xs justify-between text-on-surface-variant font-mono-data-sm text-mono-data-sm">
     <span>Every number on this site is generated from <code>results/ledger.jsonl</code>.</span>
-    <span>Generated 2026-10-15</span>
+    <span>Generated 2026-10-16</span>
   </div>
 </footer>
 <script src="assets/site.js"></script>
