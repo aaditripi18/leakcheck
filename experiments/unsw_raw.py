@@ -42,7 +42,7 @@ def names(directory: Path = DIR) -> list[str]:
 def _port(x: pd.Series) -> pd.Series:
     s = x.astype("string").str.strip()
     hexa = s.str.match(r"^0x[0-9a-fA-F]+$", na=False)
-    out = pd.to_numeric(s.where(~hexa), errors="coerce")
+    out = pd.to_numeric(s.where(~hexa), errors="coerce").astype("float64")
     out[hexa] = s[hexa].map(lambda v: int(v, 16)).astype("float64")
     return out
 
@@ -67,10 +67,15 @@ def load(directory: Path = DIR) -> pd.DataFrame:
     df["attack_cat"] = cat
     for c in ("sport", "dsport"):
         df[c] = _port(df[c])
-    df["ct_ftp_cmd"] = pd.to_numeric(df["ct_ftp_cmd"].astype("string").str.strip(), errors="coerce")
+    df["ct_ftp_cmd"] = pd.to_numeric(df["ct_ftp_cmd"].astype("string").str.strip(), errors="coerce").astype("float64")
     for c in ("proto", "state", "service"):
         df[c] = df[c].astype("string").str.strip()
     df["label"] = df["label"].astype("int8")
+    # plain numpy dtypes for every numeric feature (nullable pandas types reach the
+    # models as pd.NA, which numpy cannot convert)
+    for c in df.columns:
+        if c not in ("srcip", "dstip", "proto", "state", "service", "attack_cat") and                 pd.api.types.is_extension_array_dtype(df[c]):
+            df[c] = df[c].astype("float64")
     return df
 
 
