@@ -224,5 +224,51 @@
         "sha256": "1587ea43e58e82b14ff1f5425c88e17f8496bfcdb67a583dbff9eefaf9963ce3"
       }
     ]
+  },
+  "unsw_raw_official": {
+    "description": "UNSW-NB15 raw records: UNSW-NB15_1..4.csv (2,540,047 lines = 2,540,044 records + 3 boundary repeats), the feature list and the event list",
+    "files": [
+      {
+        "path": "unsw_raw_official/NUSW-NB15_features.csv",
+        "sha256": "c55f19cceebb6360dc50f44f8a5f246ccefbcf8a6c604ac1ad46e643869cafce",
+        "bytes": 4044,
+        "url": "https://unsw-my.sharepoint.com/:f:/g/personal/z5025758_ad_unsw_edu_au/EnuQZZn3XuNBjgfcUu4DIVMBLCHyoLHqOswirpOQifr1ag (folder CSV Files)"
+      },
+      {
+        "path": "unsw_raw_official/UNSW-NB15_1.csv",
+        "sha256": "7d851bbeabd27894ce39c8e78835c73341fc946652fb7743b9eff193b55eb511",
+        "bytes": 168979718,
+        "url": "https://unsw-my.sharepoint.com/:f:/g/personal/z5025758_ad_unsw_edu_au/EnuQZZn3XuNBjgfcUu4DIVMBLCHyoLHqOswirpOQifr1ag (folder CSV Files)"
+      },
+      {
+        "path": "unsw_raw_official/UNSW-NB15_2.csv",
+        "sha256": "6130ad02873cc6069ae695cf2844f2e8c2e9a9a1b7532dd82ab8f202757cacf8",
+        "bytes": 165221021,
+        "url": "https://unsw-my.sharepoint.com/:f:/g/personal/z5025758_ad_unsw_edu_au/EnuQZZn3XuNBjgfcUu4DIVMBLCHyoLHqOswirpOQifr1ag (folder CSV Files)"
+      },
+      {
+        "path": "unsw_raw_official/UNSW-NB15_3.csv",
+        "sha256": "ae990a96c3dfcd425ce2801aadb1727a34d5e0ae6d8215dbcdae60dedfaef640",
+        "bytes": 154588103,
+        "url": "https://unsw-my.sharepoint.com/:f:/g/personal/z5025758_ad_unsw_edu_au/EnuQZZn3XuNBjgfcUu4DIVMBLCHyoLHqOswirpOQifr1ag (folder CSV Files)"
+      },
+      {
+        "path": "unsw_raw_official/UNSW-NB15_4.csv",
+        "sha256": "cdf563692d51d405541dd659ddcdad9fa01f001f05fe9fc4b67f00ca12fbc96a",
+        "bytes": 97588754,
+        "url": "https://unsw-my.sharepoint.com/:f:/g/personal/z5025758_ad_unsw_edu_au/EnuQZZn3XuNBjgfcUu4DIVMBLCHyoLHqOswirpOQifr1ag (folder CSV Files)"
+      },
+      {
+        "path": "unsw_raw_official/UNSW-NB15_LIST_EVENTS.csv",
+        "sha256": "5b40f8128e2c87e691157c76debde04c328b0eb66bab97f1e7e17625f84497f2",
+        "bytes": 4639,
+        "url": "https://unsw-my.sharepoint.com/:f:/g/personal/z5025758_ad_unsw_edu_au/EnuQZZn3XuNBjgfcUu4DIVMBLCHyoLHqOswirpOQifr1ag (folder CSV Files)"
+      }
+    ],
+    "source": "The authors' public OneDrive share linked from https://research.unsw.edu.au/projects/unsw-nb15-dataset (folder CSV Files); downloaded 2026-10-16 with resumed transfers, sizes equal the share's listing",
+    "provenance": "Validated (experiments/unsw_raw.provenance): 2,540,044 records and 49 columns as in 'The UNSW-NB15 description.pdf'; Normal 2,218,761 and the nine families Generic 215,481, Exploits 44,525, Fuzzers 24,246, DoS 16,353, Reconnaissance 13,987, Analysis 2,677, Backdoor 2,329, Shellcode 1,511, Worms 174; labels agree with categories. Each file ends with the record the next begins with; the loader drops those 3 repeats.",
+    "citation": "N. Moustafa and J. Slay, UNSW-NB15: a comprehensive data set for network intrusion detection systems, MilCIS 2015",
+    "licence": "UNSW-NB15 terms (research use, cite the authors); not redistributed here",
+    "manual_download": true
   }
 }

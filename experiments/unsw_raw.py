@@ -9,6 +9,11 @@ inconsistencies in the raw files, normalised here and nowhere else:
   sport/dsport some values are hexadecimal ("0x000b") or "-": parsed as
               numbers where possible, else missing (they are not model features)
   ct_ftp_cmd  blank strings in some rows -> missing
+  boundaries  each file ends with the record the next file begins with
+              (2,540,047 lines; the published total is 2,540,044): the repeated
+              first line of files 2-4 is dropped when it equals the previous
+              file's last line, and only then
+  BOM         UNSW-NB15_1.csv starts with a UTF-8 byte-order mark
 
 Features follow the authors' own training/testing partition: everything except
 srcip, sport, dstip, dsport, stime and ltime (addresses and timestamps), with
@@ -44,8 +49,19 @@ def _port(x: pd.Series) -> pd.Series:
 
 def load(directory: Path = DIR) -> pd.DataFrame:
     cols = names(directory)
-    parts = [pd.read_csv(directory / f, header=None, names=cols, low_memory=False, encoding="latin-1") for f in FILES]
-    df = pd.concat(parts, ignore_index=True)
+    parts = []
+    for f in FILES:
+        part = pd.read_csv(directory / f, header=None, names=cols, low_memory=False, encoding="utf-8-sig",
+                           dtype=str, keep_default_na=False)
+        if parts and part.iloc[0].equals(parts[-1].iloc[-1]):
+            part = part.iloc[1:]  # the boundary record repeated from the previous file
+        parts.append(part)
+    raw = pd.concat(parts, ignore_index=True)
+    text_cols = ("srcip", "dstip", "proto", "state", "service", "attack_cat", "sport", "dsport", "ct_ftp_cmd")
+    df = raw.replace({"": None})
+    for c in df.columns:
+        if c not in text_cols:
+            df[c] = pd.to_numeric(df[c], errors="raise")  # every other column must be numeric
     cat = df["attack_cat"].astype("string").str.strip()
     cat = cat.where(cat.notna() & (cat != ""), "Normal").replace({"Backdoors": "Backdoor"})
     df["attack_cat"] = cat
