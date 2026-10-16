@@ -30,3 +30,20 @@ Not used, and why:
 
 Downloads resume after dropped connections (two CDNs truncated large files
 silently during setup; the hash check caught both). Archives are never extracted to disk; loaders read named members directly.
+
+## Sources checked and rejected (2026-10-16)
+
+Looked for the raw UNSW-NB15 flow records (UNSW-NB15_1..4.csv, 2,540,044 rows
+with capture timestamps), for a time-ordered split in which every attack
+category occurs before and after the cut. Neither mirror below is the raw data,
+so neither is used:
+
+- `rdpahalavan/UNSW-NB15`, Network-Flows/UNSW_Flow.parquet (commit 25ecbc46f36e,
+  SHA-256 8129db1c...): 2,059,415 flows, not 2,540,044; Generic 25,378, not the
+  published 215,481. Its README says the flows were re-extracted and matched to
+  the PCAP files, so it is a derivative.
+- `bastyje/UNSW-NB15` train.csv / test.csv: every feature min-max scaled to
+  [0, 1] and addresses encoded; not the published records.
+
+The raw files are distributed from the UNSW project page through SharePoint,
+which needs a person to download them.
