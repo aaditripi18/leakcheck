@@ -3,13 +3,28 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "leakcheck"
-version = "0.1.0"
+# Distribution name on PyPI ("leakcheck" is taken there); the import and the
+# command are both `leakcheck`.
+name = "leakcheck-audit"
+version = "0.2.0"
 description = "Find train/test leakage in security ML datasets and measure what it inflates."
+readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [{ name = "Aaditya Tripathi" }]
+keywords = ["machine learning", "security", "data leakage", "deduplication", "benchmark", "intrusion detection"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Topic :: Security",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
 dependencies = ["numpy", "pandas", "scikit-learn"]
+
+[project.urls]
+Homepage = "https://leakcheck-nu.vercel.app"
+Source = "https://github.com/aaditripi18/leakcheck"
 
 [project.optional-dependencies]
 dev = ["pytest", "pyarrow"]

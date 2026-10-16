@@ -1,0 +1,53 @@
+# Every push and pull request: the Python suite (checks, experiments' logic,
+# report and site generation, the JS engine's parity with Python), and the CLI
+# image.
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -e ".[dev]"
+          cd site && npm ci
+      - name: Tests (including JS parity and the generated site)
+        run: python -m pytest -q
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t leakcheck .
+      - name: The image audits a split
+        run: |
+          python3 - <<'PY'
+          import csv
+          rows = [{"a": i % 7, "b": i % 3, "y": i % 2} for i in range(200)]
+          for name, part in (("train.csv", rows[:150]), ("test.csv", rows[100:])):
+              with open(name, "w", newline="") as f:
+                  w = csv.DictWriter(f, fieldnames=["a", "b", "y"]); w.writeheader(); w.writerows(part)
+          PY
+          set +e
+          docker run --rm -v "$PWD:/data" leakcheck scan --train /data/train.csv --test /data/test.csv --label y
+          status=$?
+          echo "exit $status"
+          test $status -le 2
