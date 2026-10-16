@@ -209,3 +209,26 @@ Hypotheses and decision rules:
 - **H8** The conclusions do not hinge on the threshold: for each dataset and model,
   whether the gap (mean of seeds) is >= 1 point is the same at eps 0.003, 0.01 and
   0.03. Supported if this holds for at least 90% of dataset x model cells.
+
+### E7. UNSW-NB15 raw records: a chronological split without unseen attack types (written before the raw files are read)
+
+CIC-IDS2017's chronological split is confounded: its later capture day holds
+attack types that never occur earlier (FINDINGS 13), so H3 was decided on EMBER.
+The raw UNSW-NB15 records (UNSW-NB15_1..4.csv from the authors' share, with
+capture timestamps) can give a network-intrusion time split in which the attack
+families occur on both sides.
+
+- **Provenance check first.** The four files must hold 2,540,044 records, the
+  49 features listed in NUSW-NB15_features.csv, and the nine attack families named
+  in the official description; otherwise E7 does not run.
+- **Split.** Records sorted by `stime`; train = the earliest 80%, test = the rest
+  (the cut at the 80th percentile of `stime`). If any of the nine families has
+  fewer than 50 records on either side, the split is reported as confounded and
+  E7 is not used for H9.
+- **Runs.** leakcheck audit (E1 checks) on that split and on a stratified random
+  80/20 split of the same records; E5-style models (lr, rf, hgb, mlp, hgb_tuned;
+  3 seeds; full training set) on both splits; macro-F1 gap random -> chronological
+  and original -> no_near on the random split.
+- **H9** A chronological split costs more accuracy than removing near-copies on
+  network-intrusion data too: the random -> chronological macro-F1 drop exceeds
+  the original -> no_near drop for at least 3 of the 5 models (mean of 3 seeds).
