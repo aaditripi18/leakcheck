@@ -11,6 +11,8 @@ import json
 import platform
 import subprocess
 from importlib.metadata import version
+
+import leakcheck
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -19,9 +21,13 @@ LEDGER = ROOT / "results" / "ledger.jsonl"
 
 def git_state() -> dict:
     def run(*a: str) -> str:
-        return subprocess.run(["git", *a], cwd=ROOT, capture_output=True, text=True).stdout.strip()
+        try:
+            return subprocess.run(["git", *a], cwd=ROOT, capture_output=True, text=True).stdout.strip()
+        except OSError:  # no git (e.g. a container built from an archive)
+            return ""
 
-    return {"commit": run("rev-parse", "--short", "HEAD"), "dirty": bool(run("status", "--porcelain", "--", "leakcheck", "experiments"))}
+    commit = run("rev-parse", "--short", "HEAD")
+    return {"commit": commit or "unknown", "dirty": bool(run("status", "--porcelain", "--", "leakcheck", "experiments"))}
 
 
 def record(experiment: str, config: dict, results: dict, datasets: dict | None = None, ledger: Path = LEDGER) -> dict:
@@ -29,7 +35,11 @@ def record(experiment: str, config: dict, results: dict, datasets: dict | None =
         "experiment": experiment,
         "time": dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds"),
         "git": git_state(),
-        "env": {"python": platform.python_version(), **{p: version(p) for p in ("leakcheck", "numpy", "pandas", "scikit-learn")}},
+        # leakcheck's version from the package itself: the distribution is named
+        # leakcheck-audit, so importlib.metadata.version("leakcheck") fails in a
+        # fresh install.
+        "env": {"python": platform.python_version(), "leakcheck": leakcheck.__version__,
+                **{p: version(p) for p in ("numpy", "pandas", "scikit-learn")}},
         "datasets": datasets or {},
         "config": config,
         "results": results,
