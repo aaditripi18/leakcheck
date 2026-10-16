@@ -97,7 +97,8 @@ def head(title: str, description: str) -> str:
 
 def nav(active: str) -> str:
     links = [("Results", "index.html#audit", "results"), ("Hypotheses", "index.html#hypotheses", "hypotheses"),
-             ("Scanner", "scan.html", "scanner"), ("Reproduce", "index.html#reproduce", "reproduce")]
+             ("Writing", "same-copying.html", "writing"), ("Scanner", "scan.html", "scanner"),
+             ("Reproduce", "index.html#reproduce", "reproduce")]
     items = []
     for label, href, key in links:
         cur = key == active
@@ -140,6 +141,7 @@ def footer(generated: str) -> str:
     <nav class="flex flex-wrap items-center gap-space-md" aria-label="Footer">
       <a class="inline-block py-2 font-mono-data-sm text-mono-data-sm text-on-surface-variant hover:text-on-surface" href="index.html">Report</a>
       <a class="inline-block py-2 font-mono-data-sm text-mono-data-sm text-on-surface-variant hover:text-on-surface" href="scan.html">Scanner</a>
+      <a class="inline-block py-2 font-mono-data-sm text-mono-data-sm text-on-surface-variant hover:text-on-surface" href="same-copying.html">Writing</a>
       <a class="inline-block py-2 font-mono-data-sm text-mono-data-sm text-on-surface-variant hover:text-on-surface" href="{REPO_URL}/blob/main/docs/FINDINGS.md" rel="noopener noreferrer">Findings</a>
       <a class="inline-block py-2 font-mono-data-sm text-mono-data-sm text-on-surface-variant hover:text-on-surface" href="{REPO_URL}/blob/main/data/README.md" rel="noopener noreferrer">Data provenance</a>
       <a class="inline-block py-2 font-mono-data-sm text-mono-data-sm text-on-surface-variant hover:text-on-surface" href="{REPO_URL}" rel="noopener noreferrer">GitHub</a>
@@ -615,6 +617,61 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
 """ + footer(generated)
 
 
+# --- same-copying.html (essay) -----------------------------------------------------------
+
+
+def build_essay(d: dict, generated: str) -> str:
+    """A short essay; every number comes from data.json like the rest of the site."""
+    au = {a["id"]: a for a in d["audit"]}
+    rt = {r["id"]: r for r in d["retrain"]}
+    kdd, uci, sms = rt["kdd99"]["models"], rt["uci_phishing"]["models"], rt["sms_spam"]["models"]
+    h4 = next(h for h in d["hypotheses"] if h["id"] == "H4")
+    kl = kdd["lr"]
+    near_share = 1 - kl["gap_no_exact"] / kl["gap_no_near"]
+    k_gaps = [kdd[m]["gap_no_near"] for m in kdd]
+    u_gaps = [uci[m]["gap_no_near"] for m in uci]
+    kdd_leaked = sorted({round(kdd[m]["leaked"], 4) for m in kdd})
+    sms_perfect = [m for m in sms if sms[m]["leaked"] == 1.0]
+    lo, hi = uci["hgb"]["gap_no_near_ci"]
+    klo, khi = kl["gap_no_near_ci"]
+    names = {"lr": "logistic regression", "rf": "the random forest", "hgb": "gradient boosting", "mlp": "the MLP"}
+    above = [rt[n]["name"] for n in h4["paired_above_zero"]]
+    P = 'class="font-body-lg text-body-lg text-on-surface-variant leading-relaxed"'
+    H = 'class="font-headline-md text-headline-md text-on-surface mt-space-md"'
+    a = 'class="underline underline-offset-2 hover:text-on-surface"'
+    same = (f"{fpct(kdd_leaked[0])}" if len(kdd_leaked) == 1
+            else f"{fpct(kdd_leaked[0])} to {fpct(kdd_leaked[-1])}")
+    return head("Same copying, different damage — leakcheck",
+                "KDD Cup 99 and UCI Phishing copy about as much of their test sets from training. Removing the copies "
+                "costs one of them far more than the other: the copy rate is not the number to report.") + nav("writing") + f"""
+<article class="max-w-[720px] mx-auto px-margin-mobile md:px-gutter py-space-2xl flex flex-col gap-space-md">
+  <span class="sec-label text-primary">Writing · October 2026</span>
+  <h1 class="font-display-editorial text-headline-lg leading-tight text-on-surface">Same copying, different damage</h1>
+  <p class="font-body-lg text-body-lg text-on-surface leading-relaxed">KDD Cup 99 and UCI Phishing copy about the same share of their test sets from training: {fpct(au['kdd99']['exact_copies'])} and {fpct(au['uci_phishing']['exact_copies'])} of test rows are exact copies of a training row. Removing the copies costs logistic regression {fpt(kl['gap_no_near'])} macro-F1 points on the first and {fpt(uci['lr']['gap_no_near'])} on the second. The copy rate is not the number to report.</p>
+
+  <h2 {H}>The prediction that failed</h2>
+  <p {P}>Before any model was retrained, the plan committed to a prediction (H2): on the two most-copied benchmarks, removing exact and near copies from the test set would cost the standard baselines at least 5 macro-F1 points. Those two were KDD Cup 99 and UCI Phishing, chosen by copy rate alone.</p>
+  <p {P}>KDD Cup 99 passed with every model, losing {fpt(min(k_gaps))} to {fpt(max(k_gaps))} points. UCI Phishing failed with every model, losing at most {fpt(max(u_gaps))}. H2 is recorded as not supported, and the failure is the more useful half of the result.</p>
+
+  <h2 {H}>What a copy is, in each</h2>
+  <p {P}>UCI Phishing describes each website with a few dozen features, each coded in a handful of levels. With so few possible values, unrelated sites often end up with identical rows. A copy there is a common pattern, and a model that has learned the pattern gets the copy right for the same reason it gets new sites right. Take the copies out and what remains is no harder.</p>
+  <p {P}>KDD Cup 99's copies are a few traffic patterns repeated hundreds of thousands of times. The rows left after removing them are mostly the rare attacks that a model trained on those floods barely saw. Most of that damage comes from near copies rather than exact ones: {fpct(near_share)} of logistic regression's gap is still there after the exact copies alone are taken out.</p>
+
+  <h2 {H}>Memorisation, visible directly</h2>
+  <p {P}>On the leaked KDD Cup 99 rows, all four models score {same} macro-F1. On an exact copy every model predicts the training label, so every model makes the same mistakes: on the rows whose training copies carry the opposite label. On SMS Spam, {", ".join(names[m] for m in sms_perfect[:-1])} and {names[sms_perfect[-1]]} score exactly 100% on the leaked rows in every seed.</p>
+
+  <h2 {H}>How sure</h2>
+  <p {P}>Over five seeds, the 95% interval for logistic regression's KDD Cup 99 gap is {fpt(klo)} to {fpt(khi)} points. UCI Phishing's gradient-boosting gap of {fpt(uci['hgb']['gap_no_near'])} has an interval of {fpt(lo)} to {fpt(hi)}, which includes zero.</p>
+  <p {P}>The weaker model's gap is larger than the stronger model's on every dataset where either reaches a point, which is what the pre-registered rule for H4 asked. Paired by seed, that difference is clearly above zero on {len(above)} of them ({", ".join(above)}); on the two small benchmarks it is within seed noise. The pattern, a leakage gap that shrinks as the model gets stronger, is the one <a {a} href="https://moinuddinhasan.vercel.app/writing/leakage-collapses-with-model-strength" rel="noopener noreferrer">Moinuddin Hasan reported on a small image dataset</a>. Here it holds on four large security benchmarks and cannot be shown on two small ones.</p>
+
+  <h2 {H}>What to report instead</h2>
+  <p {P}>A copy rate says how much of a test set could be inflated, not how much is. The number that answers the question is the score after removing the copies, for the model being reported, next to the score before. That is what leakcheck's <code>clean</code> command and the E2 table produce, and what to ask for next to any 99%.</p>
+  <p class="font-mono-data-sm text-mono-data-sm text-on-surface-variant border-t border-surface-container-high pt-space-md">Every number here is read from <code>site/data.json</code>, which is generated from the ledger: E1 audit, E2 retraining (4 models × 5 seeds) and E2 uncertainty. Full tables in <a {a} href="{REPO_URL}/blob/main/docs/RESULTS.md" rel="noopener noreferrer">RESULTS.md</a>; the account with its caveats in <a {a} href="{REPO_URL}/blob/main/docs/FINDINGS.md" rel="noopener noreferrer">FINDINGS.md</a>.</p>
+  <a class="font-mono-data-sm text-mono-data-sm text-primary hover:underline" href="index.html">← Back to the report</a>
+</article>
+""" + footer(generated) + "</body>\n</html>\n"
+
+
 # --- scan.html ---------------------------------------------------------------------------
 
 
@@ -787,8 +844,9 @@ def main() -> None:
     generated = _ledger_date()
     (SITE / "index.html").write_text(build_index(data, ex, generated), encoding="utf-8")
     (SITE / "scan.html").write_text(build_scan(ex, generated), encoding="utf-8")
+    (SITE / "same-copying.html").write_text(build_essay(data, generated), encoding="utf-8")
     write_host_headers()
-    print("wrote site/index.html, site/scan.html, site/vercel.json, site/_headers")
+    print("wrote site/index.html, site/scan.html, site/same-copying.html, site/vercel.json, site/_headers")
     if not a.skip_css:
         npx = "npx.cmd" if sys.platform == "win32" else "npx"
         subprocess.run([npx, "tailwindcss", "-c", "tailwind.config.cjs", "-i", "src/input.css", "-o", "assets/site.css",
