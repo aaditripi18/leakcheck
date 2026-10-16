@@ -101,6 +101,12 @@ report, without installing anything.
   worker started from a `blob:` URL, so it inherits that policy. Verified in
   Chromium: `fetch` and `WebSocket` are refused from the page and from the
   worker. Example datasets ship as scripts, so even they need no request.
+- **Sized for up to about half a million rows.** Measured with the engine's
+  Node entry point: 50,000 rows in 12 s (0.5 GB), 200,000 in 56 s (1.4 GB),
+  500,000 in 122 s (2.8 GB), 20 numeric columns. A browser tab gives out
+  beyond that; larger datasets (KDD Cup 99 has 4.9 million training rows) go
+  through the command-line tool or its Docker image, where the near-copy search
+  uses NumPy instead of plain JavaScript.
 - **Same answers as Python.** `site/engine/` is a JavaScript port of every
   check, including scikit-learn's one-feature tree. `tests/test_js_parity.py`
   runs both engines on the same files and requires identical counts, and

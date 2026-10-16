@@ -738,6 +738,7 @@ def build_scan(ex: dict, generated: str) -> str:
     <div class="flex flex-col gap-1">
       <span class="font-mono-data-sm text-mono-data-sm font-medium text-on-surface">Your files never leave this page.</span>
       <p class="font-body-md text-body-md text-on-surface-variant">The page's Content-Security-Policy sets <code class="font-mono-data-sm bg-surface-container px-1 text-on-surface">connect-src 'none'</code>, so it cannot make network requests, and the scan runs in a worker that inherits that policy. Check it yourself: open your browser's network panel and run a scan.</p>
+      <p class="font-body-sm text-body-sm text-on-surface-variant">Sized for splits up to about half a million rows (measured: 500,000 rows of 20 columns in about 2 minutes and 2.8 GB of memory). For larger datasets, such as KDD Cup 99's 4.9 million rows, use the command-line tool or its Docker image, which run the same checks with NumPy.</p>
     </div>
   </div>
 </section>
