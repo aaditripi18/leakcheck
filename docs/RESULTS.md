@@ -256,6 +256,41 @@ H4, paired by seed: LR gap minus HistGB gap (macro-F1 points), 95% t interval.
 | phiusiil | +0.00 [+0.00, +0.00] | n/a (no gap) |
 | sms_spam | +0.58 [-0.26, +1.43] | no |
 
+## E7: raw UNSW-NB15, chronological split (PLAN.md, phase 2)
+
+_ledger: `e7_unsw_time` @ `682e5f8`, 2026-10-16T19:01:03+00:00_
+
+2,540,044 records (published: 2,540,044), 49 columns; chronological split at the 80th percentile of `stime`: 2,032,043 train, 508,001 test. Every attack family on both sides (records before / after the cut):
+
+| Family | Before | After |
+|---|--:|--:|
+| Fuzzers | 17,535 | 6,711 |
+| Analysis | 1,999 | 678 |
+| Backdoor | 1,627 | 702 |
+| DoS | 11,193 | 5,160 |
+| Exploits | 31,676 | 12,849 |
+| Generic | 147,043 | 68,438 |
+| Reconnaissance | 9,923 | 4,064 |
+| Shellcode | 1,071 | 440 |
+| Worms | 122 | 52 |
+| Normal | 1,809,854 | 408,907 |
+
+Macro-F1, mean of 3 seeds, full training sets:
+
+| Model | Random split | Chronological | Random - chronological | Random - no_near (random split) |
+|---|--:|--:|--:|--:|
+| lr | 97.85 | 97.70 | +0.15 | +6.46 |
+| rf | 98.77 | 98.29 | +0.48 | +4.26 |
+| hgb | 98.60 | 98.27 | +0.33 | +4.43 |
+| mlp | 98.39 | 98.09 | +0.31 | +5.03 |
+| hgb_tuned | 98.63 | 98.24 | +0.39 | +4.38 |
+
+Audit of the random split (seed 0): exact copies 22.91%, near copies 17.95% of test rows; best single feature `sttl` 99.02% balanced accuracy.
+
+Audit of the chronological split: exact copies 12.00%, near copies 20.08% of test rows; best single feature `sttl` 98.44% balanced accuracy.
+
+H9: chronological drop > no_near drop for 0 of 5 models -> **not supported**.
+
 ## E4: shortcut ablation
 
 Retrain without the features E1 flagged (drop sets read from the E1 ledger). Macro-F1 on the full test set, mean over 5 seeds. A shortcut carries the score if removing it costs >= 5 points for at least 3 of 4 models (PLAN.md, week 6).

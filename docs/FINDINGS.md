@@ -344,6 +344,48 @@ For CIC-IDS2017, Destination Port is a context shortcut that the strong models
 do not need. Only LR loses (1.91 points); the tree models find the same
 information in packet-size statistics.
 
+## 21. E7: on network traffic, copies matter and the clock does not (H9 not supported)
+
+H3 was decided on EMBER because CIC-IDS2017's later days hold attack types never
+seen earlier. E7 looked for a network-intrusion time split without that
+confound: the raw UNSW-NB15 records (UNSW-NB15_1..4.csv from the authors' share).
+They hold 2,540,047 lines, but each file ends with the record the next one begins
+with; without those 3 repeats there are exactly the published 2,540,044 records,
+2,218,761 normal, and the nine attack families at their published counts. Cut at
+the 80th percentile of capture time, every family occurs on both sides (Worms:
+122 before, 52 after).
+
+| Model | Random split | Chronological | Cost of the time split | Cost of removing near-copies |
+|---|--:|--:|--:|--:|
+| LR | 97.85 | 97.70 | +0.15 | +6.46 |
+| RF | 98.77 | 98.29 | +0.48 | +4.26 |
+| HistGB | 98.60 | 98.27 | +0.33 | +4.43 |
+| MLP | 98.39 | 98.09 | +0.31 | +5.03 |
+| HistGB, tuned | 98.63 | 98.24 | +0.39 | +4.38 |
+
+(Macro-F1, mean of 3 seeds, full training sets of about 2 million rows.)
+
+**H9 is not supported: 0 of 5 models.** On UNSW-NB15 the clock costs less than
+half a point; the copies are what flatter the score. 41% of the random split's
+test rows have an exact or near copy in training, and the chronological split
+does not remove them: 33% of its test rows still do (12.0% exact), because the
+same traffic recurs across the capture days. A time split is therefore not a fix
+for this benchmark; deduplication is. Together with EMBER (H3 supported) this
+says the leak that matters depends on the data: malware drifts over time,
+replayed network traffic repeats.
+
+The usual caveat applies with force here: the no_near rows are by construction
+the ones unlike training, so part of that 4-6 point gap is difficulty, not
+leakage. What the number does say is how much of the headline score is earned on
+traffic the model has, in effect, already seen.
+
+**One feature does the job.** On both splits `sttl` (the source's IP TTL) alone
+reaches 98-99% balanced accuracy, with `ct_state_ttl`, derived from it, close
+behind (L5). That points to the testbed: the attacking and the normal hosts sent
+packets with different initial TTLs. It is a measured property of this capture,
+not evidence that TTL detects attacks elsewhere; it is the same kind of shortcut
+as PhiUSIIL's (section 8).
+
 ## Open items before any of this is published
 
 - How the PhiUSIIL paper defines URLSimilarityIndex. Neither the UCI page nor

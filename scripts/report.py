@@ -354,6 +354,15 @@ def phase2_hypotheses(runs: dict) -> list[dict]:
                 "point is the same at eps 0.003, 0.01 and 0.03 in >= 90% of dataset x model cells.",
                 "verdict": _verdict(ok8),
                 "evidence": f"same in {same} of {total} cells" + (f"; changes: {', '.join(flips)}" if flips else "")})
+    e7r = runs.get("e7_unsw_time", {}).get("results", {})
+    if "h9" in e7r:
+        h = e7r["h9"]
+        out.append({"id": "H9", "statement": "On network-intrusion data too, a chronological split costs more accuracy "
+                    "than removing near-copies (raw UNSW-NB15, every attack family on both sides).",
+                    "verdict": h["verdict"] or "pending",
+                    "evidence": f"chronological drop > no_near drop for {h['wins']} of {h['of']} models: " + ", ".join(
+                        f"{m} {pt(g['random_minus_time'])} vs {pt(g['random_minus_no_near'])}"
+                        for m, g in e7r["gaps"].items())})
     return out
 
 
@@ -389,6 +398,41 @@ def e6(runs: dict) -> list[str]:
     out += [f"| {h['id']} | {h['statement']} | **{h['verdict']}** | {h['evidence']} |" for h in hs]
     return out + [""]
 
+
+
+def e7(runs: dict) -> list[str]:
+    if "e7_unsw_time" not in runs:
+        return []
+    d = runs["e7_unsw_time"]
+    r = d["results"]
+    if "gaps" not in r:
+        return ["## E7: raw UNSW-NB15, chronological split", "", src(d), "", "Provenance gate failed; E7 did not run.", ""]
+    prov, comp = r["provenance"], r["time_composition"]
+    out = ["## E7: raw UNSW-NB15, chronological split (PLAN.md, phase 2)", "", src(d), "",
+           f"{prov['records']:,} records (published: {prov['records_expected']:,}), {prov['columns']} columns; "
+           f"chronological split at the 80th percentile of `stime`: {comp['train']:,} train, {comp['test']:,} test. "
+           "Every attack family on both sides (records before / after the cut):", "",
+           "| Family | Before | After |", "|---|--:|--:|"]
+    out += [f"| {f} | {a:,} | {b:,} |" for f, (a, b) in comp["families"].items()]
+    out += ["", "Macro-F1, mean of 3 seeds, full training sets:", "",
+            "| Model | Random split | Chronological | Random - chronological | Random - no_near (random split) |",
+            "|---|--:|--:|--:|--:|"]
+    for m, g in r["gaps"].items():
+        out.append(f"| {m} | {100 * g['random']:.2f} | {100 * g['time']:.2f} | {pt(g['random_minus_time'])} | "
+                   f"{pt(g['random_minus_no_near'])} |")
+    for key, name in (("audit_random_seed0", "random split (seed 0)"), ("audit_time", "chronological split")):
+        a = r.get(key)
+        if a:
+            f = {x["code"]: x for x in a["findings"]}
+            sc = f.get("L5.shortcut", {})
+            top = (sc.get("details", {}).get("top") or [{}])[0]
+            out.append("")
+            out.append(f"Audit of the {name}: exact copies {pct(f['L1.cross']['value'])}, near copies "
+                       f"{pct(f['L2.near']['value'])} of test rows; best single feature `{top.get('feature')}` "
+                       f"{pct(top.get('balanced_acc', 0))} balanced accuracy.")
+    h = r["h9"]
+    out += ["", f"H9: chronological drop > no_near drop for {h['wins']} of {h['of']} models -> **{h['verdict']}**.", ""]
+    return out
 
 
 def hypotheses_md(runs: dict) -> list[str]:
@@ -545,6 +589,7 @@ def main() -> None:
     lines += e2(runs)
     lines += e2_stats(runs)
     lines += e6(runs)
+    lines += e7(runs)
     lines += e4(runs)
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text("\n".join(lines), encoding="utf-8")
