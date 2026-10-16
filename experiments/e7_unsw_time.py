@@ -76,7 +76,7 @@ def run(name: str, split: Split, seed: int) -> dict:
 
 
 def scores(name: str, seed: int) -> dict:
-    z = np.load(OUT / f"{name}_seed{seed}.npz")
+    z = np.load(OUT / f"{name}_seed{seed}.npz", allow_pickle=True)  # our own files (labels may be strings)
     ev = {k: z[k] for k in ("exact", "dist", "sim")}
     clean = ~leaked_mask(ev, EPS, TAU)
     y = z["y"]

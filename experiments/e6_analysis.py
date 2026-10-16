@@ -79,7 +79,7 @@ def gaps(cnt: np.ndarray, which: int, n_preds: int) -> np.ndarray:
 
 def load(name: str, seed: int):
     meta = json.loads((OUT / f"{name}_seed{seed}.json").read_text(encoding="utf-8"))
-    z = np.load(OUT / meta["npz"])
+    z = np.load(OUT / meta["npz"], allow_pickle=True)  # written by e5_predictions (labels may be strings)
     return meta, {k: z[k] for k in z.files}
 
 
