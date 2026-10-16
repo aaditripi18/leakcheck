@@ -177,3 +177,35 @@ exists:
   **CIC-IDS2017** (Destination Port). Same 4 models, 5 seeds, macro-F1 on the
   full test set. A shortcut "carries" the score if removing it costs ≥ 5 points
   for at least 3 of 4 models.
+
+## Phase 2 (written 2026-10-16, before any of its runs)
+
+E2 used four untuned baselines on training sets capped at 300k rows, scored with
+one near-copy threshold, and kept only aggregate scores. Phase 2 removes those
+limits.
+
+**E5. Predictions, uncapped and tuned.** For every dataset and seeds 0-2: the four
+E2 baselines trained on the *full* training set, plus `hgb_tuned` (randomised
+search, 12 configurations of learning rate, depth, leaf count, L2 and iterations,
+3-fold CV macro-F1 on a stratified 200k-row subsample of the training set, then
+refit on all of it). Every test row's prediction is saved with its exact-copy
+flag, nearest-neighbour RMS distance and best text Jaccard, so every later number
+is computed from saved predictions without retraining.
+
+**E6. Analysis of E5.** Near-copy threshold swept over eps in {0.001, 0.003, 0.01,
+0.03, 0.1} and text Jaccard in {0.6, 0.7, 0.8, 0.9, 0.95}; macro-F1 gap
+(original - clean) per model with a paired bootstrap over test rows (1,000
+resamples, 95%); LR - hgb_tuned difference by the same bootstrap.
+
+Hypotheses and decision rules:
+
+- **H6** Tuning and full training data do not remove the leakage gap: on KDD99 and
+  NSL-KDD, `hgb_tuned` loses >= 5 macro-F1 points (eps 0.01, mean of 3 seeds) with
+  a bootstrap interval above 5 on at least 2 of 3 seeds.
+- **H7** H4 survives a strong model and proper intervals: LR's gap exceeds
+  `hgb_tuned`'s with the bootstrap interval of the difference above zero on at
+  least 3 of the 4 large benchmarks (KDD99, NSL-KDD, UNSW-NB15, EMBER random split),
+  in at least 2 of 3 seeds each.
+- **H8** The conclusions do not hinge on the threshold: for each dataset and model,
+  whether the gap (mean of seeds) is >= 1 point is the same at eps 0.003, 0.01 and
+  0.03. Supported if this holds for at least 90% of dataset x model cells.
