@@ -9,3 +9,4 @@ data/processed/
 node_modules/
 .vercel/
 results/e5/*.npz
+results/e7/*.npz
