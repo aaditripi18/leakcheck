@@ -1,0 +1,32 @@
+{
+ "dataset": "ember2018",
+ "seed": 0,
+ "commit": "682e5f8",
+ "code": "403f8d8e2cf37639",
+ "n_train": 600000,
+ "n_test": 200000,
+ "npz": "ember2018_seed0.npz",
+ "fit_seconds": {
+  "lr": 216.0,
+  "rf": 264.9,
+  "hgb": 119.4,
+  "mlp": 255.8,
+  "hgb_tuned": 233.6
+ },
+ "evidence_seconds": 713.8,
+ "hgb_tuned": {
+  "params": {
+   "max_leaf_nodes": 63,
+   "max_iter": 400,
+   "max_depth": null,
+   "learning_rate": 0.2,
+   "l2_regularization": 1.0
+  },
+  "cv_macro_f1": 0.9634842803067364
+ },
+ "time": {
+  "n_train": 600000,
+  "n_test": 200000
+ },
+ "seconds": 4869.6
+}

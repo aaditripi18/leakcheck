@@ -1,0 +1,28 @@
+{
+ "dataset": "unsw_nb15",
+ "seed": 2,
+ "commit": "682e5f8",
+ "code": "403f8d8e2cf37639",
+ "n_train": 175341,
+ "n_test": 82332,
+ "npz": "unsw_nb15_seed2.npz",
+ "fit_seconds": {
+  "lr": 7.6,
+  "rf": 4.5,
+  "hgb": 3.9,
+  "mlp": 31.6,
+  "hgb_tuned": 16.7
+ },
+ "evidence_seconds": 5.0,
+ "hgb_tuned": {
+  "params": {
+   "max_leaf_nodes": 127,
+   "max_iter": 400,
+   "max_depth": null,
+   "learning_rate": 0.05,
+   "l2_regularization": 0.0
+  },
+  "cv_macro_f1": 0.9542164034481272
+ },
+ "seconds": 191.3
+}

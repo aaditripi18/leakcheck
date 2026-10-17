@@ -1,0 +1,28 @@
+{
+ "dataset": "nslkdd",
+ "seed": 1,
+ "commit": "682e5f8",
+ "code": "403f8d8e2cf37639",
+ "n_train": 125973,
+ "n_test": 22544,
+ "npz": "nslkdd_seed1.npz",
+ "fit_seconds": {
+  "lr": 2.5,
+  "rf": 1.8,
+  "hgb": 1.8,
+  "mlp": 13.6,
+  "hgb_tuned": 2.2
+ },
+ "evidence_seconds": 1.9,
+ "hgb_tuned": {
+  "params": {
+   "max_leaf_nodes": 31,
+   "max_iter": 200,
+   "max_depth": 6,
+   "learning_rate": 0.2,
+   "l2_regularization": 1.0
+  },
+  "cv_macro_f1": 0.9991385218528329
+ },
+ "seconds": 103.8
+}

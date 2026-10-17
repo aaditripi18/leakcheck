@@ -344,6 +344,40 @@ For CIC-IDS2017, Destination Port is a context shortcut that the strong models
 do not need. Only LR loses (1.91 points); the tree models find the same
 information in packet-size statistics.
 
+## 22. E5/E6: the gaps survive tuning, full data and proper intervals (H6, H7 supported; H8 not)
+
+E2 used untuned models on training sets capped at 300k rows and kept only
+aggregate scores. E5 retrained every baseline on the **full** training sets
+(KDD99: 4,898,431 rows; CIC-IDS2017: 2,264,594) plus a tuned HistGB (randomised
+search, 12 configurations, 3-fold CV), 3 seeds, saving every test prediction; E6
+computed the gaps from those predictions with a paired bootstrap over test rows
+and swept the near-copy threshold.
+
+**H6 supported.** Tuned HistGB still loses **22.16 macro-F1 points on KDD99** and
+**8.63 on NSL-KDD** when the leaked rows are removed, with every seed's 95%
+interval above 5 points. The KDD99 gap is larger than in E2 (15.0 for untuned
+HistGB on 300k rows): with all 4.9 million training rows, 83.1% of test rows have
+an exact or near copy in training, against 78% with the cap. More data, more
+copies.
+
+**H7 supported.** LR's gap exceeds tuned HistGB's on all four large benchmarks,
+with the paired bootstrap interval of the difference above zero in 3 of 3 seeds
+each: KDD99 +3.43, NSL-KDD +3.23, EMBER +1.50, UNSW-NB15 +0.98 points. This is
+the claim of section 18, now with a tuned model and per-row intervals.
+
+**H8 not supported (32 of 40 cells, rule: 90%).** Whether a gap is at least one
+point is the same at eps 0.003, 0.01 and 0.03 for 32 of 40 dataset x model cells.
+All 8 changes are gaps near one point (UNSW-NB15 and EMBER tree models, CIC-IDS2017
+LR); the large gaps hold at every threshold (KDD99 tuned HistGB: +16.3 at 0.003,
++36.0 at 0.03). The rule was a poor way to state robustness, since a one-point
+cut-off flips for any gap that sits near one point, and the honest summary is the
+sweep itself (RESULTS, E5/E6): the size of every gap depends on how near "near"
+is, and the ordering of the datasets does not.
+
+Small benchmarks stay inconclusive: UCI Phishing's gaps (0.9-2.0 points) all have
+intervals reaching below zero, and PhiUSIIL's are exactly zero (every model is at
+the ceiling, section 19).
+
 ## 21. E7: on network traffic, copies matter and the clock does not (H9 not supported)
 
 H3 was decided on EMBER because CIC-IDS2017's later days hold attack types never

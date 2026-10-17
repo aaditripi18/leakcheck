@@ -1,0 +1,28 @@
+{
+ "dataset": "uci_phishing",
+ "seed": 0,
+ "commit": "ed632d4",
+ "code": "d8fa37882fd1ed0b",
+ "n_train": 8844,
+ "n_test": 2211,
+ "npz": "uci_phishing_seed0.npz",
+ "fit_seconds": {
+  "lr": 0.1,
+  "rf": 0.3,
+  "hgb": 0.8,
+  "mlp": 1.4,
+  "hgb_tuned": 5.4
+ },
+ "evidence_seconds": 0.3,
+ "hgb_tuned": {
+  "params": {
+   "max_leaf_nodes": 63,
+   "max_iter": 800,
+   "max_depth": null,
+   "learning_rate": 0.2,
+   "l2_regularization": 1.0
+  },
+  "cv_macro_f1": 0.9721335123276335
+ },
+ "seconds": 73.2
+}

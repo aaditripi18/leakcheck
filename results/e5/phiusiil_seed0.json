@@ -1,0 +1,28 @@
+{
+ "dataset": "phiusiil",
+ "seed": 0,
+ "commit": "ed632d4",
+ "code": "d8fa37882fd1ed0b",
+ "n_train": 188636,
+ "n_test": 47159,
+ "npz": "phiusiil_seed0.npz",
+ "fit_seconds": {
+  "lr": 16.0,
+  "rf": 21.8,
+  "hgb": 92.2,
+  "mlp": 543.6,
+  "hgb_tuned": 177.9
+ },
+ "evidence_seconds": 44.7,
+ "hgb_tuned": {
+  "params": {
+   "max_leaf_nodes": 63,
+   "max_iter": 400,
+   "max_depth": 10,
+   "learning_rate": 0.03,
+   "l2_regularization": 1.0
+  },
+  "cv_macro_f1": 0.9999945868781538
+ },
+ "seconds": 4630.8
+}

@@ -1,18 +1,19 @@
 {
  "dataset": "sms_spam",
  "seed": 1,
- "commit": "eccf554",
+ "commit": "64d42ed",
+ "code": "d8fa37882fd1ed0b",
  "n_train": 4459,
  "n_test": 1115,
  "npz": "sms_spam_seed1.npz",
  "fit_seconds": {
-  "lr": 0.2,
-  "rf": 0.4,
-  "hgb": 11.7,
-  "mlp": 10.4,
-  "hgb_tuned": 8.4
+  "lr": 0.4,
+  "rf": 0.6,
+  "hgb": 19.6,
+  "mlp": 17.9,
+  "hgb_tuned": 12.8
  },
- "evidence_seconds": 0.6,
+ "evidence_seconds": 0.9,
  "hgb_tuned": {
   "params": {
    "max_leaf_nodes": 31,
@@ -23,5 +24,5 @@
   },
   "cv_macro_f1": 0.9557661695487286
  },
- "seconds": 266.6
+ "seconds": 684.5
 }

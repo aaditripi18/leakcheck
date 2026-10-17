@@ -256,6 +256,55 @@ H4, paired by seed: LR gap minus HistGB gap (macro-F1 points), 95% t interval.
 | phiusiil | +0.00 [+0.00, +0.00] | n/a (no gap) |
 | sms_spam | +0.58 [-0.26, +1.43] | no |
 
+## E5/E6: uncapped and tuned models, threshold sweeps, bootstrap intervals
+
+_ledger: `e6_analysis` @ `112f619`, 2026-10-17T01:34:28+00:00_
+
+Full training sets (no cap), 3 seeds, plus `hgb_tuned` (randomised search, PLAN.md phase 2). Macro-F1 gap original - clean in points, mean over seeds; the bracket is the range of the seeds' 95% bootstrap intervals (1,000 resamples over test rows).
+
+### At the default threshold (eps 0.01, Jaccard 0.8)
+
+| Dataset | Leaked share | lr | rf | hgb | mlp | hgb_tuned |
+|---|--:|--:|--:|--:|--:|--:|
+| kdd99 | 83.11% | +25.59 [+25.22, +25.96] | +23.57 [+23.05, +24.12] | +22.02 [+21.40, +22.61] | +22.33 [+21.15, +23.62] | +22.16 [+21.57, +22.86] |
+| nslkdd | 33.07% | +11.86 [+11.49, +12.21] | +11.22 [+10.41, +12.03] | +8.61 [+8.17, +9.11] | +8.47 [+7.95, +8.97] | +8.63 [+7.83, +9.61] |
+| unsw_nb15 | 17.89% | +2.01 [+1.91, +2.10] | +1.15 [+1.06, +1.25] | +1.02 [+0.91, +1.14] | +1.43 [+1.26, +1.58] | +1.03 [+0.94, +1.13] |
+| cicids2017 | 77.65% | -0.45 [-0.61, -0.29] | -0.13 [-0.15, -0.11] | -0.08 [-0.11, -0.04] | -0.16 [-0.19, -0.12] | -0.10 [-0.13, -0.07] |
+| ember2018 | 25.82% | +2.38 [+2.27, +2.49] | +1.33 [+1.27, +1.37] | +1.31 [+1.24, +1.37] | +1.29 [+1.23, +1.34] | +0.88 [+0.84, +0.94] |
+| uci_phishing | 65.14% | +1.75 [-0.95, +4.52] | +1.49 [-0.40, +3.46] | +0.85 [-1.14, +2.85] | +2.03 [-0.55, +4.73] | +1.00 [-0.89, +3.17] |
+| phiusiil | 4.43% | +0.00 [+0.00, +0.00] | +0.00 [+0.00, +0.00] | +0.00 [+0.00, +0.00] | +0.00 [+0.00, +0.00] | +0.00 [+0.00, +0.00] |
+| sms_spam | 14.14% | +3.48 [+1.57, +6.02] | +4.13 [+2.32, +6.90] | +2.42 [+1.21, +4.46] | +1.96 [+0.83, +3.53] | +2.48 [+1.20, +4.26] |
+
+### Gap against the near-copy threshold (tuned HistGB, then LR)
+
+| Dataset | eps 0.001 | eps 0.003 | eps 0.01 | eps 0.03 | eps 0.1 |
+|---|--:|--:|--:|--:|--:|
+| kdd99 (hgb_tuned) | +12.04 (71.80% leaked) | +16.33 (78.31% leaked) | +22.16 (83.11% leaked) | +36.03 (88.98% leaked) | +54.05 (94.14% leaked) |
+| kdd99 (lr) | +13.63 (71.80% leaked) | +18.97 (78.31% leaked) | +25.59 (83.11% leaked) | +40.76 (88.98% leaked) | +60.97 (94.14% leaked) |
+| nslkdd (hgb_tuned) | +1.85 (10.21% leaked) | +4.02 (19.19% leaked) | +8.63 (33.07% leaked) | +19.21 (52.85% leaked) | +32.04 (66.51% leaked) |
+| nslkdd (lr) | +2.66 (10.21% leaked) | +5.63 (19.19% leaked) | +11.86 (33.07% leaked) | +25.73 (52.85% leaked) | +42.93 (66.51% leaked) |
+| unsw_nb15 (hgb_tuned) | +0.72 (11.63% leaked) | +0.82 (12.81% leaked) | +1.03 (17.89% leaked) | +2.64 (34.39% leaked) | +4.95 (81.98% leaked) |
+| unsw_nb15 (lr) | +1.20 (11.63% leaked) | +1.42 (12.81% leaked) | +2.01 (17.89% leaked) | +4.56 (34.39% leaked) | +5.79 (81.98% leaked) |
+| cicids2017 (hgb_tuned) | -0.07 (47.81% leaked) | -0.10 (61.61% leaked) | -0.10 (77.65% leaked) | +0.08 (90.45% leaked) | +3.39 (99.37% leaked) |
+| cicids2017 (lr) | -0.05 (47.81% leaked) | -0.51 (61.61% leaked) | -0.45 (77.65% leaked) | +3.64 (90.45% leaked) | +27.71 (99.37% leaked) |
+| ember2018 (hgb_tuned) | +0.40 (13.93% leaked) | +0.60 (19.22% leaked) | +0.88 (25.82% leaked) | +1.19 (33.31% leaked) | +1.72 (46.07% leaked) |
+| ember2018 (lr) | +1.29 (13.93% leaked) | +1.80 (19.22% leaked) | +2.38 (25.82% leaked) | +2.16 (33.31% leaked) | +2.49 (46.07% leaked) |
+| uci_phishing (hgb_tuned) | +1.00 (65.14% leaked) | +1.00 (65.14% leaked) | +1.00 (65.14% leaked) | +1.00 (65.14% leaked) | +0.67 (70.15% leaked) |
+| uci_phishing (lr) | +1.75 (65.14% leaked) | +1.75 (65.14% leaked) | +1.75 (65.14% leaked) | +1.75 (65.14% leaked) | +1.53 (70.15% leaked) |
+| phiusiil (hgb_tuned) | +0.00 (4.35% leaked) | +0.00 (4.38% leaked) | +0.00 (4.43% leaked) | +0.00 (4.61% leaked) | +0.00 (5.05% leaked) |
+| phiusiil (lr) | +0.00 (4.35% leaked) | +0.00 (4.38% leaked) | +0.00 (4.43% leaked) | +0.00 (4.61% leaked) | +0.00 (5.05% leaked) |
+| sms_spam (hgb_tuned) | +2.48 (14.14% leaked) | +2.48 (14.14% leaked) | +2.48 (14.14% leaked) | +2.48 (14.14% leaked) | +2.48 (14.14% leaked) |
+| sms_spam (lr) | +3.48 (14.14% leaked) | +3.48 (14.14% leaked) | +3.48 (14.14% leaked) | +3.48 (14.14% leaked) | +3.48 (14.14% leaked) |
+
+### Phase 2 verdicts
+
+| | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| H6 | Tuning and full training data do not remove the leakage gap (tuned HistGB loses >= 5 macro-F1 points on KDD99 and NSL-KDD). | **supported** | kdd99: tuned HistGB loses +22.16 (interval above 5 points in 3/3 seeds); nslkdd: tuned HistGB loses +8.63 (interval above 5 points in 3/3 seeds) |
+| H7 | LR's leakage gap exceeds tuned HistGB's, with a bootstrap interval above zero, on at least 3 of the 4 large benchmarks. | **supported** | kdd99: LR - tuned HistGB +3.43, interval above zero in 3/3 seeds; nslkdd: LR - tuned HistGB +3.23, interval above zero in 3/3 seeds; unsw_nb15: LR - tuned HistGB +0.98, interval above zero in 3/3 seeds; ember2018: LR - tuned HistGB +1.50, interval above zero in 3/3 seeds |
+| H8 | Conclusions do not hinge on the near-copy threshold: whether a gap is >= 1 point is the same at eps 0.003, 0.01 and 0.03 in >= 90% of dataset x model cells. | **not supported** | same in 32 of 40 cells; changes: unsw_nb15/rf, unsw_nb15/hgb, unsw_nb15/hgb_tuned, cicids2017/lr, ember2018/rf, ember2018/hgb, ember2018/mlp, ember2018/hgb_tuned |
+| H9 | On network-intrusion data too, a chronological split costs more accuracy than removing near-copies (raw UNSW-NB15, every attack family on both sides). | **not supported** | chronological drop > no_near drop for 0 of 5 models: lr +0.15 vs +6.46, rf +0.48 vs +4.26, hgb +0.33 vs +4.43, mlp +0.31 vs +5.03, hgb_tuned +0.39 vs +4.38 |
+
 ## E7: raw UNSW-NB15, chronological split (PLAN.md, phase 2)
 
 _ledger: `e7_unsw_time` @ `682e5f8`, 2026-10-16T19:01:03+00:00_

@@ -1,0 +1,32 @@
+{
+ "dataset": "cicids2017",
+ "seed": 1,
+ "commit": "45b6538",
+ "code": "403f8d8e2cf37639",
+ "n_train": 2264594,
+ "n_test": 566149,
+ "npz": "cicids2017_seed1.npz",
+ "fit_seconds": {
+  "lr": 114.7,
+  "rf": 105.2,
+  "hgb": 27.7,
+  "mlp": 307.4,
+  "hgb_tuned": 44.1
+ },
+ "evidence_seconds": 1242.7,
+ "hgb_tuned": {
+  "params": {
+   "max_leaf_nodes": 31,
+   "max_iter": 200,
+   "max_depth": 6,
+   "learning_rate": 0.2,
+   "l2_regularization": 1.0
+  },
+  "cv_macro_f1": 0.9983416305431162
+ },
+ "time": {
+  "n_train": 2318531,
+  "n_test": 512212
+ },
+ "seconds": 2412.9
+}

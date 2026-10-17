@@ -1,0 +1,28 @@
+{
+ "dataset": "kdd99",
+ "seed": 2,
+ "commit": "45b6538",
+ "code": "403f8d8e2cf37639",
+ "n_train": 4898431,
+ "n_test": 311029,
+ "npz": "kdd99_seed2.npz",
+ "fit_seconds": {
+  "lr": 57.4,
+  "rf": 65.3,
+  "hgb": 40.6,
+  "mlp": 260.1,
+  "hgb_tuned": 108.0
+ },
+ "evidence_seconds": 52.7,
+ "hgb_tuned": {
+  "params": {
+   "max_leaf_nodes": 15,
+   "max_iter": 800,
+   "max_depth": 16,
+   "learning_rate": 0.1,
+   "l2_regularization": 1.0
+  },
+  "cv_macro_f1": 0.9997094519210958
+ },
+ "seconds": 654.6
+}
