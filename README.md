@@ -33,6 +33,14 @@ for each hypothesis were committed before the runs they govern.
 | H3 | A time-aware split costs more than deduplication | **supported** on EMBER, by a small margin (0.3–0.9 points) |
 | H4 | Weaker models lean harder on leaked rows | **supported** (LR gap > HistGB gap on 6 of 6 eligible datasets) |
 | H5 | Some benchmark has a single feature at ≥ 95% balanced accuracy | **supported** (PhiUSIIL `URLSimilarityIndex`, 99.6%) |
+| H6 | Tuning and all the training data do not remove the gap | **supported**: tuned HistGB on all 4.9M KDD99 rows loses 22.2 points, NSL-KDD 8.6; every seed's interval above 5 |
+| H7 | LR's gap exceeds tuned HistGB's, interval above zero | **supported** on 4 of 4 large benchmarks, 3 of 3 seeds each |
+| H8 | Whether a gap clears one point does not depend on the threshold | **not supported**: same in 32 of 40 cells; every change is a gap near one point |
+| H9 | On network traffic, a time split costs more than removing copies | **not supported**: raw UNSW-NB15, time split 0.2–0.5 points vs near-copies 4.3–6.5 |
+
+H6–H9 are phase 2 (PLAN.md): full training sets, a tuned model, every test
+prediction saved, a paired bootstrap over test rows, a threshold sweep, and the
+raw UNSW-NB15 records.
 
 What the numbers say:
 
@@ -49,6 +57,11 @@ What the numbers say:
   clean: 0.009% exact copies and no training file newer than the test period.
 - **Some benchmarks are too easy to rank models.** PhiUSIIL stays at 0.9995+
   macro-F1 even after removing the four features that each reach 95% alone.
+- **On network traffic the copies matter and the clock does not.** In the raw
+  UNSW-NB15 records (every attack family before and after the cut), splitting by
+  capture time costs under half a point; removing near-copies costs 4–6. Even the
+  time split leaves a third of its test rows with a copy in training, because the
+  traffic repeats. `sttl` (source TTL) alone reaches 98–99% balanced accuracy.
 - **A random split can hide a collapse.** CIC-IDS2017 scores 0.97–0.999 on a
   random split and 0.46–0.57 when tested on the later capture files, whose
   attack types never appear in training.
