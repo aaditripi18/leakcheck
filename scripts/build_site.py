@@ -246,6 +246,10 @@ SHORT_H = {
     "H3": "A time-based split hurts more than removing copies.",
     "H4": "Weaker models lean harder on leaked rows.",
     "H5": "Some benchmark is solved by a single feature.",
+    "H6": "Tuning and all the training data do not make the copies stop mattering.",
+    "H7": "Weaker models lean harder on copies, with intervals and a tuned model.",
+    "H8": "Whether a gap clears one point does not depend on the near-copy threshold.",
+    "H9": "On network traffic, a time split costs more than removing copies.",
 }
 
 
@@ -274,6 +278,19 @@ def short_evidence(h: dict, d: dict) -> str:
         names = [rt[n]["name"] for n in above]
         return (f"{base[:-1]}; the paired 95% interval is above zero on {len(above)} of {len(h['wins'])} "
                 f"({', '.join(names)}).")
+    n = h.get("numbers") or {}
+    if h["id"] == "H6" and n:
+        return (f"Tuned gradient boosting on all {au['kdd99']['n_train']:,} KDD Cup 99 training rows still loses "
+                f"{fpt(n['kdd99'])} points; NSL-KDD {fpt(n['nslkdd'])}. Every seed's interval is above 5.")
+    if h["id"] == "H7" and n:
+        return (f"Logistic regression's gap exceeds tuned boosting's on {n['wins']} of {n['of']} large benchmarks, "
+                "with the paired interval above zero in every seed.")
+    if h["id"] == "H8" and n:
+        return (f"The same in {n['same']} of {n['total']} cells; every change is a gap near one point. "
+                "The large gaps hold at every threshold.")
+    if h["id"] == "H9" and n:
+        return (f"Raw UNSW-NB15: the time split costs {fpt(n['time'][0])}–{fpt(n['time'][1])} points, removing "
+                f"near-copies {fpt(n['no_near'][0])}–{fpt(n['no_near'][1])}.")
     if h["id"] == "H5":
         a = max(d["audit"], key=lambda a: a["best_single_feature_bacc"] or 0)
         return f"{a['name']}: {a['best_single_feature']} alone reaches {fpct(a['best_single_feature_bacc'])} balanced accuracy."
@@ -557,7 +574,7 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
 </section>
 
 <section class="flex flex-col gap-space-md">
-  {sec_head("05", "Pre-registered", "Five hypotheses, decided by rules fixed before the runs", "hypotheses")}
+  {sec_head("05", "Pre-registered", f"{len(d['hypotheses'])} hypotheses, decided by rules fixed before the runs", "hypotheses")}
   <div class="flex flex-col border border-surface-container-high divide-y divide-surface-container-high bg-surface">{"".join(hyps)}</div>
   <p class="font-mono-data-sm text-mono-data-sm text-secondary">Each decision rule was committed to <a class="underline underline-offset-2 hover:text-on-surface" href="{REPO_URL}/blob/main/PLAN.md" rel="noopener noreferrer">PLAN.md</a> before the experiment it judges was run.</p>
 </section>

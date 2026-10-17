@@ -20,7 +20,7 @@
   <div class="h-14 max-w-[1100px] mx-auto px-margin-mobile md:px-gutter flex items-center justify-between gap-space-md">
     <div class="flex items-center gap-space-sm">
       <a class="font-mono-data-lg text-mono-data-lg text-on-surface tracking-tight font-medium hover:text-primary transition-colors" href="index.html">leakcheck</a>
-      <span class="hidden sm:inline-flex items-center border border-outline-variant px-space-xs py-0.5 bg-surface-container-low sec-label text-on-surface-variant">v0.1</span>
+      <span class="hidden sm:inline-flex items-center border border-outline-variant px-space-xs py-0.5 bg-surface-container-low sec-label text-on-surface-variant">v0.2</span>
     </div>
     <nav class="hidden md:flex items-center gap-space-lg" aria-label="Main"><a class="font-mono-data-sm text-mono-data-sm transition-colors text-on-surface-variant hover:text-on-surface" href="index.html#audit">Results</a><a class="font-mono-data-sm text-mono-data-sm transition-colors text-on-surface-variant hover:text-on-surface" href="index.html#hypotheses">Hypotheses</a><a class="font-mono-data-sm text-mono-data-sm transition-colors text-on-surface-variant hover:text-on-surface" href="same-copying.html">Writing</a><a class="font-mono-data-sm text-mono-data-sm transition-colors text-on-surface-variant hover:text-on-surface" href="scan.html">Scanner</a><a class="font-mono-data-sm text-mono-data-sm transition-colors text-on-surface-variant hover:text-on-surface" href="index.html#reproduce">Reproduce</a><a class="font-mono-data-sm text-mono-data-sm text-on-surface-variant hover:text-on-surface inline-flex items-center gap-0.5" href="https://github.com/aaditripi18/leakcheck" rel="noopener noreferrer">GitHub<svg class="icon text-[12px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></nav>
     <div class="flex items-center gap-space-sm">
@@ -278,7 +278,7 @@
 <section class="flex flex-col gap-space-md">
   <div id="hypotheses" class="scroll-mt-20">
   <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">05</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">Pre-registered</span></div>
-  <h2 class="font-headline-md text-headline-md text-on-surface mt-1">Five hypotheses, decided by rules fixed before the runs</h2>
+  <h2 class="font-headline-md text-headline-md text-on-surface mt-1">9 hypotheses, decided by rules fixed before the runs</h2>
 </div>
   <div class="flex flex-col border border-surface-container-high divide-y divide-surface-container-high bg-surface"><div class="p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-sm hover:bg-surface-container-low transition-colors">
   <div class="flex items-start gap-space-md max-w-3xl">
@@ -325,6 +325,42 @@
     </div>
   </div>
   <div class="self-start md:self-center shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 font-mono-data-sm text-mono-data-sm font-semibold bg-success/10 text-success border border-success/30">SUPPORTED</span></div>
+</div><div class="p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-sm hover:bg-surface-container-low transition-colors">
+  <div class="flex items-start gap-space-md max-w-3xl">
+    <span class="font-mono-data-md text-mono-data-md font-bold text-on-surface bg-surface-container px-2 py-0.5">H6</span>
+    <div class="flex flex-col">
+      <span class="font-body-md text-body-md font-medium text-on-surface">Tuning and all the training data do not make the copies stop mattering.</span>
+      <span class="font-mono-data-sm text-mono-data-sm text-secondary mt-0.5">Tuned gradient boosting on all 4,898,431 KDD Cup 99 training rows still loses 22.2 points; NSL-KDD 8.6. Every seed&#x27;s interval is above 5.</span>
+    </div>
+  </div>
+  <div class="self-start md:self-center shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 font-mono-data-sm text-mono-data-sm font-semibold bg-success/10 text-success border border-success/30">SUPPORTED</span></div>
+</div><div class="p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-sm hover:bg-surface-container-low transition-colors">
+  <div class="flex items-start gap-space-md max-w-3xl">
+    <span class="font-mono-data-md text-mono-data-md font-bold text-on-surface bg-surface-container px-2 py-0.5">H7</span>
+    <div class="flex flex-col">
+      <span class="font-body-md text-body-md font-medium text-on-surface">Weaker models lean harder on copies, with intervals and a tuned model.</span>
+      <span class="font-mono-data-sm text-mono-data-sm text-secondary mt-0.5">Logistic regression&#x27;s gap exceeds tuned boosting&#x27;s on 4 of 4 large benchmarks, with the paired interval above zero in every seed.</span>
+    </div>
+  </div>
+  <div class="self-start md:self-center shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 font-mono-data-sm text-mono-data-sm font-semibold bg-success/10 text-success border border-success/30">SUPPORTED</span></div>
+</div><div class="p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-sm hover:bg-surface-container-low transition-colors">
+  <div class="flex items-start gap-space-md max-w-3xl">
+    <span class="font-mono-data-md text-mono-data-md font-bold text-on-surface bg-surface-container px-2 py-0.5">H8</span>
+    <div class="flex flex-col">
+      <span class="font-body-md text-body-md font-medium text-on-surface">Whether a gap clears one point does not depend on the near-copy threshold.</span>
+      <span class="font-mono-data-sm text-mono-data-sm text-secondary mt-0.5">The same in 32 of 40 cells; every change is a gap near one point. The large gaps hold at every threshold.</span>
+    </div>
+  </div>
+  <div class="self-start md:self-center shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 font-mono-data-sm text-mono-data-sm font-semibold bg-surface-container-high text-secondary border border-outline-variant">NOT SUPPORTED</span></div>
+</div><div class="p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-sm hover:bg-surface-container-low transition-colors">
+  <div class="flex items-start gap-space-md max-w-3xl">
+    <span class="font-mono-data-md text-mono-data-md font-bold text-on-surface bg-surface-container px-2 py-0.5">H9</span>
+    <div class="flex flex-col">
+      <span class="font-body-md text-body-md font-medium text-on-surface">On network traffic, a time split costs more than removing copies.</span>
+      <span class="font-mono-data-sm text-mono-data-sm text-secondary mt-0.5">Raw UNSW-NB15: the time split costs 0.2–0.5 points, removing near-copies 4.3–6.5.</span>
+    </div>
+  </div>
+  <div class="self-start md:self-center shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 font-mono-data-sm text-mono-data-sm font-semibold bg-surface-container-high text-secondary border border-outline-variant">NOT SUPPORTED</span></div>
 </div></div>
   <p class="font-mono-data-sm text-mono-data-sm text-secondary">Each decision rule was committed to <a class="underline underline-offset-2 hover:text-on-surface" href="https://github.com/aaditripi18/leakcheck/blob/main/PLAN.md" rel="noopener noreferrer">PLAN.md</a> before the experiment it judges was run.</p>
 </section>
@@ -488,7 +524,7 @@ python scripts/report.py</pre>
   </div>
   <div class="max-w-[1100px] mx-auto px-margin-mobile md:px-gutter mt-space-lg pt-space-md border-t border-surface-container-highest flex flex-col sm:flex-row gap-space-xs justify-between text-on-surface-variant font-mono-data-sm text-mono-data-sm">
     <span>Every number on this site is generated from <code>results/ledger.jsonl</code>.</span>
-    <span>Generated 2026-10-16</span>
+    <span>Generated 2026-10-17</span>
   </div>
 </footer>
 <script src="assets/site.js"></script>

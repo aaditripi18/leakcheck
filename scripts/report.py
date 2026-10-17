@@ -319,7 +319,8 @@ def phase2_hypotheses(runs: dict) -> list[dict]:
             ev6.append(f"{d}: tuned HistGB loses {pt(c['gap_mean'])} (interval above 5 points in {above}/3 seeds)")
     out.append({"id": "H6", "statement": "Tuning and full training data do not remove the leakage gap (tuned HistGB "
                 "loses >= 5 macro-F1 points on KDD99 and NSL-KDD).", "verdict": _verdict(ok6),
-                "evidence": "; ".join(ev6) or "pending"})
+                "evidence": "; ".join(ev6) or "pending",
+                "numbers": {d: cell(d, "hgb_tuned")["gap_mean"] for d in ("kdd99", "nslkdd") if cell(d, "hgb_tuned")}})
 
     ev7, wins = [], 0
     done = [d for d in PHASE2_LARGE if d in r]
@@ -332,7 +333,7 @@ def phase2_hypotheses(runs: dict) -> list[dict]:
     ok7 = (wins >= 3) if len(done) == len(PHASE2_LARGE) else None
     out.append({"id": "H7", "statement": "LR's leakage gap exceeds tuned HistGB's, with a bootstrap interval above zero, "
                 "on at least 3 of the 4 large benchmarks.", "verdict": _verdict(ok7),
-                "evidence": "; ".join(ev7) or "pending"})
+                "evidence": "; ".join(ev7) or "pending", "numbers": {"wins": wins, "of": len(done)}})
 
     total = same = 0
     flips = []
@@ -353,7 +354,8 @@ def phase2_hypotheses(runs: dict) -> list[dict]:
     out.append({"id": "H8", "statement": "Conclusions do not hinge on the near-copy threshold: whether a gap is >= 1 "
                 "point is the same at eps 0.003, 0.01 and 0.03 in >= 90% of dataset x model cells.",
                 "verdict": _verdict(ok8),
-                "evidence": f"same in {same} of {total} cells" + (f"; changes: {', '.join(flips)}" if flips else "")})
+                "evidence": f"same in {same} of {total} cells" + (f"; changes: {', '.join(flips)}" if flips else ""),
+                "numbers": {"same": same, "total": total}})
     e7r = runs.get("e7_unsw_time", {}).get("results", {})
     if "h9" in e7r:
         h = e7r["h9"]
@@ -362,7 +364,11 @@ def phase2_hypotheses(runs: dict) -> list[dict]:
                     "verdict": h["verdict"] or "pending",
                     "evidence": f"chronological drop > no_near drop for {h['wins']} of {h['of']} models: " + ", ".join(
                         f"{m} {pt(g['random_minus_time'])} vs {pt(g['random_minus_no_near'])}"
-                        for m, g in e7r["gaps"].items())})
+                        for m, g in e7r["gaps"].items()),
+                    "numbers": {"time": [min(g["random_minus_time"] for g in e7r["gaps"].values()),
+                                         max(g["random_minus_time"] for g in e7r["gaps"].values())],
+                                "no_near": [min(g["random_minus_no_near"] for g in e7r["gaps"].values()),
+                                            max(g["random_minus_no_near"] for g in e7r["gaps"].values())]}})
     return out
 
 
@@ -572,7 +578,7 @@ def site_data(runs: dict) -> dict:
         "summary": {"datasets": len(audit), "rows_audited": rows,
                     "datasets_with_5pct_exact_copies": sum((a["exact_copies"] or 0) >= 0.05 for a in audit),
                     "models": list(MODELS), "seeds": 5},
-        "checks": CHECKS, "hypotheses": hypotheses(runs), "audit": audit, "retrain": retrain,
+        "checks": CHECKS, "hypotheses": hypotheses(runs) + phase2_hypotheses(runs), "audit": audit, "retrain": retrain,
         "ablation": ablation, "validation": validation,
     }
 

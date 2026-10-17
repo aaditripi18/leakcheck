@@ -111,6 +111,52 @@
    "statement": "At least one widely used benchmark has a single feature reaching >= 0.95 balanced accuracy on its own.",
    "verdict": "supported",
    "evidence": "phiusiil: URLSimilarityIndex 99.60%"
+  },
+  {
+   "id": "H6",
+   "statement": "Tuning and full training data do not remove the leakage gap (tuned HistGB loses >= 5 macro-F1 points on KDD99 and NSL-KDD).",
+   "verdict": "supported",
+   "evidence": "kdd99: tuned HistGB loses +22.16 (interval above 5 points in 3/3 seeds); nslkdd: tuned HistGB loses +8.63 (interval above 5 points in 3/3 seeds)",
+   "numbers": {
+    "kdd99": 0.22158843786623109,
+    "nslkdd": 0.08630545403447738
+   }
+  },
+  {
+   "id": "H7",
+   "statement": "LR's leakage gap exceeds tuned HistGB's, with a bootstrap interval above zero, on at least 3 of the 4 large benchmarks.",
+   "verdict": "supported",
+   "evidence": "kdd99: LR - tuned HistGB +3.43, interval above zero in 3/3 seeds; nslkdd: LR - tuned HistGB +3.23, interval above zero in 3/3 seeds; unsw_nb15: LR - tuned HistGB +0.98, interval above zero in 3/3 seeds; ember2018: LR - tuned HistGB +1.50, interval above zero in 3/3 seeds",
+   "numbers": {
+    "wins": 4,
+    "of": 4
+   }
+  },
+  {
+   "id": "H8",
+   "statement": "Conclusions do not hinge on the near-copy threshold: whether a gap is >= 1 point is the same at eps 0.003, 0.01 and 0.03 in >= 90% of dataset x model cells.",
+   "verdict": "not supported",
+   "evidence": "same in 32 of 40 cells; changes: unsw_nb15/rf, unsw_nb15/hgb, unsw_nb15/hgb_tuned, cicids2017/lr, ember2018/rf, ember2018/hgb, ember2018/mlp, ember2018/hgb_tuned",
+   "numbers": {
+    "same": 32,
+    "total": 40
+   }
+  },
+  {
+   "id": "H9",
+   "statement": "On network-intrusion data too, a chronological split costs more accuracy than removing near-copies (raw UNSW-NB15, every attack family on both sides).",
+   "verdict": "not supported",
+   "evidence": "chronological drop > no_near drop for 0 of 5 models: lr +0.15 vs +6.46, rf +0.48 vs +4.26, hgb +0.33 vs +4.43, mlp +0.31 vs +5.03, hgb_tuned +0.39 vs +4.38",
+   "numbers": {
+    "time": [
+     0.0015073499337139307,
+     0.004839661008492535
+    ],
+    "no_near": [
+     0.042580184844204116,
+     0.06455510670310483
+    ]
+   }
   }
  ],
  "audit": [

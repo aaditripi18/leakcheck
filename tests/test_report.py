@@ -26,7 +26,8 @@ def test_report_and_site_data_from_ledger(tmp_path, monkeypatch):
     assert md.index("## Hypothesis verdicts") < md.index("## E1")
     data = json.loads((tmp_path / "site" / "data.json").read_text(encoding="utf-8"))
     verdicts = {h["id"]: h["verdict"] for h in data["hypotheses"]}
-    assert verdicts == {"H1": "supported", "H2": "not supported", "H3": "supported", "H4": "supported", "H5": "supported"}
+    assert verdicts == {"H1": "supported", "H2": "not supported", "H3": "supported", "H4": "supported", "H5": "supported",
+                        "H6": "supported", "H7": "supported", "H8": "not supported", "H9": "not supported"}
     for section in ("audit", "retrain", "ablation"):
         assert data[section] and all(len(row["source"]["commit"]) >= 7 for row in data[section])
     # the page's numbers equal the generated report's

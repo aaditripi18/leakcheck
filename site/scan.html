@@ -20,7 +20,7 @@
   <div class="h-14 max-w-[1100px] mx-auto px-margin-mobile md:px-gutter flex items-center justify-between gap-space-md">
     <div class="flex items-center gap-space-sm">
       <a class="font-mono-data-lg text-mono-data-lg text-on-surface tracking-tight font-medium hover:text-primary transition-colors" href="index.html">leakcheck</a>
-      <span class="hidden sm:inline-flex items-center border border-outline-variant px-space-xs py-0.5 bg-surface-container-low sec-label text-on-surface-variant">v0.1</span>
+      <span class="hidden sm:inline-flex items-center border border-outline-variant px-space-xs py-0.5 bg-surface-container-low sec-label text-on-surface-variant">v0.2</span>
     </div>
     <nav class="hidden md:flex items-center gap-space-lg" aria-label="Main"><a class="font-mono-data-sm text-mono-data-sm transition-colors text-on-surface-variant hover:text-on-surface" href="index.html#audit">Results</a><a class="font-mono-data-sm text-mono-data-sm transition-colors text-on-surface-variant hover:text-on-surface" href="index.html#hypotheses">Hypotheses</a><a class="font-mono-data-sm text-mono-data-sm transition-colors text-on-surface-variant hover:text-on-surface" href="same-copying.html">Writing</a><a class="font-mono-data-sm text-mono-data-sm transition-colors text-on-surface font-medium underline underline-offset-8 decoration-primary" href="scan.html" aria-current="page">Scanner</a><a class="font-mono-data-sm text-mono-data-sm transition-colors text-on-surface-variant hover:text-on-surface" href="index.html#reproduce">Reproduce</a><a class="font-mono-data-sm text-mono-data-sm text-on-surface-variant hover:text-on-surface inline-flex items-center gap-0.5" href="https://github.com/aaditripi18/leakcheck" rel="noopener noreferrer">GitHub<svg class="icon text-[12px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></nav>
     <div class="flex items-center gap-space-sm">
@@ -49,6 +49,7 @@
     <div class="flex flex-col gap-1">
       <span class="font-mono-data-sm text-mono-data-sm font-medium text-on-surface">Your files never leave this page.</span>
       <p class="font-body-md text-body-md text-on-surface-variant">The page's Content-Security-Policy sets <code class="font-mono-data-sm bg-surface-container px-1 text-on-surface">connect-src 'none'</code>, so it cannot make network requests, and the scan runs in a worker that inherits that policy. Check it yourself: open your browser's network panel and run a scan.</p>
+      <p class="font-body-sm text-body-sm text-on-surface-variant">Sized for splits up to about half a million rows (measured: 500,000 rows of 20 columns in about 2 minutes and 2.8 GB of memory). For larger datasets, such as KDD Cup 99's 4.9 million rows, use the command-line tool or its Docker image, which run the same checks with NumPy.</p>
     </div>
   </div>
 </section>
@@ -208,7 +209,7 @@
   </div>
   <div class="max-w-[1100px] mx-auto px-margin-mobile md:px-gutter mt-space-lg pt-space-md border-t border-surface-container-highest flex flex-col sm:flex-row gap-space-xs justify-between text-on-surface-variant font-mono-data-sm text-mono-data-sm">
     <span>Every number on this site is generated from <code>results/ledger.jsonl</code>.</span>
-    <span>Generated 2026-10-16</span>
+    <span>Generated 2026-10-17</span>
   </div>
 </footer>
 <script src="assets/site.js"></script>
