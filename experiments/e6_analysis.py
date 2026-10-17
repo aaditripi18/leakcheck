@@ -131,7 +131,11 @@ def main() -> None:
                                               "leaked_share_mean": float(np.mean([x["leaked_share"] for x in rs]))}
                          for (d, s, v, m), rs in cell.items()}
     record("e6_analysis", {"eps_grid": EPS_GRID, "tau_grid": TAU_GRID, "default": [EPS, TAU], "bootstrap": B,
-                           "seeds": list(SEEDS), "models": list(ALL_MODELS), "source": "results/e5/*.npz"}, results)
+                           "seeds": list(SEEDS), "models": list(ALL_MODELS), "source": "results/e5/*.npz",
+                           "code_fingerprints": sorted({json.loads((OUT / f"{n}_seed{s}.json").read_text(encoding="utf-8")).get("code", "")
+                                                        for n in names for s in SEEDS}),
+                           "fingerprint_note": "two fingerprints: experiments/data.py gained an error branch for "
+                                               "manual-download datasets while E5 ran (fetch only; no E5 dataset uses it)"}, results)
 
 
 if __name__ == "__main__":
