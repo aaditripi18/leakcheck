@@ -1,0 +1,22 @@
+{
+ "split": "random",
+ "seed": 0,
+ "hgb_tuned": {
+  "params": {
+   "max_leaf_nodes": 63,
+   "max_iter": 400,
+   "max_depth": 10,
+   "learning_rate": 0.03,
+   "l2_regularization": 1.0
+  },
+  "cv_macro_f1": 0.984135479077357
+ },
+ "fit_seconds": {
+  "lr": 57.8,
+  "rf": 51.4,
+  "hgb": 46.8,
+  "mlp": 554.0,
+  "hgb_tuned": 108.5
+ },
+ "seconds": 1240.2
+}
