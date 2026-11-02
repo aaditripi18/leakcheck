@@ -78,7 +78,7 @@ def gaps(cnt: np.ndarray, which: int, n_preds: int) -> np.ndarray:
 
 
 def load(name: str, seed: int):
-    meta = json.loads((OUT / f"{name}_seed{seed}.json").read_text(encoding="utf-8"))
+    meta = json.loads((OUT / f"{data.run_file(name)}_seed{seed}.json").read_text(encoding="utf-8"))
     z = np.load(OUT / meta["npz"], allow_pickle=True)  # written by e5_predictions (labels may be strings)
     return meta, {k: z[k] for k in z.files}
 
@@ -112,7 +112,7 @@ def analyse(name: str) -> tuple[list[dict], dict]:
 
 
 def main() -> None:
-    names = [n for n in ORDER if all((OUT / f"{n}_seed{s}.json").exists() for s in SEEDS)]
+    names = [n for n in ORDER if all((OUT / f"{data.run_file(n)}_seed{s}.json").exists() for s in SEEDS)]
     all_rows, results = [], {}
     for n in names:
         rows, summary = analyse(n)
@@ -132,7 +132,7 @@ def main() -> None:
                          for (d, s, v, m), rs in cell.items()}
     record("e6_analysis", {"eps_grid": EPS_GRID, "tau_grid": TAU_GRID, "default": [EPS, TAU], "bootstrap": B,
                            "seeds": list(SEEDS), "models": list(ALL_MODELS), "source": "results/e5/*.npz",
-                           "code_fingerprints": sorted({json.loads((OUT / f"{n}_seed{s}.json").read_text(encoding="utf-8")).get("code", "")
+                           "code_fingerprints": sorted({json.loads((OUT / f"{data.run_file(n)}_seed{s}.json").read_text(encoding="utf-8")).get("code", "")
                                                         for n in names for s in SEEDS}),
                            "fingerprint_note": "two fingerprints: experiments/data.py gained an error branch for "
                                                "manual-download datasets while E5 ran (fetch only; no E5 dataset uses it)"}, results)

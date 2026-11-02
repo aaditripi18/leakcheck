@@ -1,0 +1,122 @@
+{
+ "dataset": "edgeiiot",
+ "seed": 3,
+ "commit": "b73762d",
+ "n_train": 300000,
+ "n_test": 443841,
+ "leak_rate": {
+  "exact": 0.0003942853409216364,
+  "near": 0.00042582816819536725
+ },
+ "models": {
+  "lr": {
+   "original": {
+    "n": 443841,
+    "accuracy": 1.0,
+    "macro_f1": 1.0,
+    "balanced_accuracy": 1.0
+   },
+   "no_exact": {
+    "n": 443666,
+    "accuracy": 1.0,
+    "macro_f1": 1.0,
+    "balanced_accuracy": 1.0
+   },
+   "no_near": {
+    "n": 443652,
+    "accuracy": 1.0,
+    "macro_f1": 1.0,
+    "balanced_accuracy": 1.0
+   },
+   "leaked": {
+    "n": 189,
+    "accuracy": 1.0,
+    "macro_f1": 1.0,
+    "balanced_accuracy": 1.0
+   },
+   "fit_seconds": 10.8
+  },
+  "rf": {
+   "original": {
+    "n": 443841,
+    "accuracy": 1.0,
+    "macro_f1": 1.0,
+    "balanced_accuracy": 1.0
+   },
+   "no_exact": {
+    "n": 443666,
+    "accuracy": 1.0,
+    "macro_f1": 1.0,
+    "balanced_accuracy": 1.0
+   },
+   "no_near": {
+    "n": 443652,
+    "accuracy": 1.0,
+    "macro_f1": 1.0,
+    "balanced_accuracy": 1.0
+   },
+   "leaked": {
+    "n": 189,
+    "accuracy": 1.0,
+    "macro_f1": 1.0,
+    "balanced_accuracy": 1.0
+   },
+   "fit_seconds": 8.9
+  },
+  "hgb": {
+   "original": {
+    "n": 443841,
+    "accuracy": 1.0,
+    "macro_f1": 1.0,
+    "balanced_accuracy": 1.0
+   },
+   "no_exact": {
+    "n": 443666,
+    "accuracy": 1.0,
+    "macro_f1": 1.0,
+    "balanced_accuracy": 1.0
+   },
+   "no_near": {
+    "n": 443652,
+    "accuracy": 1.0,
+    "macro_f1": 1.0,
+    "balanced_accuracy": 1.0
+   },
+   "leaked": {
+    "n": 189,
+    "accuracy": 1.0,
+    "macro_f1": 1.0,
+    "balanced_accuracy": 1.0
+   },
+   "fit_seconds": 11.8
+  },
+  "mlp": {
+   "original": {
+    "n": 443841,
+    "accuracy": 1.0,
+    "macro_f1": 1.0,
+    "balanced_accuracy": 1.0
+   },
+   "no_exact": {
+    "n": 443666,
+    "accuracy": 1.0,
+    "macro_f1": 1.0,
+    "balanced_accuracy": 1.0
+   },
+   "no_near": {
+    "n": 443652,
+    "accuracy": 1.0,
+    "macro_f1": 1.0,
+    "balanced_accuracy": 1.0
+   },
+   "leaked": {
+    "n": 189,
+    "accuracy": 1.0,
+    "macro_f1": 1.0,
+    "balanced_accuracy": 1.0
+   },
+   "fit_seconds": 41.1
+  }
+ },
+ "seconds": 102.9
+}

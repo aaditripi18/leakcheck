@@ -70,7 +70,7 @@ def without(split: Split, cols: list[str]) -> Split:
 
 
 def run_one(name: str, seed: int, sets: dict[str, list[str]]) -> dict:
-    cache = OUT / f"{name}_seed{seed}.json"
+    cache = OUT / f"{data.run_file(name)}_seed{seed}.json"
     commit = git_state()["commit"]
     if cache.exists():
         res = json.loads(cache.read_text(encoding="utf-8"))

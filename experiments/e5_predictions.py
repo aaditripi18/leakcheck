@@ -109,7 +109,7 @@ def code_fingerprint() -> str:
 
 
 def run_one(name: str, seed: int) -> dict:
-    meta_path = OUT / f"{name}_seed{seed}.json"
+    meta_path = OUT / f"{data.run_file(name)}_seed{seed}.json"
     commit = git_state()["commit"]
     fp = code_fingerprint()
     if meta_path.exists():
@@ -120,7 +120,7 @@ def run_one(name: str, seed: int) -> dict:
     split = original_split(name, seed)  # full training set: no subsample
     arrays = {"y": np.asarray(split.y_test), **row_evidence(split)}
     meta = {"dataset": name, "seed": seed, "commit": commit, "code": fp, "n_train": len(split.train), "n_test": len(split.test),
-            "npz": f"{name}_seed{seed}.npz", "fit_seconds": {}, "evidence_seconds": round(time.time() - t0, 1)}
+            "npz": f"{data.run_file(name)}_seed{seed}.npz", "fit_seconds": {}, "evidence_seconds": round(time.time() - t0, 1)}
     print(f"   {name} seed {seed}: evidence in {meta['evidence_seconds']} s "
           f"(train {len(split.train):,}, test {len(split.test):,})", flush=True)
     tuned, cv = tune_hgb(split, seed)

@@ -54,8 +54,8 @@ def composition(tr, te) -> dict:
 
 
 def run(name: str, split: Split, seed: int) -> dict:
-    path = OUT / f"{name}_seed{seed}.npz"
-    meta_path = OUT / f"{name}_seed{seed}.json"
+    path = OUT / f"{data.run_file(name)}_seed{seed}.npz"
+    meta_path = OUT / f"{data.run_file(name)}_seed{seed}.json"
     if meta_path.exists() and path.exists():
         return json.loads(meta_path.read_text(encoding="utf-8"))
     t0 = time.time()
@@ -76,7 +76,7 @@ def run(name: str, split: Split, seed: int) -> dict:
 
 
 def scores(name: str, seed: int) -> dict:
-    z = np.load(OUT / f"{name}_seed{seed}.npz", allow_pickle=True)  # our own files (labels may be strings)
+    z = np.load(OUT / f"{data.run_file(name)}_seed{seed}.npz", allow_pickle=True)  # our own files (labels may be strings)
     ev = {k: z[k] for k in ("exact", "dist", "sim")}
     clean = ~leaked_mask(ev, EPS, TAU)
     y = z["y"]

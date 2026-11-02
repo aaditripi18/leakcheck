@@ -351,3 +351,9 @@ def load_edgeiiot() -> pd.DataFrame:
         with zf.open(_zip_member(zf, "DNN-EdgeIIoT-dataset.csv")) as fh:
             df = pd.read_csv(fh, low_memory=False)
     return _numeric_where_possible(df, keep=("Attack_type",))
+
+
+def run_file(name: str) -> str:
+    """A run name as a file-name stem: "dataset:view" would make Windows write an
+    alternate data stream of a file called "dataset" instead of a file."""
+    return name.replace(":", "__")

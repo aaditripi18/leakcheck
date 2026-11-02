@@ -155,7 +155,7 @@ def original_split(name: str, seed: int) -> Split:
 
 
 def run_one(name: str, seed: int) -> dict:
-    cache = OUT / f"{name}_seed{seed}.json"
+    cache = OUT / f"{data.run_file(name)}_seed{seed}.json"
     commit = git_state()["commit"]
     if cache.exists():
         res = json.loads(cache.read_text(encoding="utf-8"))

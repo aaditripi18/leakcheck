@@ -86,7 +86,7 @@ def _ledger_gaps() -> dict:
 
 
 def load(name: str) -> list[dict]:
-    return [json.loads((OUT / f"{name}_seed{s}.json").read_text(encoding="utf-8")) for s in range(5)]
+    return [json.loads((OUT / f"{data.run_file(name)}_seed{s}.json").read_text(encoding="utf-8")) for s in range(5)]
 
 
 def analyse(name: str, per_seed: list[dict], recorded: dict) -> dict:
