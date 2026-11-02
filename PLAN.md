@@ -318,3 +318,14 @@ also appears in training. E2 models score this split and the random split.
 - **H16** Once every attack type is seen in training, the time split costs no
   more than 2 macro-F1 points relative to the random split (i.e. CIC-IDS2017's
   collapse in E2 was the unseen attack types, not time).
+
+**Note (2026-11-03, after the first E9 run).** The first E9 implementation
+removed one nearest training copy per leaked test row per round, for at most 20
+rounds, re-fitting the scaling each round. On KDD Cup 99 that left 148k leaked
+rows with a training copy within eps (also 66 NSL-KDD, 2,261 UNSW-NB15, 10-18
+PhiUSIIL), so it did not do what the procedure says ("every row that exactly or
+nearly copies a test row"). It now removes every training row within eps of a
+leaked row in one radius search, in the scaled space in which E2 called the row
+leaked, and checks that none is left. E9/E10 are rerun on every dataset with this
+implementation; the first run is reported as superseded. Its E10 numbers do not
+depend on the change.

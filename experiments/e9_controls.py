@@ -34,31 +34,61 @@ SEEDS = (0, 1, 2)
 ROUNDS = 20
 
 
+def _radius(split: Split, test_idx: np.ndarray, eps: float, keep: np.ndarray | None = None):
+    """Radius search for the chosen test rows against the (kept) training rows, in the
+    scaled space and categorical buckets of near.nearest, fitted on the *whole*
+    training set: the space in which leak_masks called a test row leaked.
+    Returns (training rows within eps of any test row, test rows with any such row)."""
+    from sklearn.neighbors import NearestNeighbors
+
+    xtr, xte = near.embed(split)
+    ktr, kte = near._cat_keys(split)
+    keep = np.ones(len(split.train), bool) if keep is None else keep
+    train_hit = np.zeros(len(split.train), bool)
+    test_hit = np.zeros(len(test_idx), bool)
+    tr_groups = pd.Series(np.arange(len(ktr))).groupby(ktr).indices
+    sub = kte[test_idx]
+    for key, pos in pd.Series(np.arange(len(sub))).groupby(sub).indices.items():
+        members = tr_groups.get(key)
+        if members is None:
+            continue
+        members = members[keep[members]]
+        if not len(members):
+            continue
+        nn = NearestNeighbors(radius=eps, algorithm="brute").fit(xtr[members])
+        for c in range(0, len(pos), 2000):
+            chunk = pos[c:c + 2000]
+            for i, found in zip(chunk, nn.radius_neighbors(xte[test_idx[chunk]], return_distance=False)):
+                if len(found):
+                    train_hit[members[found]] = True
+                    test_hit[i] = True
+    return train_hit, test_hit
+
+
 def copies_in_train(split: Split, leaked: np.ndarray) -> tuple[np.ndarray, int]:
-    """Training rows to drop so no leaked test row keeps an exact or near copy.
-    Returns (keep mask over training rows, test rows still within eps after ROUNDS)."""
+    """Training rows to keep so that no leaked test row keeps an exact or near copy:
+    exact copies by hash, every row within eps by radius search, text near copies by
+    repeated MinHash nearest neighbour (at most ROUNDS rounds). Returns (keep mask,
+    leaked test rows still with a copy afterwards: a check, expected 0)."""
     keep = ~np.isin(split.train_hash, split.test_hash[leaked])
     todo = np.flatnonzero(leaked)
-    left = 0
-    for _ in range(ROUNDS):
-        sub = like(split, split.train[keep], split.test)
-        pos = np.flatnonzero(keep)
-        hit = np.zeros(len(todo), bool)
-        if near.numeric_columns(sub) and len(todo):
-            dist, nn = near.nearest(sub, todo)
-            close = (dist <= NEAR_EPS) & (nn >= 0)
-            keep[pos[nn[close]]] = False
-            hit |= close
-        if split.text is not None and len(todo):
+    if near.numeric_columns(split) and len(todo):
+        keep &= ~_radius(split, todo, NEAR_EPS)[0]
+    if split.text is not None and len(todo):
+        for _ in range(ROUNDS):
+            sub = like(split, split.train[keep], split.test)
+            pos = np.flatnonzero(keep)
             sim, nn = near_text.nearest_text(sub.train[split.text], sub.test[split.text], todo, TEXT_TAU)
             close = (sim >= TEXT_TAU) & (nn >= 0)
+            if not close.any():
+                break
             keep[pos[nn[close]]] = False
-            hit |= close
-        todo = todo[hit]
-        left = len(todo)
-        if not left:
-            break
-    return keep, left
+            todo = todo[close]
+    # check, in the same space: no leaked row may keep an exact or numeric near copy
+    left = np.isin(split.test_hash[leaked], split.train_hash[keep])
+    if near.numeric_columns(split) and leaked.any():
+        left |= _radius(split, np.flatnonzero(leaked), NEAR_EPS, keep)[1]
+    return keep, int(left.sum())
 
 
 def run_one(name: str, seed: int) -> dict:
