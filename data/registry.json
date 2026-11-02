@@ -286,5 +286,1099 @@
         "bytes": 311062159
       }
     ]
+  },
+  "cseids2018": {
+    "description": "CSE-CIC-IDS2018 'Processed Traffic Data for ML Algorithms': ten per-day CICFlowMeter CSVs (80 features + Label; the 20-02 file adds Flow ID, Src IP, Src Port, Dst IP)",
+    "source": "Official public bucket s3://cse-cic-ids2018 (registry.opendata.aws/cse-cic-ids2018). Fetched from the byte-identical Kaggle copy solarmainframe/ids-intrusion-csv because the bucket served about 60 KB/s here; the url field is each file's official object.",
+    "provenance": "Every file is proven identical to its official object: size and recomputed multipart ETag (16 MiB parts) both match the bucket listing (experiments/verify_s3_etag.py). Label counts are checked against Sensors 22(19):7409, Table 3.",
+    "licence": "Canadian Institute for Cybersecurity terms; cite the AWS registry entry and Sharafaldin et al. 2018",
+    "citation": "A Realistic Cyber Defense Dataset (CSE-CIC-IDS2018), https://registry.opendata.aws/cse-cic-ids2018; Sharafaldin, Lashkari, Ghorbani, ICISSP 2018",
+    "manual_download": true,
+    "files": [
+      {
+        "path": "cseids2018/02-14-2018.csv",
+        "sha256": "acff8bc61376ee031d80878ee6099e0b1a87a1bd711d8068298421418c9f8147",
+        "bytes": 358223333,
+        "url": "https://cse-cic-ids2018.s3.ca-central-1.amazonaws.com/Processed%20Traffic%20Data%20for%20ML%20Algorithms/Wednesday-14-02-2018_TrafficForML_CICFlowMeter.csv"
+      },
+      {
+        "path": "cseids2018/02-15-2018.csv",
+        "sha256": "fa2947a8256d81ee9103ae16139d62d0e17aa23e696ee80d9e76fb51c01c9c4b",
+        "bytes": 375945899,
+        "url": "https://cse-cic-ids2018.s3.ca-central-1.amazonaws.com/Processed%20Traffic%20Data%20for%20ML%20Algorithms/Thursday-15-02-2018_TrafficForML_CICFlowMeter.csv"
+      },
+      {
+        "path": "cseids2018/02-16-2018.csv",
+        "sha256": "1a4919faa0c49c7af97230b0c2d076eba23ee6dd81103a3801d51ac316355d8b",
+        "bytes": 333723605,
+        "url": "https://cse-cic-ids2018.s3.ca-central-1.amazonaws.com/Processed%20Traffic%20Data%20for%20ML%20Algorithms/Friday-16-02-2018_TrafficForML_CICFlowMeter.csv"
+      },
+      {
+        "path": "cseids2018/02-20-2018.csv",
+        "sha256": "7287a4d7740a1dddbf330ceb2beb6a4889d33ba63674558a68b5eb50d16711df",
+        "bytes": 4054925350,
+        "url": "https://cse-cic-ids2018.s3.ca-central-1.amazonaws.com/Processed%20Traffic%20Data%20for%20ML%20Algorithms/Thuesday-20-02-2018_TrafficForML_CICFlowMeter.csv"
+      },
+      {
+        "path": "cseids2018/02-21-2018.csv",
+        "sha256": "a5f4a1c2689e0aa6566c03a58466de9c407c0be0cbd3cc69306544026611be04",
+        "bytes": 328893673,
+        "url": "https://cse-cic-ids2018.s3.ca-central-1.amazonaws.com/Processed%20Traffic%20Data%20for%20ML%20Algorithms/Wednesday-21-02-2018_TrafficForML_CICFlowMeter.csv"
+      },
+      {
+        "path": "cseids2018/02-22-2018.csv",
+        "sha256": "da33c927018274f9d49b145baa00e4ce0526c25b3b890b34c489e247b5e24544",
+        "bytes": 382636202,
+        "url": "https://cse-cic-ids2018.s3.ca-central-1.amazonaws.com/Processed%20Traffic%20Data%20for%20ML%20Algorithms/Thursday-22-02-2018_TrafficForML_CICFlowMeter.csv"
+      },
+      {
+        "path": "cseids2018/02-23-2018.csv",
+        "sha256": "d0a7f5059d9823b6e9b392b759e306481a3502d190dea7a1b5502ae079ea069b",
+        "bytes": 382840456,
+        "url": "https://cse-cic-ids2018.s3.ca-central-1.amazonaws.com/Processed%20Traffic%20Data%20for%20ML%20Algorithms/Friday-23-02-2018_TrafficForML_CICFlowMeter.csv"
+      },
+      {
+        "path": "cseids2018/02-28-2018.csv",
+        "sha256": "f15e2a12304446058a0186c8ad67de2bd15735a9ba5c70c9a1f4c4242ab06771",
+        "bytes": 209249758,
+        "url": "https://cse-cic-ids2018.s3.ca-central-1.amazonaws.com/Processed%20Traffic%20Data%20for%20ML%20Algorithms/Wednesday-28-02-2018_TrafficForML_CICFlowMeter.csv"
+      },
+      {
+        "path": "cseids2018/03-01-2018.csv",
+        "sha256": "b0534c5d7d8b41e03df71c6966c995d116a8ed28e61f377c8b14cdf5d28f4edf",
+        "bytes": 107842858,
+        "url": "https://cse-cic-ids2018.s3.ca-central-1.amazonaws.com/Processed%20Traffic%20Data%20for%20ML%20Algorithms/Thursday-01-03-2018_TrafficForML_CICFlowMeter.csv"
+      },
+      {
+        "path": "cseids2018/03-02-2018.csv",
+        "sha256": "d96f38e7496aba83475031e6fb8c6fdf1abf6aa1b71325a917798f3c7de93de1",
+        "bytes": 352368373,
+        "url": "https://cse-cic-ids2018.s3.ca-central-1.amazonaws.com/Processed%20Traffic%20Data%20for%20ML%20Algorithms/Friday-02-03-2018_TrafficForML_CICFlowMeter.csv"
+      }
+    ]
+  },
+  "ciciot2023": {
+    "description": "CIC-IoT2023 CSVs: 169 parts, 46 features + label (34 classes: 33 attacks + BenignTraffic), 46,686,579 rows",
+    "source": "Kaggle copy madhavmalhotra/unb-cic-iot-dataset (wataiData/csv/CICIoT2023/). The official UNB download sits behind a registration form asking for personal details; per PLAN.md phase 3 a copy is used only if it matches the published per-class counts.",
+    "provenance": "No official checksum is published. Accepted only if every one of the 34 label counts equals Table 3 of Neto et al., Sensors 23(13):5941 (experiments/e0_sources_phase3.py).",
+    "licence": "Canadian Institute for Cybersecurity terms; cite Neto et al. 2023",
+    "citation": "Neto, Dadkhah, Ferreira, Zohourian, Lu, Ghorbani. CICIoT2023: A Real-Time Dataset and Benchmark for Large-Scale Attacks in IoT Environment. Sensors 23(13):5941 (2023)",
+    "manual_download": true,
+    "files": [
+      {
+        "path": "ciciot2023/part-00000-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "d5b8e9e76d60fb053ef98eeb1dfdf13e101caef8abf1b36f353105ca3779b05d",
+        "bytes": 70337132,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00000-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00001-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "e9a0352070c872cb8b99cf8daf47e567170bccf35a305dbb59d81f17da4b81d0",
+        "bytes": 64480675,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00001-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00002-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "5a48099370277ab6a0b05581600063569d86472b86f986a593fc8f3b78380298",
+        "bytes": 81098243,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00002-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00003-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "d774b5fe13230bed4b44222d26e10f87947e6895d215b0711f3f6eea7abcedcb",
+        "bytes": 68051400,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00003-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00004-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "763c2db3dbbfb941fb3f81cd3770e01c95b8c6aa830c23c159e6eb03f9bac835",
+        "bytes": 67007207,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00004-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00005-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "2060f6960af30e7821b5e33bade2fb513b338541c51d813e492b5b98fef73235",
+        "bytes": 70729011,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00005-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00006-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "3de2432e0a9d10516e468fa63b31b40dde06a81047e5e661655a14b3b2dd65b3",
+        "bytes": 68849887,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00006-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00007-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "8fc092e4e477347ab2178d954c0f4a621f401ddb1f0bb02ace35a7ff2447e2f4",
+        "bytes": 67153124,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00007-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00008-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "ae11bf9783c060cc26965dca1bb1a7cb40bb7eac50489ef555248842478e78b2",
+        "bytes": 72588116,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00008-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00009-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "c23b12dafc352c34e0042f306bd6125a2eb9bb849d5f15b7a6bad3daa34ccb50",
+        "bytes": 67055876,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00009-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00010-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "0a351b63cb16f7ce7aca176af8746fab8feb9da28e1ee8e9885040137aca52f7",
+        "bytes": 74085935,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00010-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00011-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "07da1b5ea6f7e915bfcd6a875180fe01b72ff36f06928de3b369f75a75610d67",
+        "bytes": 65390551,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00011-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00012-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "280d3519c6a01745e7276075dd0b5c9883c8c001addc9e4ee31d9e4faf3b0bb4",
+        "bytes": 70266581,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00012-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00013-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "ff4e6cdbe53026342d44cf553b353097aef0279d838ddfc9e0ed631972c519b0",
+        "bytes": 70324474,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00013-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00014-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "336c51ba044480e52497c491113f1e355827662044079cb7eadb2d779dc4fdc3",
+        "bytes": 63581910,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00014-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00015-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "79d0df02375e1dd8c5721c03f2e2317090ae9314eed0812a78260bed25956cca",
+        "bytes": 79141048,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00015-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00016-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "b65c6d0a8f477d68347052855a91c3362a3ed560802d2b67588f1c07380fd83f",
+        "bytes": 68612370,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00016-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00017-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "67052d121538beebef07a1fe4bc7f652a1a5031ba3b7d72e22f066128e4a41fa",
+        "bytes": 65811521,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00017-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00018-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "68834e7bc30581739ff725171f7369e40423166b4c625f64f8808bab4c2e3ebc",
+        "bytes": 69052134,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00018-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00019-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "7c51ce7171372967664043cee869def464cc7f4c960fdd246b0a3dada47d10e0",
+        "bytes": 68075117,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00019-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00020-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "64903f174cac715cda32fd3b8253ebfe91572d42de2d2cde6c67e175c0a41676",
+        "bytes": 69864603,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00020-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00021-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "f294f8e6381d5a017e20f53fd42b869e5c400f76ec31999ee461c76640bd67c9",
+        "bytes": 65796329,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00021-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00022-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "17953606b20fed09d10bc817c160717b5330486c3e28c11da7dd42e96c10f862",
+        "bytes": 74297036,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00022-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00023-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "48ba2b15b4ae44f5de3fcc709b486b5e1fbfbb8aadd066ad0242c27a5b42ec75",
+        "bytes": 77214111,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00023-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00024-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "a46ef1dc5b6569a86c9dcaa887cba5e49edebd92a15aac7cafc0be88545f5a19",
+        "bytes": 66492051,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00024-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00025-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "e000b1ba9212e0f9ac30c32a7747abb9cae4768c254afebdadbe28fe8c39b5ec",
+        "bytes": 131863205,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00025-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00026-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "71c374e1c9d7dd9eaa3921838e0455d2a1285511031d9285ee33d8549acc1317",
+        "bytes": 69611996,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00026-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00027-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "dad39729f1b88ae6f5eb90fed971c15494251d84bb7f8bf1afc840ae46cabca0",
+        "bytes": 65160540,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00027-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00028-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "ec66a93898f976d4370f22cc9e27b979cbb42a99ed146120b424f5ae4c8f5334",
+        "bytes": 74038119,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00028-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00029-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "7aaa1101e970c645b5ae4aede0f6a07a8c50bedfbc1808e9944e3d2c3055ef1d",
+        "bytes": 74134748,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00029-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00030-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "f196c34bff9b048c52b295c9e7f4672bd38ba6c390981614b07f3a64bcd29bb0",
+        "bytes": 70229372,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00030-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00031-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "141f5b1579f68215b6ebc1004249b5b8244ac6b6b189df577c0928f66f762544",
+        "bytes": 67392879,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00031-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00032-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "d077240287ece18f7e16b9b4bdd589eecc47cb4c4f7d2e1119bfa56ed18b1584",
+        "bytes": 67051812,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00032-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00033-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "372d47de1ad90025291e242b0bac6e6a3f5b133a22eb9eac5106a67888bbddfb",
+        "bytes": 131915584,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00033-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00034-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "1512aa2f71baa3fd3a63f0041f3ef15373fdf10282fdedbb03da2972e182adf4",
+        "bytes": 68429148,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00034-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00035-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "f0fb1cfb1f1d3c9235e2bb234718f9e2bbc95c21a6503ac1ed09c91208687f98",
+        "bytes": 74443318,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00035-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00036-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "0abad549b117888ff565ec6e452a5849a72e37171c256b9e6e325076008c4cf6",
+        "bytes": 129338673,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00036-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00037-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "7cc40bf4cb8b7255c1bbb46f3a71567b849c503d211376657649fdd1a4cbb674",
+        "bytes": 63328378,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00037-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00038-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "cb7966579b900c660e3a6f9c1eb9f5c6f96b027600dc6d03962d9cd52a36d53c",
+        "bytes": 69724612,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00038-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00039-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "2102ae7cea2dbb43751a3711fd842b094ff7e7bb7e168d401fcc972aca914880",
+        "bytes": 128847605,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00039-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00040-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "aecd4def64a66653be109b6e4bd094ed5e31ffd1f9226ef6b6bbbbe013b23fd4",
+        "bytes": 67877094,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00040-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00041-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "1770822310a3e52caa46de34cf90bba2043d3174759cb306d8405461de47bd43",
+        "bytes": 131136787,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00041-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00042-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "db4bf059054a46dc8359256cac8eafe1d05e1e366b0a1e8e786581fa2fd4f6e1",
+        "bytes": 65548482,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00042-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00043-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "c8e22d59b1839f62407d9af8a6d48e4f20531efcbdc80f5c70e052051d25404a",
+        "bytes": 73934126,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00043-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00044-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "4ce2d03d4870d01478e6753ce73982c5bebe5ba6c2bf50599adbc705a7fd08cf",
+        "bytes": 68363042,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00044-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00045-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "06db946b3eaca89375c96ddc943e1d0780ce9ce0b78f1c55bf6c9b586cbc13ff",
+        "bytes": 72852687,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00045-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00046-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "aa4fa0ae69408ac8b580fc2a2c955afa2d57376b2807f4da191ad7b1b55da457",
+        "bytes": 69396990,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00046-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00047-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "aed9da2159c8096cb75dde6c03fbbe24ae457c538953ecb8f7ab365c3617cd1b",
+        "bytes": 70436360,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00047-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00048-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "4897d536edc3980430b93c94f61c18e33704950f6e38e5d647ead4f356db26e6",
+        "bytes": 64758310,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00048-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00049-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "595d0d6314df404e0e219a259c59f430f5f4240bcc131d7e0d3fe734dcc7b1fd",
+        "bytes": 73366528,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00049-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00050-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "ab9edbda50ffc26775d178fa0cbcc79af463989dfda4306ba133e533453888ba",
+        "bytes": 68827565,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00050-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00051-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "ffb2e56f226bcb912a34a25afbc3f176b570252c2d4d00bd480aa609c695adca",
+        "bytes": 74016352,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00051-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00052-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "10c1f51d78ea6697e87e96749306157f841c1628a94855aa856a0848059f3f5b",
+        "bytes": 131237337,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00052-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00053-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "c2791126b96823c1fca0daacddf1d5d8d6597f307dd944bbbc1e517e0b48346b",
+        "bytes": 71647643,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00053-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00054-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "3261f3de003d6c851e5866b7a26aa5991dd4195e801a0e25823029d7b52f43e3",
+        "bytes": 69393256,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00054-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00055-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "9da203c00b324a3daec29d210a81bc73237c2be11c3adf12de33878a9289ffd0",
+        "bytes": 65483787,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00055-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00056-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "3ea5b8ca088c8622303c7cce667c0f7945c95109073d495c81048df15abc59ee",
+        "bytes": 69216827,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00056-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00057-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "c4e14db802535fde81d4743d0fa064b938c9279afb08c31cf91f517aaaeac398",
+        "bytes": 126559084,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00057-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00058-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "7851a94f745858fc638296ac4370e775c87563fbf04923694edcb03b3709bfe4",
+        "bytes": 69781679,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00058-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00059-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "f5e380cff0ddd5c6ed712ab64c46fef880ef8a31db38052c266fdc69215d9492",
+        "bytes": 72201522,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00059-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00060-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "96b5da28c0934fb42e2969fb6ed144eac1bef63dc75cdb5a4b70008d1ec95fde",
+        "bytes": 74883016,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00060-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00061-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "f0ca9d06e68b8291a078f78672e7e8bf24fc70005d5dfccb8becc25ab29a18d5",
+        "bytes": 70630063,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00061-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00062-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "619f9b7b8c82f62cf8f98f6e1a67047d848ccec0d44d5e4506a0fe002f1b78c5",
+        "bytes": 129950207,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00062-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00063-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "02da284eb6997f36e566e2996b894d2c8ffee11a42224bc6e11225210e04e8b6",
+        "bytes": 69938127,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00063-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00064-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "97ba8fabb123827fb46811c91a348962e0f9d070dc8d8126791ebe2d40254b08",
+        "bytes": 77504476,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00064-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00065-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "dbf76c920cec0c675a209cc549171ebfab69d445d4fb9e0e0abab8ddad705be6",
+        "bytes": 72143930,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00065-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00066-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "1aa726963c6136749d5aa60c72da6666a935b9772c26d510cd96a45a1c65bc2c",
+        "bytes": 63665600,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00066-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00067-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "d8ca531ef8a715871f7c9eb6cb73b9aab8714252f72a8ed4417217de50200f2e",
+        "bytes": 78950881,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00067-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00068-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "09ae80f0c64c04aeed457092216de1133ae5b44a5f4c1b3a56dd863742f2e7f3",
+        "bytes": 65994215,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00068-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00069-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "51ce02e6853fc98d7d358e1aac999d5e8be2c0125dace5d315bcdc1299437765",
+        "bytes": 70749825,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00069-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00070-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "595d3cd83abef4128ec342be65be6e5a1f69fcb09c8c17e4f630db445af3651d",
+        "bytes": 67709008,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00070-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00071-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "d8337f8305737bd1e69b21d63608f6ecf62eef8c175992d5bcf494e50d7e0ffb",
+        "bytes": 81768949,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00071-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00072-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "1dac142700d7d52ca26d8a7bd9f953f5d51e685fcf4dafaf23bb0172f6f947d5",
+        "bytes": 76823868,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00072-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00073-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "eec7461b39a335f8a27f2a3eb64ae879c5306ab38783e1c38c399948416e448b",
+        "bytes": 69410931,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00073-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00074-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "f6aa320a5de672d7bbd87d637b6f57f6bde76b7eea4a792b30fceb16e3e6205b",
+        "bytes": 72796357,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00074-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00075-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "70532068d867e1cd81ad714e34e96453a0128f4a9a58738972ec5ce7f35dce8a",
+        "bytes": 130882802,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00075-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00076-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "bd1105e59263193566defa9e44535807af1dfc841da2ecf69b15e1aad3bf1f57",
+        "bytes": 131641019,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00076-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00077-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "648422e0881b82dff41a5ad9047ac360b79c965519c179d06b80cd66fc8ac74c",
+        "bytes": 128353857,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00077-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00078-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "75505a94ee886b71710c6c80a1e2ceb08d2981840db65a623e8b66c76ebcac2c",
+        "bytes": 128139824,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00078-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00079-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "4f3777f1ac7318db08f2f899a614eb83fec89a0abea79d88e95564b4381dc793",
+        "bytes": 132927483,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00079-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00080-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "d69d1a254e0f264246b8fb52e10c6cd64bb4aa942ddb04d3afb2b41b1c516b3f",
+        "bytes": 69421521,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00080-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00081-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "87383d6f1ff2f0539793e5208e6abb5aa44a1c5619c83cd8bbc0e2b7a0e69399",
+        "bytes": 67969473,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00081-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00082-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "eaf6d3467cd107e3853a78c4bc1238fb34280ef695353f4a279fe4f5c10c3635",
+        "bytes": 67841365,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00082-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00083-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "7c87085053c9cf3c16c6b836455af0d0280885cb061d3eb27030c227a76e7433",
+        "bytes": 67381798,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00083-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00084-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "59ba44b3d9331702022032a14e9d26afe6e2b93ed6fad0c01a98851902ced961",
+        "bytes": 66230041,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00084-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00085-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "34c19c8b852553defc86b93b8cf1aead86e0a632f77c455bfd9ce5074a74e7c1",
+        "bytes": 71587066,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00085-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00086-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "729c68832e47fed61d14eb9e09df2e9e83572a1cfff2beca5810e4bfbc1c80e9",
+        "bytes": 71624988,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00086-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00087-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "ab3dcbe67122e8598d1432f0a2173089888dd1b92bdc0ea7c181506f36dc10d5",
+        "bytes": 69605941,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00087-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00088-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "d5f03527a7cbeca945115f8c2dd89a7fe411bb854e224399af52a7b0e9cda650",
+        "bytes": 66855519,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00088-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00089-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "0031df007b5f4d840f8e1568afda76ded41ac53bc08214f593591b368ba9a7ee",
+        "bytes": 71404342,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00089-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00090-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "bcd2a9df9dfc2f522cd666f4c113078920baab24fadde31bb049320c88878f58",
+        "bytes": 70897157,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00090-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00091-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "9b59eea09fc1d8803688f6d253e1820e47031d23c346a76deb2527d686404e58",
+        "bytes": 76621852,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00091-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00092-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "ac55fcc5e43b4d67ef4811517f31656f802e4de8795c1fe75b39a8a298ae829b",
+        "bytes": 62406325,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00092-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00093-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "1d7b79e7f17781ca674a3fb7923452e165c592bad7eaea6b87bec4396a8691ea",
+        "bytes": 74783438,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00093-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00094-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "9fcbf419b5a0652eb4df52157171762855404d2abd1e1efb013ded1e849f3c7c",
+        "bytes": 126307446,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00094-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00095-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "98399f0769dcef4b46cc3524cf7c348ba8d960641211ac733b6432026d496171",
+        "bytes": 130884768,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00095-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00096-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "cd1541f1d18e1db1f20004320d9391276367c161697f46c65cf6fb22ebe9f939",
+        "bytes": 75144993,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00096-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00097-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "36e9780ecea8e3bae743af27a2d0b7e801e960504b545219fc154b32c9416003",
+        "bytes": 72043305,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00097-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00098-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "dd78c1c33b8bc874b94ad3e58cc65cf6ec2a91c6a343f0230c179479b30afe74",
+        "bytes": 131632566,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00098-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00099-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "e562852003c426bf10718307364b521f9b402297c3ad919036aae2dc0958c3a5",
+        "bytes": 71182337,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00099-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00100-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "b06726d7ada42d7b7b644667b9936379c6148cefaf1f4a5a7839989d8d14afaa",
+        "bytes": 66577384,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00100-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00101-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "15a53e37536ad7ec37f3b81a26ca45bbc8d2fb0a3ed293e6b44a8b4a1460cf33",
+        "bytes": 68886307,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00101-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00102-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "e932b373a884bc2d11338e170a6949ab17bae5670d986181d6bcd56b34dfff67",
+        "bytes": 68355236,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00102-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00103-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "35485ce4d3c18ff93088b335e9aa7352d38aca99e76d6d0d84b0cbb298913122",
+        "bytes": 74389885,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00103-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00104-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "1e759cee3b7364e37f54bb8b9610dee01d2992af092c1d04b9659f0d811b563e",
+        "bytes": 65859132,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00104-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00105-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "4676e9e2765229e9c2cd4989966f6c29905abebe8fe71cda7bb6c20ce0b3ae85",
+        "bytes": 68289162,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00105-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00106-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "b3c3b4257c4c2f8526fe3d9c7b0bcf5d16e4fd0c69f6e87b05d36f35167531ca",
+        "bytes": 73891212,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00106-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00107-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "2504a7a5c5426cf24a46104cb9d23435982dee3f88cd772b11cf670b2210acb7",
+        "bytes": 65853341,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00107-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00108-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "563fbb3113dc9f0973d7f7ff4ce3977b2793af6d3b0d9cfc37816fdc84358fd0",
+        "bytes": 68243073,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00108-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00109-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "31950f2d5049c40140870003f4f176fc2b126e6dd147d91a0dd6faaaea0f9883",
+        "bytes": 77472282,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00109-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00110-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "17824fc2372d93fbe6a2e5a3e6cc35abd866bef91e49db81a0fe2d674ab5648e",
+        "bytes": 69778307,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00110-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00111-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "24deeb755f758adb38b1f7ab52797844e9abc5275c83de8e468544c5d2aa0b51",
+        "bytes": 79332993,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00111-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00112-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "7f0a517bf58a78bf2a58342f8ec48f36165c0cacb53b40a7c03003bff079ae04",
+        "bytes": 74659074,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00112-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00113-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "3dbce22d16e5c4405e8e37992f50248fb7b8ad2e35716af2952ae7f27adda172",
+        "bytes": 132985640,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00113-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00114-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "dffcb391730f2f11c75c76c10616a627f382da2617c59da9a38484d4adf03363",
+        "bytes": 70684400,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00114-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00115-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "4277e84e3488c9fd593fe2c717fd3e5fa7901b49100d3633afd8e9e77e138218",
+        "bytes": 64469015,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00115-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00116-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "f703a4990b8f2765bd427054187c455f4e83053a1cd71bab213a279856aba3b8",
+        "bytes": 72152282,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00116-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00117-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "100f64fd62549b0b3398fcf0007cac65d8ccd674b015750431e943630cfda4d5",
+        "bytes": 71755315,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00117-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00118-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "e1f780d057acf6a282d976d7710dbc39e23003e52d648e51288126472206aa2e",
+        "bytes": 64761296,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00118-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00119-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "e5b501e20f03aef8151cfc35c006f213917546c609909d221b8888f83cc7d969",
+        "bytes": 70663852,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00119-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00120-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "f8ce2fc499eda1747293a006c001b75556aece0f9b2365ae20af323a3de4847e",
+        "bytes": 69271655,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00120-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00121-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "da4674e201af10a7cda206cb502d4fef2c781a3f7cb459ee3ac225013da5bf4d",
+        "bytes": 72670364,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00121-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00122-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "3ff7228012151f5808aaeee6de8742ec9513d2243a8eae5e8092cfd3cfda9b5a",
+        "bytes": 73113834,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00122-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00123-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "507da9059bf219b8b73d323e3cc72d9404ccbdc5b46c562f69513c12c1fe6a68",
+        "bytes": 75568816,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00123-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00124-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "f975bbd5c4a6e906687a9302b4776c2a624bbfe60b525d2a18a5b4a40e82435b",
+        "bytes": 73293640,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00124-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00125-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "fed9251936899af0049246437f5f8657f0eb1a22b4209b542ead9895d05a5d05",
+        "bytes": 132131508,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00125-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00126-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "24c2f51f3ca6ee27b43ecb3768b18771e7df9b0aba67c358388bde223442e444",
+        "bytes": 69087322,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00126-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00127-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "d7086b58a5e9c536998e5c40166d8b1d8aa82a3d32cdb82232f5413413e4ba76",
+        "bytes": 131911597,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00127-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00128-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "7346e699abba5b3511b8b8a937886ad5f16b033db479c2a133435dc139c72f26",
+        "bytes": 70598310,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00128-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00129-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "e3e3d28a478a0adcd1fdf95535edc64668ec8756e31b429e4a66948ff9d185ea",
+        "bytes": 67656345,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00129-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00130-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "e44dd3434ef9a722595bc46bfb9074489b5a5b4a69e74d8f3e30ed6d5685fde9",
+        "bytes": 75690669,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00130-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00131-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "d44096119e01c9640dd8228c95d77973bc5f9aa278c98c8384b6c21ddbafab4d",
+        "bytes": 131358881,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00131-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00132-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "63fc87fd72d596ecf3645ad5f71b1edbcc7b0a659fd5f4173718b52f785325ee",
+        "bytes": 70418759,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00132-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00133-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "93b0e85b7807373f7f4d1efe080ffa5bb69332dd96c4c5f9762154b5fb713b36",
+        "bytes": 70643676,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00133-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00134-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "02929567e1b08da3074ed8d3cd5b6b6e6909da97b711e7f795e9430738a9ca5d",
+        "bytes": 71745152,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00134-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00135-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "adc2d3b2d90a4b685bfeeb8429f4ace84a00d93476ca45b84755ca7e11d8a4a4",
+        "bytes": 70491013,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00135-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00136-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "87d6eee2fb9ca09d35227e018beaadff19729e7153d4dfd1a082e30a08953d61",
+        "bytes": 131004617,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00136-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00137-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "3f633f9ffc589b2069f29168ddb599c3e284f880cc6e54dc79e29da218350c96",
+        "bytes": 75533437,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00137-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00138-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "60070edf413d2f7ca975218490866a3c58da1172cfe77faf348863c8440ec704",
+        "bytes": 131640373,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00138-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00139-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "d5f1f5056c699bf8a57f4a3d664a77958dee4a5e004f040897da13c9e9a284c2",
+        "bytes": 71311521,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00139-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00140-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "5e4d56ac9a32439de2f7c67873e435891790e46bc3a0fb90b4c94224ac9c771e",
+        "bytes": 132388545,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00140-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00141-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "6e3cd06f1115a4b439da5a8f653ed02bdb7a06b19539e2efa7460cc921cd0f9b",
+        "bytes": 66005625,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00141-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00142-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "83f1457c2324d49bfa8d6ade1c875c8c645ec58df91143a2f5cb0c5535972f98",
+        "bytes": 76802163,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00142-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00143-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "48bf5f3612b377b6ef2821a2dae2b5aaf0a1ef60b0254ffe90f7a215cf5f2720",
+        "bytes": 70471586,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00143-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00144-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "35a8440a366d3f4a5fcf72c6047ac268a5379089476d16ebb9538ac037c04123",
+        "bytes": 72128631,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00144-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00145-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "bf04595278f16a75c427f3c97696b2e0cf39ed4930fb3cae9b0b662049396703",
+        "bytes": 130414605,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00145-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00146-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "23b972691e8f70f37553437f2207e75cc6e6c7f8fd6924afdac1d6d6938aee70",
+        "bytes": 66934350,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00146-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00147-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "80186bffb7083c5841b9bde65d976e4bc56cf42b6d204ad70c3c8318ff4870eb",
+        "bytes": 70086002,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00147-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00148-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "46458e931b167f0b292f082916fe949dfadca6ea7b7ff3bbfa8e510c324a6c04",
+        "bytes": 69221518,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00148-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00149-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "719db61118775732ae141e4d6d1f809f113a37cc0c6ed0d856b826f8dafae318",
+        "bytes": 131359680,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00149-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00150-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "4dee51fe7fdfe22d65d7e3db2da37937a0e64838ad69022f0e1faef6e3ad7cc8",
+        "bytes": 68381805,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00150-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00151-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "1c5a2099e1d12ac819ce0f04aba95df131b4681e868cfff02e5c82f7f0d80aff",
+        "bytes": 67649802,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00151-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00152-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "a1e308658e6055f153a121f2d7d37b486a80a8998b6311672dea8ebcf693e6f8",
+        "bytes": 131599898,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00152-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00153-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "070b0d89b5e54d070953f90fce39b3c2dcbba6747119da9e9529f963d4da65d4",
+        "bytes": 128196454,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00153-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00154-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "8a16616ec1cf6b1a10e3420aafc054033d277186eab0b231e9fa4d753e52ea2c",
+        "bytes": 68450439,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00154-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00155-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "6ddb775f3aa320b6153168540b577933a04271e6408e1933440fbbeb04d902c0",
+        "bytes": 67682865,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00155-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00156-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "f45fa33f4409296b7bfc91d3e4755610a98af7eebfa35d93ee60975e3661d429",
+        "bytes": 75512960,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00156-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00157-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "d22f273fd7b584d45ef35c4ceb3c51fbdb736224d338edb4cd0f0a40e85218e5",
+        "bytes": 70687117,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00157-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00158-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "a94564db14a558b18047c96aa9675dc99bc27a72e4ee4b80e67f87f369a522aa",
+        "bytes": 67910165,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00158-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00159-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "69eb62b391c2e20caaa14ab74a00e2203cff714d2018e38b0de7dec92a0e2609",
+        "bytes": 68155333,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00159-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00160-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "a0a635f095eaae43d790b5c6b027825485c39a00a9639d6ff12e28574ad3b41b",
+        "bytes": 68131575,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00160-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00161-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "1904364c534d6f65bcc476a268ea5281ca686c2b7db09bd6ad27701144200bb4",
+        "bytes": 68495768,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00161-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00162-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "d01c2a56d93490a97b5feabd02874cb32df638b3e8fafa01d88eff68634e30a1",
+        "bytes": 129494463,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00162-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00163-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "12c579a5a1791d7dcd894eef86e8ed3575b58a7a414a06b1d861fcdfe7a835d7",
+        "bytes": 68831773,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00163-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00164-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "d71ad83a8a81fea3f2366c85f0b35e24817a7588104e4577d0bb3366b2c62c66",
+        "bytes": 131907276,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00164-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00165-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "321ffd456b78a68a2782dbd1aa02302d1fa5d5a00b18af37d51155328195efe2",
+        "bytes": 130926988,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00165-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00166-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "8d50281afd07e795bf6d2f47d94aaad4af9a81176ac6a6e98eb76be81fe9737e",
+        "bytes": 132269505,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00166-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00167-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "872e5ec24ba3b5b2c3e8a41db042464eda7118b2a6f163edcd93d43a4cf2f8a4",
+        "bytes": 67099665,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00167-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      },
+      {
+        "path": "ciciot2023/part-00168-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv",
+        "sha256": "ed825526d019737f85f851e486f85c2a934e981b8ad763331b5d1c0cbc13c3d9",
+        "bytes": 69171708,
+        "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00168-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
+      }
+    ]
   }
 }
