@@ -281,3 +281,40 @@ leakcheck's own L5 identifier check flags removed (the rule is the tool's, not
 chosen per dataset). This view is post hoc and is reported as such; H10-H12 are
 judged on the pre-registered view as distributed, and the second view is
 reported beside it.
+
+## Phase 3b (written 2026-11-02, before any of its runs): turning the caveats into measurements
+
+Four statements the README makes as caveats each get an experiment.
+
+**E9. Are the copies memorised, or would they be predicted anyway?** For every
+dataset and model (the four E2 baselines, seeds 0-2, E2's training cap): train
+once on the training set and once on the training set with every row that
+exactly or nearly (eps 0.01) copies a test row removed; score both on the
+leaked test rows only. A leaked row is *memorised* if the full model gets it
+right and the deduplicated model does not. Reported per dataset: the share of
+leaked rows that are memorised, and the share predicted correctly either way.
+- **H13** On KDD Cup 99 and NSL-KDD, more leaked rows are memorised than on UCI
+  Phishing (the benchmark whose copies cost under 2 points).
+
+**E10. A random-removal control for the gap.** For every dataset, model and seed
+of E2: remove from the test set a random subset of rows the same size and class
+mix as the leaked rows (seed 0-2) and score what is left. The leakage gap is
+reported next to this control gap.
+- **H14** On every dataset with a leakage gap >= 1 point, the random-removal gap
+  is < 0.5 points (the gap comes from which rows were removed, not from removing
+  rows).
+
+**E11. EMBER on the official feature vector.** EMBER's own code (AGPL) is run
+unmodified in a separate environment, outside this repository, to produce the
+official 2,381-dimension vectors; nothing of it is copied here. L1-L5 and E2
+then run on those vectors.
+- **H15** The EMBER conclusions do not depend on the view: exact-copy rate and
+  E2 gap on the official vectors are within 1 point of leakcheck's own view.
+
+**E12. CIC-IDS2017 without the unseen-attack confound.** A chronological split
+*within each label*: for every label, the earliest 80% of its flows (by capture
+file, then row order) train and the latest 20% test, so every test attack type
+also appears in training. E2 models score this split and the random split.
+- **H16** Once every attack type is seen in training, the time split costs no
+  more than 2 macro-F1 points relative to the random split (i.e. CIC-IDS2017's
+  collapse in E2 was the unseen attack types, not time).
