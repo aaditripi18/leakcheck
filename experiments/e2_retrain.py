@@ -143,10 +143,12 @@ E2_SPLITS = {"ember2018": ember_random}
 
 
 def original_split(name: str, seed: int) -> Split:
+    """`dataset` uses its first audit view; `dataset:view` names another (phase 3)."""
     if name in E2_SPLITS:
         return E2_SPLITS[name](seed)
-    (_, split, _), *_ = PREP[name](seed).splits
-    return split
+    base, _, view = name.partition(":")
+    views = {v: split for v, split, _ in PREP[base](seed).splits}
+    return views[view] if view else next(iter(views.values()))
 
 
 # --- one (dataset, seed) ----------------------------------------------------------------
@@ -226,7 +228,7 @@ def main(names: list[str]) -> None:
         print(f"== {name}", flush=True)
         per_seed = [run_one(name, s) for s in SEEDS]
         summary = summarize(per_seed)
-        prep = PREP[name]()
+        prep = PREP[name.partition(":")[0]]()
         policy = ("random 600k/200k of all labelled files (original) vs official temporal (time)"
                   if name in E2_SPLITS else prep.split_policy)
         record("e2_retrain:" + name, {"seeds": list(SEEDS), "max_train": MAX_TRAIN, "near_eps": NEAR_EPS,
