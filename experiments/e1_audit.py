@@ -102,11 +102,22 @@ def prep_sms(seed: int = SEED) -> Prepared:
                     {"text": "message"}, ("sms_spam",))
 
 
+def without_identifiers(s: Split) -> Split:
+    """The same split without the columns leakcheck's L5 identifier check flags
+    (phase 3 amendment: a post hoc second view of the current benchmarks)."""
+    from leakcheck.checks.shortcut import check_identifiers
+
+    drop = [c["feature"] for c in check_identifiers(s).details["columns"]]
+    return Split(s.train.drop(columns=drop), s.test.drop(columns=drop), s.label, time=s.time, group=s.group,
+                 text=s.text, ignore=[c for c in s.ignore if c not in drop])
+
+
 def prep_edgeiiot(seed: int = SEED) -> Prepared:
     df = data.cached(data.load_edgeiiot)
     tr, te = random_split(df, df["Attack_type"], seed)
     s = Split(tr.drop(columns=["Attack_type"]), te.drop(columns=["Attack_type"]), "Attack_label")
-    return Prepared([("all", s, ALL)], f"stratified random {1 - TEST_SIZE:.0%}/{TEST_SIZE:.0%} by Attack_type, seed {seed}",
+    return Prepared([("all", s, ALL), ("no_identifiers", without_identifiers(s), ALL)],
+                    f"stratified random {1 - TEST_SIZE:.0%}/{TEST_SIZE:.0%} by Attack_type, seed {seed}",
                     {"excluded": ["Attack_type (attack name)"],
                      "kept": "every distributed feature, identifiers included (frame.time, IPs, ports)"},
                     ("edgeiiot",))

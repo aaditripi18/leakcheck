@@ -270,3 +270,14 @@ training sets, `hgb_tuned`, three seeds, paired bootstrap) run unchanged.
 
 Verdicts are reported whatever they are, next to H1, H2 and H5 for the classic
 benchmarks.
+
+**Amendment (2026-11-02, after the Edge-IIoTset E1 run, before the other two
+datasets are read).** Edge-IIoTset keeps per-packet identifiers (`frame.time`,
+IP addresses, ports), and `frame.time` alone makes almost every row unique, so
+an exact-copy rate measured with them in says little about whether the same
+traffic sits on both sides. E1 therefore also audits a second view of each
+current benchmark, **`no_identifiers`**: the same split with the columns
+leakcheck's own L5 identifier check flags removed (the rule is the tool's, not
+chosen per dataset). This view is post hoc and is reported as such; H10-H12 are
+judged on the pre-registered view as distributed, and the second view is
+reported beside it.
