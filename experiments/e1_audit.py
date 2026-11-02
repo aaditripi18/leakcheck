@@ -102,12 +102,35 @@ def prep_sms(seed: int = SEED) -> Prepared:
                     {"text": "message"}, ("sms_spam",))
 
 
+def big_split(df, label_col: str, target: str, seed: int, **kw) -> Split:
+    """E1's stratified random split for tens of millions of rows: split by row index,
+    build each side once and drop the label in place (no extra full copies)."""
+    tr_idx, te_idx = train_test_split(np.arange(len(df)), test_size=TEST_SIZE, random_state=seed,
+                                      stratify=df[label_col])
+    # same rows in the same order as random_split (train_test_split on the frame itself)
+    tr, te = df.iloc[tr_idx].reset_index(drop=True), df.iloc[te_idx].reset_index(drop=True)
+    for side in (tr, te):
+        del side[label_col]
+    return Split(tr, te, target, **kw)
+
+
+def views(s: Split) -> list:
+    """The pre-registered view, plus no_identifiers when L5 flags any identifier."""
+    out = [("all", s, ALL)]
+    nid = without_identifiers(s)
+    if nid is not s:
+        out.append(("no_identifiers", nid, ALL))
+    return out
+
+
 def without_identifiers(s: Split) -> Split:
     """The same split without the columns leakcheck's L5 identifier check flags
     (phase 3 amendment: a post hoc second view of the current benchmarks)."""
     from leakcheck.checks.shortcut import check_identifiers
 
     drop = [c["feature"] for c in check_identifiers(s).details["columns"]]
+    if not drop:
+        return s
     return Split(s.train.drop(columns=drop), s.test.drop(columns=drop), s.label, time=s.time, group=s.group,
                  text=s.text, ignore=[c for c in s.ignore if c not in drop])
 
@@ -124,24 +147,22 @@ def prep_edgeiiot(seed: int = SEED) -> Prepared:
 
 
 def prep_cseids2018(seed: int = SEED) -> Prepared:
-    df = data.cached(data.load_cseids2018)
+    df = data.load_cseids2018()  # not data.cached: 16M rows, no second copy
     df["is_attack"] = (df["Label"] != "Benign").astype("int8")
-    tr, te = random_split(df, df["Label"], seed)
-    s = Split(tr.drop(columns=["Label"]), te.drop(columns=["Label"]), "is_attack", time="capture_order")
-    return Prepared([("all", s, ALL), ("no_identifiers", without_identifiers(s), ALL)],
-                    f"stratified random {1 - TEST_SIZE:.0%}/{TEST_SIZE:.0%} by Label, seed {seed}",
+    s = big_split(df, "Label", "is_attack", seed, time="capture_order")
+    del df
+    return Prepared(views(s), f"stratified random {1 - TEST_SIZE:.0%}/{TEST_SIZE:.0%} by Label, seed {seed}",
                     {"excluded": ["Label (attack name)"], "time": "capture_order = index of the capture day (10 files)",
                      "kept": "every distributed feature, identifiers included (Timestamp; Flow ID and IPs on 20-02)"},
                     ("cseids2018",))
 
 
 def prep_ciciot2023(seed: int = SEED) -> Prepared:
-    df = data.cached(data.load_ciciot2023)
+    df = data.load_ciciot2023()  # not data.cached: 47M rows, no second copy
     df["is_attack"] = (df["label"] != "BenignTraffic").astype("int8")
-    tr, te = random_split(df, df["label"], seed)
-    s = Split(tr.drop(columns=["label"]), te.drop(columns=["label"]), "is_attack")
-    return Prepared([("all", s, ALL), ("no_identifiers", without_identifiers(s), ALL)],
-                    f"stratified random {1 - TEST_SIZE:.0%}/{TEST_SIZE:.0%} by label, seed {seed}",
+    s = big_split(df, "label", "is_attack", seed)
+    del df
+    return Prepared(views(s), f"stratified random {1 - TEST_SIZE:.0%}/{TEST_SIZE:.0%} by label, seed {seed}",
                     {"excluded": ["label (attack name)"]}, ("ciciot2023",))
 
 

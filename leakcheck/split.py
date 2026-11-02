@@ -22,22 +22,56 @@ def read_table(path: str | Path) -> pd.DataFrame:
     return pd.read_csv(path, low_memory=False, skipinitialspace=True)
 
 
-def canonicalize(df: pd.DataFrame, mantissa_bits: int = MANTISSA_BITS) -> pd.DataFrame:
-    """Return a copy whose equal-looking rows are bit-identical."""
-    out = {}
+def _kinds(df: pd.DataFrame) -> dict[str, str]:
+    """How each column is canonicalized, decided on the whole column (so a chunk
+    without the column's NaNs is treated exactly like one with them)."""
+    kinds = {}
     for col in df.columns:
         s = df[col]
         if pd.api.types.is_bool_dtype(s):
-            out[col] = s.astype("int64")
+            kinds[col] = "int"
         elif pd.api.types.is_integer_dtype(s) and not s.isna().any():
-            out[col] = s.astype("int64")
+            kinds[col] = "int"
         elif pd.api.types.is_numeric_dtype(s):
+            kinds[col] = "float"
+        else:
+            kinds[col] = "string"
+    return kinds
+
+
+def canonicalize(df: pd.DataFrame, mantissa_bits: int = MANTISSA_BITS,
+                 kinds: dict[str, str] | None = None) -> pd.DataFrame:
+    """Return a copy whose equal-looking rows are bit-identical."""
+    kinds = kinds or _kinds(df)
+    out = {}
+    for col in df.columns:
+        s = df[col]
+        if kinds[col] == "int":
+            out[col] = s.astype("int64")
+        elif kinds[col] == "float":
             out[col] = pd.Series(_round_mantissa(s.to_numpy(dtype="float64"), mantissa_bits), index=s.index)
         else:
             # Strings / mixed: strip whitespace, unify missing values.
             t = s.astype("string").str.strip()
             out[col] = t.fillna("<NA>")
     return pd.DataFrame(out, index=df.index)
+
+
+HASH_CHUNK = 1_000_000  # rows canonicalized at a time: bounds memory on tens of millions of rows
+
+
+def canonical_row_hashes(df: pd.DataFrame, mantissa_bits: int = MANTISSA_BITS) -> np.ndarray:
+    """row_hashes(canonicalize(df)), computed in row chunks. A row's hash depends only
+    on its own values and the column kinds, which are decided on the whole frame,
+    so the result is identical to the unchunked computation."""
+    if df.shape[1] == 0:
+        return np.zeros(len(df), dtype=np.uint64)
+    kinds = _kinds(df)
+    out = np.empty(len(df), dtype=np.uint64)
+    for start in range(0, len(df), HASH_CHUNK):
+        part = df.iloc[start:start + HASH_CHUNK]
+        out[start:start + len(part)] = row_hashes(canonicalize(part, mantissa_bits, kinds))
+    return out
 
 
 def _round_mantissa(x: np.ndarray, bits: int) -> np.ndarray:
@@ -102,7 +136,7 @@ class Split:
         # Canonicalize train and test together so a column that is int in one
         # file and float in the other (e.g. because of a NaN) hashes the same.
         both = pd.concat([self.train[self.features], self.test[self.features]], ignore_index=True)
-        return row_hashes(canonicalize(both))
+        return canonical_row_hashes(both)
 
     @property
     def train_hash(self) -> np.ndarray:

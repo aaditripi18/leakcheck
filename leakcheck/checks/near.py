@@ -21,7 +21,7 @@ import pandas as pd
 from sklearn.neighbors import NearestNeighbors
 
 from ..findings import Finding, grade, wilson
-from ..split import Split, canonicalize, row_hashes
+from ..split import Split, canonical_row_hashes
 
 EPS = 0.01
 EPS_GRID = (0.001, 0.003, 0.01, 0.03, 0.1)
@@ -50,27 +50,50 @@ def _slog(x: np.ndarray) -> np.ndarray:
         return np.sign(x) * np.log1p(np.abs(x))
 
 
+LARGE = 200_000_000  # train values above which the embedding is stored as float32 (memory)
+
+
+def _column_stats(tr: np.ndarray) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Median, IQR and std of each column over finite values, one column at a time in
+    float64 (the same numbers np.nan* gives on the whole matrix, without a copy of it)."""
+    med, iqr, std = (np.full(tr.shape[1], np.nan) for _ in range(3))
+    for j in range(tr.shape[1]):
+        c = tr[:, j].astype("float64")
+        c = c[np.isfinite(c)]
+        if c.size:
+            q25, q50, q75 = np.percentile(c, [25, 50, 75])
+            med[j], iqr[j], std[j] = q50, q75 - q25, c.std()
+    return med, iqr, std
+
+
 def embed(split: Split) -> tuple[np.ndarray, np.ndarray]:
-    """Scaled numeric matrices (train, test), RMS-normalised."""
+    """Scaled numeric matrices (train, test), RMS-normalised. Above LARGE training
+    values the matrices are float32 (the scaling statistics stay float64)."""
     cols = numeric_columns(split)
-    tr = _slog(split.train[cols].to_numpy(dtype="float64", copy=True))
-    te = _slog(split.test[cols].to_numpy(dtype="float64", copy=True))
-    fin = np.where(np.isfinite(tr), tr, np.nan)
-    with warnings.catch_warnings():  # all-NaN columns
-        warnings.simplefilter("ignore", RuntimeWarning)
-        med = np.nanmedian(fin, axis=0)
-        iqr = np.nanpercentile(fin, 75, axis=0) - np.nanpercentile(fin, 25, axis=0)
-        std = np.nanstd(fin, axis=0)
+    big = len(split.train) * len(cols) > LARGE
+    dtype = "float32" if big else "float64"
+    tr = _slog(split.train[cols].to_numpy(dtype=dtype, copy=True))
+    te = _slog(split.test[cols].to_numpy(dtype=dtype, copy=True))
+    if big:
+        med, iqr, std = _column_stats(tr)
+    else:
+        fin = np.where(np.isfinite(tr), tr, np.nan)
+        with warnings.catch_warnings():  # all-NaN columns
+            warnings.simplefilter("ignore", RuntimeWarning)
+            med = np.nanmedian(fin, axis=0)
+            iqr = np.nanpercentile(fin, 75, axis=0) - np.nanpercentile(fin, 25, axis=0)
+            std = np.nanstd(fin, axis=0)
     scale = np.where(iqr > 0, iqr, np.where(std > 0, std, 1.0))
     med = np.nan_to_num(med)
     scale = np.nan_to_num(scale, nan=1.0)
 
     def z(x: np.ndarray) -> np.ndarray:
-        out = (x - med) / scale
+        out = (x - med.astype(x.dtype)) / scale.astype(x.dtype)  # stays float32 when x is
         out[np.isnan(x)] = -MISSING
         out[np.isposinf(x)] = 2 * MISSING
         out[np.isneginf(x)] = -2 * MISSING
-        return out / np.sqrt(max(len(cols), 1))
+        out /= np.sqrt(max(len(cols), 1))
+        return out
 
     return z(tr), z(te)
 
@@ -78,7 +101,7 @@ def embed(split: Split) -> tuple[np.ndarray, np.ndarray]:
 def _cat_keys(split: Split) -> tuple[np.ndarray, np.ndarray]:
     cols = categorical_columns(split)
     both = pd.concat([split.train[cols], split.test[cols]], ignore_index=True)
-    h = row_hashes(canonicalize(both))
+    h = canonical_row_hashes(both)
     return h[: len(split.train)], h[len(split.train) :]
 
 
