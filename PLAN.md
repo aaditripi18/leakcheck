@@ -232,3 +232,41 @@ families occur on both sides.
 - **H9** A chronological split costs more accuracy than removing near-copies on
   network-intrusion data too: the random -> chronological macro-F1 drop exceeds
   the original -> no_near drop for at least 3 of the 5 models (mean of 3 seeds).
+
+## Phase 3 (written 2026-11-02, before any of its data is downloaded)
+
+The eight audited benchmarks are the classic ones (KDD Cup 99 from 1999,
+CIC-IDS2017). Current intrusion-detection papers mostly report on newer
+datasets. Phase 3 asks whether the same problems are in the benchmarks people
+use now, with the same checks, splits and models as phases 1 and 2.
+
+**E8. Current benchmarks.** Three datasets, each from its maintainers' own
+release, checksummed and validated against published counts before use:
+
+- **CSE-CIC-IDS2018** (CIC and the Communications Security Establishment): the
+  "Processed Traffic Data for ML Algorithms" CSVs in the public AWS bucket
+  `s3://cse-cic-ids2018` (registry.opendata.aws/cse-cic-ids2018).
+- **Edge-IIoTset** (Ferrag et al., IEEE Access 2022): `DNN-EdgeIIoT-dataset.csv`
+  from the authors' Kaggle dataset `mohamedamineferrag/edgeiiotset-cyber-security-dataset-of-iot-iiot`.
+- **CIC-IoT2023** (Neto et al., Sensors 2023): the CSVs of the UNB release. If
+  the only download is behind a registration form, a mirror is used only if it
+  matches the published per-class counts; otherwise the dataset is dropped and
+  the reason recorded.
+
+None ships an official train/test split, so each gets the CIC-IDS2017 rule:
+stratified random 80/20 by attack label, seed 0. Flow identifiers (IPs, ports,
+timestamps, flow IDs) are kept as features exactly as distributed, because that
+is how the published ML files are used; L5 reports whether any of them is a
+shortcut. E1 (audit), E2 (four untuned baselines, 300k cap) and E5/E6 (full
+training sets, `hgb_tuned`, three seeds, paired bootstrap) run unchanged.
+
+- **H10** At least 2 of the 3 current benchmarks have >= 5% of test rows that
+  exactly copy a training row (H1's rule).
+- **H11** On every current benchmark with >= 5% exact copies, removing leaked
+  test rows (exact and near, eps 0.01) costs at least one model >= 1 macro-F1
+  point, with the paired bootstrap interval above zero in >= 2 of 3 seeds.
+- **H12** At least one current benchmark has a single feature reaching >= 0.95
+  balanced accuracy on its own (H5's rule).
+
+Verdicts are reported whatever they are, next to H1, H2 and H5 for the classic
+benchmarks.
