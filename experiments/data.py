@@ -24,6 +24,7 @@ import urllib.request
 import zipfile
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -357,3 +358,42 @@ def run_file(name: str) -> str:
     """A run name as a file-name stem: "dataset:view" would make Windows write an
     alternate data stream of a file called "dataset" instead of a file."""
     return name.replace(":", "__")
+
+
+CSEIDS_FILES = ("02-14-2018.csv", "02-15-2018.csv", "02-16-2018.csv", "02-20-2018.csv", "02-21-2018.csv",
+                "02-22-2018.csv", "02-23-2018.csv", "02-28-2018.csv", "03-01-2018.csv", "03-02-2018.csv")
+
+
+def load_cseids2018() -> pd.DataFrame:
+    """The ten "Processed Traffic Data for ML Algorithms" CSVs, in capture order, plus
+    `capture_order` (0-9). Header lines repeated inside some files are dropped; the
+    four extra columns of the 20-02 file (Flow ID, Src IP, Src Port, Dst IP) are kept
+    and are missing elsewhere. Numbers are read as float32 to fit in memory."""
+    paths = verify_local("cseids2018")
+    frames = []
+    for i, p in enumerate(paths):
+        d = pd.read_csv(p, low_memory=False, dtype=str)
+        d.columns = [c.strip() for c in d.columns]
+        d = d[d["Label"] != "Label"]  # repeated header lines are not records
+        for c in d.columns:
+            if c not in ("Label", "Timestamp", "Flow ID", "Src IP", "Dst IP"):
+                d[c] = pd.to_numeric(d[c], errors="coerce").astype("float32")
+        d["capture_order"] = np.int8(i)
+        frames.append(d.reset_index(drop=True))
+    df = pd.concat(frames, ignore_index=True)
+    for c in ("Label", "Timestamp", "Flow ID", "Src IP", "Dst IP"):
+        df[c] = df[c].astype("string")
+    return df
+
+
+def load_ciciot2023() -> pd.DataFrame:
+    """The 169 CSV parts of CIC-IoT2023, concatenated (46 features + label), as float32."""
+    frames = []
+    for p in verify_local("ciciot2023"):
+        d = pd.read_csv(p, low_memory=False)
+        num = [c for c in d.columns if c != "label"]
+        d[num] = d[num].astype("float32")
+        frames.append(d)
+    df = pd.concat(frames, ignore_index=True)
+    df["label"] = df["label"].astype("string")
+    return df

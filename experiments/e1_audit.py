@@ -123,6 +123,28 @@ def prep_edgeiiot(seed: int = SEED) -> Prepared:
                     ("edgeiiot",))
 
 
+def prep_cseids2018(seed: int = SEED) -> Prepared:
+    df = data.cached(data.load_cseids2018)
+    df["is_attack"] = (df["Label"] != "Benign").astype("int8")
+    tr, te = random_split(df, df["Label"], seed)
+    s = Split(tr.drop(columns=["Label"]), te.drop(columns=["Label"]), "is_attack", time="capture_order")
+    return Prepared([("all", s, ALL), ("no_identifiers", without_identifiers(s), ALL)],
+                    f"stratified random {1 - TEST_SIZE:.0%}/{TEST_SIZE:.0%} by Label, seed {seed}",
+                    {"excluded": ["Label (attack name)"], "time": "capture_order = index of the capture day (10 files)",
+                     "kept": "every distributed feature, identifiers included (Timestamp; Flow ID and IPs on 20-02)"},
+                    ("cseids2018",))
+
+
+def prep_ciciot2023(seed: int = SEED) -> Prepared:
+    df = data.cached(data.load_ciciot2023)
+    df["is_attack"] = (df["label"] != "BenignTraffic").astype("int8")
+    tr, te = random_split(df, df["label"], seed)
+    s = Split(tr.drop(columns=["label"]), te.drop(columns=["label"]), "is_attack")
+    return Prepared([("all", s, ALL), ("no_identifiers", without_identifiers(s), ALL)],
+                    f"stratified random {1 - TEST_SIZE:.0%}/{TEST_SIZE:.0%} by label, seed {seed}",
+                    {"excluded": ["label (attack name)"]}, ("ciciot2023",))
+
+
 def prep_ember(seed: int = SEED) -> Prepared:
     from experiments.ember import CATEGORICAL, columns, load_ember
 
@@ -148,7 +170,7 @@ def prep_ember(seed: int = SEED) -> Prepared:
 PREP = {
     "kdd99": prep_kdd99, "nslkdd": prep_nslkdd, "unsw_nb15": prep_unsw, "cicids2017": prep_cic,
     "ember2018": prep_ember, "uci_phishing": prep_uci_phishing, "phiusiil": prep_phiusiil, "sms_spam": prep_sms,
-    "edgeiiot": prep_edgeiiot,
+    "edgeiiot": prep_edgeiiot, "cseids2018": prep_cseids2018, "ciciot2023": prep_ciciot2023,
 }
 
 
