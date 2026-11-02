@@ -325,3 +325,29 @@ def load_sms_spam() -> pd.DataFrame:
         text = zf.read(_zip_member(zf, "SMSSpamCollection")).decode("utf-8")
     rows = [line.split("\t", 1) for line in text.splitlines() if line]
     return pd.DataFrame(rows, columns=["label", "message"])
+
+
+# --- Phase 3: current benchmarks -------------------------------------------------------
+
+
+def _numeric_where_possible(df: pd.DataFrame, keep: tuple[str, ...] = ()) -> pd.DataFrame:
+    """Columns read as text become numbers when every non-missing value parses as one
+    (the CSVs mix "0", "0.0" and 0); anything else stays a string category."""
+    for c in df.columns:
+        if c in keep or df[c].dtype != object:
+            continue
+        num = pd.to_numeric(df[c], errors="coerce")
+        if num.notna().sum() == df[c].notna().sum():
+            df[c] = num
+        else:
+            df[c] = df[c].astype("string")
+    return df
+
+
+def load_edgeiiot() -> pd.DataFrame:
+    """DNN-EdgeIIoT-dataset.csv as distributed: 61 features, Attack_label, Attack_type."""
+    (path,) = verify_local("edgeiiot")
+    with zipfile.ZipFile(path) as zf:
+        with zf.open(_zip_member(zf, "DNN-EdgeIIoT-dataset.csv")) as fh:
+            df = pd.read_csv(fh, low_memory=False)
+    return _numeric_where_possible(df, keep=("Attack_type",))

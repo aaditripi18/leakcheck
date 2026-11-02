@@ -270,5 +270,21 @@
     "citation": "N. Moustafa and J. Slay, UNSW-NB15: a comprehensive data set for network intrusion detection systems, MilCIS 2015",
     "licence": "UNSW-NB15 terms (research use, cite the authors); not redistributed here",
     "manual_download": true
+  },
+  "edgeiiot": {
+    "description": "Edge-IIoTset DNN-EdgeIIoT-dataset.csv (the authors' 'Selected dataset for ML and DL', deep-learning file): 2,219,201 rows, 61 features + Attack_label + Attack_type (1,615,643 Normal, 603,558 attacks of 14 types)",
+    "source": "The authors' Kaggle dataset mohamedamineferrag/edgeiiotset-cyber-security-dataset-of-iot-iiot (the IEEE DataPort entry, DOI 10.21227/mbc1-1h68, points to it for updates), file 'Edge-IIoTset dataset/Selected dataset for ML and DL/DNN-EdgeIIoT-dataset.csv', fetched with the Kaggle CLI",
+    "provenance": "Distributed by the dataset's authors; no official checksum is published. Totals agree with how later papers describe the file (about 2.2 million rows, 1.6 million normal, 14 attack types).",
+    "licence": "Free for academic research; commercial use needs the authors' permission",
+    "citation": "Ferrag, Friha, Hamouda, Maglaras, Janicke. Edge-IIoTset: A New Comprehensive Realistic Cyber Security Dataset of IoT and IIoT Applications for Centralized and Federated Learning. IEEE Access 10 (2022) 40281-40306",
+    "manual_download": true,
+    "files": [
+      {
+        "path": "edgeiiot/DNN-EdgeIIoT-dataset.csv.zip",
+        "url": "kaggle datasets download mohamedamineferrag/edgeiiotset-cyber-security-dataset-of-iot-iiot -f \"Edge-IIoTset dataset/Selected dataset for ML and DL/DNN-EdgeIIoT-dataset.csv\"",
+        "sha256": "40f2ecf8bd206ccd3e9a21543c501b6d875ea55348e250628b0da31157b60982",
+        "bytes": 311062159
+      }
+    ]
   }
 }

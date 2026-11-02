@@ -102,6 +102,16 @@ def prep_sms(seed: int = SEED) -> Prepared:
                     {"text": "message"}, ("sms_spam",))
 
 
+def prep_edgeiiot(seed: int = SEED) -> Prepared:
+    df = data.cached(data.load_edgeiiot)
+    tr, te = random_split(df, df["Attack_type"], seed)
+    s = Split(tr.drop(columns=["Attack_type"]), te.drop(columns=["Attack_type"]), "Attack_label")
+    return Prepared([("all", s, ALL)], f"stratified random {1 - TEST_SIZE:.0%}/{TEST_SIZE:.0%} by Attack_type, seed {seed}",
+                    {"excluded": ["Attack_type (attack name)"],
+                     "kept": "every distributed feature, identifiers included (frame.time, IPs, ports)"},
+                    ("edgeiiot",))
+
+
 def prep_ember(seed: int = SEED) -> Prepared:
     from experiments.ember import CATEGORICAL, columns, load_ember
 
@@ -127,6 +137,7 @@ def prep_ember(seed: int = SEED) -> Prepared:
 PREP = {
     "kdd99": prep_kdd99, "nslkdd": prep_nslkdd, "unsw_nb15": prep_unsw, "cicids2017": prep_cic,
     "ember2018": prep_ember, "uci_phishing": prep_uci_phishing, "phiusiil": prep_phiusiil, "sms_spam": prep_sms,
+    "edgeiiot": prep_edgeiiot,
 }
 
 
