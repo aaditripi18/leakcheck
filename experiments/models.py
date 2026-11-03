@@ -45,6 +45,15 @@ def _finite(x):
     return np.where(np.isfinite(x), x, np.nan)
 
 
+def _cat(x):
+    """Categorical columns as object arrays with np.nan for missing: pandas' string
+    dtype marks missing as pd.NA, which scikit-learn's encoders reject (IDS2018's
+    Flow ID and IP columns exist in one of ten files). Unchanged where nothing is
+    missing."""
+    x = pd.DataFrame(x).astype(object)
+    return x.where(x.notna(), np.nan).to_numpy()
+
+
 def _as_text(x):
     return pd.Series(np.asarray(x).ravel()).fillna("").astype(str).to_numpy()
 
@@ -65,8 +74,11 @@ def preprocessor(model: str, num: list[str], cat: list[str], text: str | None) -
                 ("scale", StandardScaler()),
             ]), num))
         if cat:
-            parts.append(("cat", OneHotEncoder(handle_unknown="infrequent_if_exist", max_categories=MAX_CATEGORIES,
-                                               sparse_output=True), cat))
+            parts.append(("cat", Pipeline([
+                ("na", FunctionTransformer(_cat)),
+                ("onehot", OneHotEncoder(handle_unknown="infrequent_if_exist", max_categories=MAX_CATEGORIES,
+                                         sparse_output=True)),
+            ]), cat))
     else:
         # A text column makes the matrix sparse, and RandomForest takes NaN only in
         # dense input. In that case missing values become a sentinel far below any
@@ -81,8 +93,11 @@ def preprocessor(model: str, num: list[str], cat: list[str], text: str | None) -
             parts.append(("num", Pipeline(num_steps), num))
         if cat:
             fill = -1 if sentinel else np.nan  # category codes start at 0; must be an int here
-            parts.append(("cat", OrdinalEncoder(handle_unknown="use_encoded_value", unknown_value=fill,
-                                                encoded_missing_value=fill, max_categories=250), cat))
+            parts.append(("cat", Pipeline([
+                ("na", FunctionTransformer(_cat)),
+                ("ordinal", OrdinalEncoder(handle_unknown="use_encoded_value", unknown_value=fill,
+                                           encoded_missing_value=fill, max_categories=250)),
+            ]), cat))
     if text:
         k = TFIDF_FEATURES_DENSE if model == "hgb" else TFIDF_FEATURES
         parts.append(("text", Pipeline([("str", FunctionTransformer(_as_text)),
