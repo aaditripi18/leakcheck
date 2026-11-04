@@ -329,3 +329,17 @@ leaked row in one radius search, in the scaled space in which E2 called the row
 leaked, and checks that none is left. E9/E10 are rerun on every dataset with this
 implementation; the first run is reported as superseded. Its E10 numbers do not
 depend on the change.
+
+**Amendment (2026-11-04, before E5 runs on any current benchmark).** E5 as
+specified does not fit two of the current benchmarks on this machine. Its
+per-row evidence finds every test row's nearest training row: for CIC-IoT2023
+that is 9.3M test rows against 37M training rows, and for CSE-CIC-IDS2018 3.2M
+against 13M (on the order of 10^14-10^15 distance computations), and a random
+forest or MLP on 13-37M rows exceeds the memory and time available. For these
+two only:
+- every model is scored on, and per-row evidence is computed for, a stratified
+  random sample of 200,000 test rows (by label, seed = the run's seed);
+- lr, hgb and hgb_tuned train on the full training set; rf and mlp train on a
+  stratified 2,000,000-row sample of it (seed = the run's seed).
+Edge-IIoTset (1.8M training rows) runs exactly as specified. H11 is judged on
+these runs; its rule ("some model") does not depend on rf or mlp.
