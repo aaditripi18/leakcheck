@@ -136,10 +136,23 @@ def ember_temporal(seed: int) -> Split:
                  "label", time="appeared")
 
 
+def ember_official_random(seed: int) -> Split:
+    """E11: E2's EMBER random split (the same files, same seed) on the official vectors."""
+    from experiments.ember import load_ember
+    from experiments.ember_official import aligned
+    # the rows of _ember_labelled(), in its order (it drops sha256, which the join needs)
+    df = data.cached(load_ember)
+    base = df[df["label"] != -1][["sha256", "split", "appeared", "label"]].reset_index(drop=True)
+    v = aligned(base)
+    tr, te = train_test_split(v, test_size=EMBER_TEST, random_state=seed, stratify=v["label"])
+    return Split(tr.drop(columns=["split"]).reset_index(drop=True), te.drop(columns=["split"]).reset_index(drop=True),
+                 "label", time="appeared")
+
+
 TIME_SPLITS = {"cicids2017": time_split_cic, "ember2018": ember_temporal}
 # E2 "original" split where it differs from E1's audit split: for EMBER the
 # original is a random split, so the official temporal split can play "time".
-E2_SPLITS = {"ember2018": ember_random}
+E2_SPLITS = {"ember2018": ember_random, "ember2018_official": ember_official_random}
 
 
 def original_split(name: str, seed: int) -> Split:

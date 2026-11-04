@@ -188,10 +188,31 @@ def prep_ember(seed: int = SEED) -> Prepared:
     )
 
 
+def prep_ember_official(seed: int = SEED) -> Prepared:
+    """E11: the official temporal split, on EMBER's own 2,381-dimension vectors."""
+    from experiments.ember import load_ember
+    from experiments.ember_official import aligned
+
+    df = load_ember()
+    df = df[df["label"] != -1]
+    df = df.assign(family=np.where(df["avclass"] != "", df["avclass"], "benign:" + df["sha256"]))
+    v = aligned(df.reset_index(drop=True))
+    tr = v[v["split"] == "train"].drop(columns=["split"]).reset_index(drop=True)
+    te = v[v["split"] == "test"].drop(columns=["split"]).reset_index(drop=True)
+    s = Split(tr, te, "label", time="appeared", group="family")
+    return Prepared([("official_vector", s, ALL)],
+                    "official temporal (train Jan-Oct 2018, test Nov-Dec 2018); unlabelled samples dropped",
+                    {"features": "EMBER's own feature_version 2 vectors (2,381 floats), made by EMBER's code outside "
+                                 "this repository and verified against EMBER's published model (ROC AUC 0.996429)",
+                     "L6": "group = AVClass family for malware; each benign file is its own group"},
+                    ("ember2018",))
+
+
 PREP = {
     "kdd99": prep_kdd99, "nslkdd": prep_nslkdd, "unsw_nb15": prep_unsw, "cicids2017": prep_cic,
     "ember2018": prep_ember, "uci_phishing": prep_uci_phishing, "phiusiil": prep_phiusiil, "sms_spam": prep_sms,
     "edgeiiot": prep_edgeiiot, "cseids2018": prep_cseids2018, "ciciot2023": prep_ciciot2023,
+    "ember2018_official": prep_ember_official,
 }
 
 
