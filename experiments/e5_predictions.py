@@ -26,7 +26,7 @@ import pandas as pd
 from sklearn.model_selection import RandomizedSearchCV, StratifiedKFold, train_test_split
 
 from experiments import data
-from experiments.e2_retrain import TIME_SPLITS, fit_predict, original_split
+from experiments.e2_retrain import TIME_SPLITS, fit_predict, like, original_split, subsample
 from experiments.ledger import git_state
 from experiments.models import MODELS, build
 from leakcheck import Split
@@ -35,6 +35,11 @@ from leakcheck.checks import near, near_text
 SEEDS = (0, 1, 2)
 ALL_MODELS = MODELS + ("hgb_tuned",)
 TUNE_ROWS = 200_000
+# PLAN.md amendment (2026-11-04): the two current benchmarks with 13-37M training rows are
+# scored on a stratified test sample, and rf/mlp train on a stratified training sample.
+BIG = {"cseids2018", "ciciot2023"}
+BIG_TEST_ROWS = 200_000
+BIG_TRAIN_ROWS_RF_MLP = 2_000_000
 TUNE_ITER = 12
 MIN_TAU = 0.6  # the lowest Jaccard the analysis sweeps to
 OUT = data.ROOT / "results" / "e5"
@@ -118,16 +123,23 @@ def run_one(name: str, seed: int) -> dict:
             return meta
     t0 = time.time()
     split = original_split(name, seed)  # full training set: no subsample
+    big = name.partition(":")[0] in BIG
+    if big:
+        keep, _ = train_test_split(np.arange(len(split.test)), train_size=BIG_TEST_ROWS, random_state=seed,
+                                   stratify=split.y_test)
+        split = like(split, split.train, split.test.iloc[np.sort(keep)].reset_index(drop=True))
     arrays = {"y": np.asarray(split.y_test), **row_evidence(split)}
     meta = {"dataset": name, "seed": seed, "commit": commit, "code": fp, "n_train": len(split.train), "n_test": len(split.test),
-            "npz": f"{data.run_file(name)}_seed{seed}.npz", "fit_seconds": {}, "evidence_seconds": round(time.time() - t0, 1)}
+            "npz": f"{data.run_file(name)}_seed{seed}.npz", "fit_seconds": {}, "evidence_seconds": round(time.time() - t0, 1),
+            **({"test_sample": BIG_TEST_ROWS, "rf_mlp_train_rows": BIG_TRAIN_ROWS_RF_MLP} if big else {})}
     print(f"   {name} seed {seed}: evidence in {meta['evidence_seconds']} s "
           f"(train {len(split.train):,}, test {len(split.test):,})", flush=True)
     tuned, cv = tune_hgb(split, seed)
     meta["hgb_tuned"] = {"params": {k.split("__", 1)[1]: v for k, v in tuned.items()}, "cv_macro_f1": cv}
     print(f"   {name} seed {seed}: tuned {meta['hgb_tuned']}", flush=True)
     for m in ALL_MODELS:
-        pred, secs = fit_predict_any(split, m, seed, tuned)
+        fit_on = subsample(split, seed, cap=BIG_TRAIN_ROWS_RF_MLP) if big and m in ("rf", "mlp") else split
+        pred, secs = fit_predict_any(fit_on, m, seed, tuned)
         arrays[f"pred_{m}"] = np.asarray(pred)
         meta["fit_seconds"][m] = round(secs, 1)
         print(f"   {name} seed {seed} {m}: {secs:.0f} s", flush=True)
