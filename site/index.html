@@ -276,9 +276,63 @@
 </section>
 
 <section class="flex flex-col gap-space-md">
+  <div class="flex flex-col md:flex-row md:items-end justify-between border-b border-surface-container-high pb-space-sm gap-2">
+    <div id="current" class="scroll-mt-20">
+  <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">05</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">The benchmarks in use now</span></div>
+  <h2 class="font-headline-md text-headline-md text-on-surface mt-1">Current benchmarks hide their copies</h2>
+</div>
+    <div class="font-mono-data-sm text-mono-data-sm text-secondary">Each checked against its publisher before use</div>
+  </div>
+  <div class="w-full overflow-x-auto" tabindex="0" role="region" aria-label="Current benchmarks, scrolls sideways">
+    <table class="w-full text-left border-collapse border border-surface-container-high min-w-[760px] bg-surface font-mono-data-sm text-mono-data-sm text-on-surface">
+      <caption class="sr-only">Exact test copies in three current benchmarks, as distributed and without identifier columns</caption>
+      <thead><tr class="bg-surface-container-low border-b border-on-surface sec-label text-secondary">
+        <th scope="col" class="py-space-sm px-space-md">Dataset</th><th scope="col" class="py-space-sm px-space-md text-right">Test rows</th>
+        <th scope="col" class="py-space-sm px-space-md text-right">Exact copies, as distributed</th>
+        <th scope="col" class="py-space-sm px-space-md text-right">Without identifier columns</th>
+        <th scope="col" class="py-space-sm px-space-md text-right">Best single feature</th>
+      </tr></thead>
+      <tbody class="divide-y divide-surface-container-high"><tr>
+  <th scope="row" class="py-space-sm px-space-md font-medium text-left">Edge-IIoTset (2022)</th>
+  <td class="py-space-sm px-space-md text-right tabular">443,841</td>
+  <td class="py-space-sm px-space-md text-right tabular">0.04%</td>
+  <td class="py-space-sm px-space-md text-right tabular text-primary font-semibold">16.2%</td>
+  <td class="py-space-sm px-space-md text-right tabular">dns.qry.name.len 100.0%</td>
+</tr><tr>
+  <th scope="row" class="py-space-sm px-space-md font-medium text-left">CSE-CIC-IDS2018</th>
+  <td class="py-space-sm px-space-md text-right tabular">3,246,589</td>
+  <td class="py-space-sm px-space-md text-right tabular">4.9%</td>
+  <td class="py-space-sm px-space-md text-right tabular text-primary font-semibold">40.3%</td>
+  <td class="py-space-sm px-space-md text-right tabular">Dst Port 90.9%</td>
+</tr><tr>
+  <th scope="row" class="py-space-sm px-space-md font-medium text-left">CIC-IoT2023</th>
+  <td class="py-space-sm px-space-md text-right tabular">9,337,316</td>
+  <td class="py-space-sm px-space-md text-right tabular text-primary font-semibold">44.3%</td>
+  <td class="py-space-sm px-space-md text-right tabular">no identifier columns</td>
+  <td class="py-space-sm px-space-md text-right tabular">Weight 99.1%</td>
+</tr></tbody>
+    </table>
+  </div>
+  <p class="font-body-sm text-body-sm text-on-surface-variant">A timestamp, flow ID or port makes nearly every row unique, so a duplicate check on the files as shipped sees little. Without the columns leakcheck's identifier check flags (a view added after the first run), the repeats show. Edge-IIoTset (2022): the authors' own release. CSE-CIC-IDS2018: byte-identical to the official S3 objects; label counts equal the published table. CIC-IoT2023: label counts equal the published table.</p>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-space-md"><div class="p-space-md bg-surface-container-low border border-surface-container-high flex flex-col gap-space-xs">
+  <span class="sec-label text-on-surface-variant">Copies are easy, not memorised</span>
+  <span class="font-mono-data-lg text-[32px] leading-tight text-on-surface font-bold tabular">97%</span>
+  <span class="font-body-sm text-body-sm text-on-surface-variant">of KDD Cup 99&#x27;s copied test rows are still predicted correctly by a model trained without any copy (E9).</span>
+</div><div class="p-space-md bg-surface-container-low border border-surface-container-high flex flex-col gap-space-xs">
+  <span class="sec-label text-on-surface-variant">Most of a gap is which rows go</span>
+  <span class="font-mono-data-lg text-[32px] leading-tight text-on-surface font-bold tabular">0.5–0.7 pts</span>
+  <span class="font-body-sm text-body-sm text-on-surface-variant">is what removing a random subset of the same size costs on NSL-KDD, against 8.5–11.9 for removing the copies (E10).</span>
+</div><div class="p-space-md bg-surface-container-low border border-surface-container-high flex flex-col gap-space-xs">
+  <span class="sec-label text-on-surface-variant">Time was not the problem</span>
+  <span class="font-mono-data-lg text-[32px] leading-tight text-on-surface font-bold tabular">0.5–1.5 pts</span>
+  <span class="font-body-sm text-body-sm text-on-surface-variant">is what CIC-IDS2017&#x27;s time split costs once every attack type is seen in training (E12).</span>
+</div></div>
+</section>
+
+<section class="flex flex-col gap-space-md">
   <div id="hypotheses" class="scroll-mt-20">
-  <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">05</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">Pre-registered</span></div>
-  <h2 class="font-headline-md text-headline-md text-on-surface mt-1">9 hypotheses, decided by rules fixed before the runs</h2>
+  <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">06</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">Pre-registered</span></div>
+  <h2 class="font-headline-md text-headline-md text-on-surface mt-1">16 hypotheses, decided by rules fixed before the runs</h2>
 </div>
   <div class="flex flex-col border border-surface-container-high divide-y divide-surface-container-high bg-surface"><div class="p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-sm hover:bg-surface-container-low transition-colors">
   <div class="flex items-start gap-space-md max-w-3xl">
@@ -361,20 +415,83 @@
     </div>
   </div>
   <div class="self-start md:self-center shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 font-mono-data-sm text-mono-data-sm font-semibold bg-surface-container-high text-secondary border border-outline-variant">NOT SUPPORTED</span></div>
+</div><div class="p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-sm hover:bg-surface-container-low transition-colors">
+  <div class="flex items-start gap-space-md max-w-3xl">
+    <span class="font-mono-data-md text-mono-data-md font-bold text-on-surface bg-surface-container px-2 py-0.5">H10</span>
+    <div class="flex flex-col">
+      <span class="font-body-md text-body-md font-medium text-on-surface">At least 2 of the 3 current benchmarks have &gt;= 5% exact test copies (as distributed)</span>
+      <span class="font-mono-data-sm text-mono-data-sm text-secondary mt-0.5">1 of 3: Edge-IIoTset (2022) 0.04%, CSE-CIC-IDS2018 4.91%, CIC-IoT2023 44.26%</span>
+    </div>
+  </div>
+  <div class="self-start md:self-center shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 font-mono-data-sm text-mono-data-sm font-semibold bg-surface-container-high text-secondary border border-outline-variant">NOT SUPPORTED</span></div>
+</div><div class="p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-sm hover:bg-surface-container-low transition-colors">
+  <div class="flex items-start gap-space-md max-w-3xl">
+    <span class="font-mono-data-md text-mono-data-md font-bold text-on-surface bg-surface-container px-2 py-0.5">H11</span>
+    <div class="flex flex-col">
+      <span class="font-body-md text-body-md font-medium text-on-surface">On every current benchmark with &gt;= 5% exact copies, removing leaked rows costs some model &gt;= 1 point (bootstrap interval above 0 in &gt;= 2 of 3 seeds)</span>
+      <span class="font-mono-data-sm text-mono-data-sm text-secondary mt-0.5">needs E5/E6 on the current benchmarks</span>
+    </div>
+  </div>
+  <div class="self-start md:self-center shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 font-mono-data-sm text-mono-data-sm font-semibold bg-surface-container-high text-secondary border border-outline-variant">PENDING</span></div>
+</div><div class="p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-sm hover:bg-surface-container-low transition-colors">
+  <div class="flex items-start gap-space-md max-w-3xl">
+    <span class="font-mono-data-md text-mono-data-md font-bold text-on-surface bg-surface-container px-2 py-0.5">H12</span>
+    <div class="flex flex-col">
+      <span class="font-body-md text-body-md font-medium text-on-surface">Some current benchmark has a single feature at &gt;= 95% balanced accuracy</span>
+      <span class="font-mono-data-sm text-mono-data-sm text-secondary mt-0.5">Edge-IIoTset (2022) 100.00%, CSE-CIC-IDS2018 90.91%, CIC-IoT2023 99.08%</span>
+    </div>
+  </div>
+  <div class="self-start md:self-center shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 font-mono-data-sm text-mono-data-sm font-semibold bg-success/10 text-success border border-success/30">SUPPORTED</span></div>
+</div><div class="p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-sm hover:bg-surface-container-low transition-colors">
+  <div class="flex items-start gap-space-md max-w-3xl">
+    <span class="font-mono-data-md text-mono-data-md font-bold text-on-surface bg-surface-container px-2 py-0.5">H13</span>
+    <div class="flex flex-col">
+      <span class="font-body-md text-body-md font-medium text-on-surface">More leaked rows are memorised on KDD Cup 99 and NSL-KDD than on UCI Phishing</span>
+      <span class="font-mono-data-sm text-mono-data-sm text-secondary mt-0.5">kdd99 0.00%, nslkdd 0.31%, uci_phishing 3.28% (mean over the four models)</span>
+    </div>
+  </div>
+  <div class="self-start md:self-center shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 font-mono-data-sm text-mono-data-sm font-semibold bg-surface-container-high text-secondary border border-outline-variant">NOT SUPPORTED</span></div>
+</div><div class="p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-sm hover:bg-surface-container-low transition-colors">
+  <div class="flex items-start gap-space-md max-w-3xl">
+    <span class="font-mono-data-md text-mono-data-md font-bold text-on-surface bg-surface-container px-2 py-0.5">H14</span>
+    <div class="flex flex-col">
+      <span class="font-body-md text-body-md font-medium text-on-surface">Wherever the leakage gap is &gt;= 1 point, the random-removal gap is &lt; 0.5</span>
+      <span class="font-mono-data-sm text-mono-data-sm text-secondary mt-0.5">14 of 23 (dataset, model) cells; exceptions: nslkdd/lr +0.58, nslkdd/rf +0.67, nslkdd/hgb +0.61, nslkdd/mlp +0.50, unsw_nb15/lr +0.67, unsw_nb15/rf +0.59, unsw_nb15/hgb +0.58, unsw_nb15/mlp +0.54, uci_phishing/lr +1.51</span>
+    </div>
+  </div>
+  <div class="self-start md:self-center shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 font-mono-data-sm text-mono-data-sm font-semibold bg-surface-container-high text-secondary border border-outline-variant">NOT SUPPORTED</span></div>
+</div><div class="p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-sm hover:bg-surface-container-low transition-colors">
+  <div class="flex items-start gap-space-md max-w-3xl">
+    <span class="font-mono-data-md text-mono-data-md font-bold text-on-surface bg-surface-container px-2 py-0.5">H15</span>
+    <div class="flex flex-col">
+      <span class="font-body-md text-body-md font-medium text-on-surface">EMBER&#x27;s conclusions hold on the official 2,381-dimension vectors</span>
+      <span class="font-mono-data-sm text-mono-data-sm text-secondary mt-0.5">needs EMBER&#x27;s own code, run outside this repository</span>
+    </div>
+  </div>
+  <div class="self-start md:self-center shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 font-mono-data-sm text-mono-data-sm font-semibold bg-surface-container-high text-secondary border border-outline-variant">PENDING</span></div>
+</div><div class="p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-sm hover:bg-surface-container-low transition-colors">
+  <div class="flex items-start gap-space-md max-w-3xl">
+    <span class="font-mono-data-md text-mono-data-md font-bold text-on-surface bg-surface-container px-2 py-0.5">H16</span>
+    <div class="flex flex-col">
+      <span class="font-body-md text-body-md font-medium text-on-surface">With every attack type seen in training, CIC-IDS2017&#x27;s time split costs &lt;= 2 points relative to the random split</span>
+      <span class="font-mono-data-sm text-mono-data-sm text-secondary mt-0.5">lr +1.54, rf +1.22, hgb +0.47, mlp +1.29</span>
+    </div>
+  </div>
+  <div class="self-start md:self-center shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 font-mono-data-sm text-mono-data-sm font-semibold bg-success/10 text-success border border-success/30">SUPPORTED</span></div>
 </div></div>
   <p class="font-mono-data-sm text-mono-data-sm text-secondary">Each decision rule was committed to <a class="underline underline-offset-2 hover:text-on-surface" href="https://github.com/aaditripi18/leakcheck/blob/main/PLAN.md" rel="noopener noreferrer">PLAN.md</a> before the experiment it judges was run.</p>
 </section>
 
 <section class="flex flex-col gap-space-md">
   <div class="scroll-mt-20">
-  <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">06</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">What we learned</span></div>
+  <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">07</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">What we learned</span></div>
   <h2 class="font-headline-md text-headline-md text-on-surface mt-1">Four findings</h2>
 </div>
   <div class="grid grid-cols-1 md:grid-cols-2 gap-space-lg"><div class="p-space-lg bg-surface-container-low border border-surface-container-high flex flex-col justify-between">
   <div class="flex flex-col gap-space-xs">
     <span class="font-mono-data-sm text-mono-data-sm text-primary font-semibold">FINDING 01</span>
     <h3 class="font-headline-sm text-headline-sm text-on-surface">Copying is not the same as inflation.</h3>
-    <p class="font-body-md text-body-md text-on-surface-variant mt-2">UCI Phishing copies about as much as KDD Cup 99 (64.4% vs 68.4% of test rows) but loses only 1.5 macro-F1 points when the copies go, against 17.5 for KDD Cup 99. With 30 features of 2–3 values each, a UCI Phishing copy is just a common pattern a model gets right anyway; KDD Cup 99&#x27;s copies are memorised exceptions, and 73% of its gap comes from near-copies rather than exact ones.</p>
+    <p class="font-body-md text-body-md text-on-surface-variant mt-2">UCI Phishing copies about as much as KDD Cup 99 (64.4% vs 68.4% of test rows) but loses only 1.5 macro-F1 points when the copies go, against 17.5 for KDD Cup 99. Retrained without any copy, models still get 97% of KDD Cup 99&#x27;s copied rows right: the copies are easy rows, not memorised ones. What they do is fill the test set; remove them and what is left is the hard part. 73% of KDD Cup 99&#x27;s gap comes from near-copies rather than exact ones.</p>
   </div>
   <div class="mt-space-md pt-space-xs border-t border-surface-container-high font-mono-data-sm text-mono-data-sm text-secondary">Logistic regression: KDD99 −17.5 vs UCI −1.5</div>
 </div><div class="p-space-lg bg-surface-container-low border border-surface-container-high flex flex-col justify-between">
@@ -395,7 +512,7 @@
   <div class="flex flex-col gap-space-xs">
     <span class="font-mono-data-sm text-mono-data-sm text-primary font-semibold">FINDING 04</span>
     <h3 class="font-headline-sm text-headline-sm text-on-surface">Random splits can hide a collapse.</h3>
-    <p class="font-body-md text-body-md text-on-surface-variant mt-2">On CIC-IDS2017 the baselines score 97.1–99.9% macro-F1 on a random split, and 46.2–56.5% when trained on earlier capture days and tested on the last ones, whose attack types (PortScan, DDoS) never appear in training.</p>
+    <p class="font-body-md text-body-md text-on-surface-variant mt-2">On CIC-IDS2017 the baselines score 97.1–99.9% macro-F1 on a random split, and 46.2–56.5% when trained on earlier capture days and tested on the last ones, whose attack types (PortScan, DDoS) never appear in training. Split by time within each attack type instead, the cost is 0.5–1.5 points: the collapse was the unseen attacks, not time.</p>
   </div>
   <div class="mt-space-md pt-space-xs border-t border-surface-container-high font-mono-data-sm text-mono-data-sm text-secondary">Gradient boosting: random split 99.9% → later days 46.2%</div>
 </div></div>
@@ -403,7 +520,7 @@
 
 <section class="flex flex-col gap-space-md">
   <div class="scroll-mt-20">
-  <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">07</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">Validation</span></div>
+  <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">08</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">Validation</span></div>
   <h2 class="font-headline-md text-headline-md text-on-surface mt-1">Checked against the literature</h2>
 </div>
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-start">
@@ -458,7 +575,7 @@
 
 <section class="flex flex-col gap-space-md" aria-labelledby="reproduce-title">
   <div id="reproduce" class="scroll-mt-20">
-    <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">08</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">Reproduce</span></div>
+    <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">09</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">Reproduce</span></div>
     <h2 id="reproduce-title" class="font-headline-md text-headline-md text-on-surface mt-1">Reproduce every number</h2>
   </div>
   <div class="bg-[#111110] text-[#f4f4f1] p-space-md md:p-space-lg border border-[#2f312f]">
@@ -492,17 +609,17 @@ python -m experiments.e4_ablation phiusiil cicids2017
 python scripts/report.py</pre>
     <div class="mt-space-md pt-space-sm border-t border-[#2f312f] flex flex-col md:flex-row md:items-center justify-between gap-1 font-mono-data-sm text-mono-data-sm text-[#8c8c88]">
       <span>Every run appends a line to an append-only ledger; this page is generated from it.</span>
-      <span class="text-white font-medium">21 ledger lines behind this page</span>
+      <span class="text-white font-medium">35 ledger lines behind this page</span>
     </div>
   </div>
 </section>
 
 <section class="flex flex-col gap-space-md pt-space-md border-t border-surface-container-high">
   <div class="scroll-mt-20">
-  <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">09</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">Scope</span></div>
+  <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">10</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">Scope</span></div>
   <h2 class="font-headline-md text-headline-md text-on-surface mt-1">Limitations</h2>
 </div>
-  <ul class="grid grid-cols-1 md:grid-cols-2 gap-x-space-xl gap-y-space-xs font-body-sm text-body-sm text-on-surface-variant list-disc pl-4"><li>A copy is not always a bug: real traffic repeats. Both the original and the cleaned score are reported.</li><li>The cleaned test set is harder by construction; the gap measures how much of a score was earned on copies.</li><li>Near-copy thresholds (0.01 RMS, Jaccard 0.8) are fixed choices; a curve and a training-set baseline are reported alongside.</li><li>Baselines are untuned standard models, and training sets are capped at 300,000 rows.</li><li>EMBER is scanned on leakcheck&#x27;s own numeric view, not the official 2,381-dimension feature vector.</li><li>CIC-IDS2017&#x27;s time split is confounded with unseen attack types, so H3 was decided on EMBER.</li></ul>
+  <ul class="grid grid-cols-1 md:grid-cols-2 gap-x-space-xl gap-y-space-xs font-body-sm text-body-sm text-on-surface-variant list-disc pl-4"><li>A copy is not always a bug: real traffic repeats, and most copied rows are ones any model gets right. Both the original and the cleaned score are reported.</li><li>The cleaned test set is harder by construction; a random removal of the same size is reported beside every gap (it costs up to 1.5 points, against 15–17 on KDD Cup 99).</li><li>Near-copy thresholds (0.01 RMS, Jaccard 0.8) are fixed choices; a curve, a training-set baseline and a sweep are reported alongside.</li><li>The baseline gaps are repeated with full training sets and a tuned model; on the two largest current benchmarks that run scores a 200,000-row test sample.</li><li>EMBER is scanned on leakcheck&#x27;s own numeric view, not the official 2,381-dimension feature vector.</li><li>Two current benchmarks come from public copies: IDS2018&#x27;s is byte-identical to the official bucket, CIC-IoT2023&#x27;s matches all 34 published label counts.</li></ul>
 </section>
 
 </article>
@@ -524,7 +641,7 @@ python scripts/report.py</pre>
   </div>
   <div class="max-w-[1100px] mx-auto px-margin-mobile md:px-gutter mt-space-lg pt-space-md border-t border-surface-container-highest flex flex-col sm:flex-row gap-space-xs justify-between text-on-surface-variant font-mono-data-sm text-mono-data-sm">
     <span>Every number on this site is generated from <code>results/ledger.jsonl</code>.</span>
-    <span>Generated 2026-10-17</span>
+    <span>Generated 2026-11-03</span>
   </div>
 </footer>
 <script src="assets/site.js"></script>

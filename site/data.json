@@ -3,7 +3,11 @@
  "ledger_lines": [
   "e0_kdd @ 0f452ad",
   "e0_synthetic @ 0f452ad",
+  "e12_cic_within @ cdf9b4f",
   "e1_audit:cicids2017 @ 6780929",
+  "e1_audit:ciciot2023 @ cdf9b4f",
+  "e1_audit:cseids2018 @ f8c3a34",
+  "e1_audit:edgeiiot @ 0aadc6f",
   "e1_audit:ember2018 @ 5074849",
   "e1_audit:kdd99 @ 6780929",
   "e1_audit:nslkdd @ 6780929",
@@ -21,7 +25,17 @@
   "e2_retrain:unsw_nb15 @ 42caa56",
   "e2_stats @ 347deca",
   "e4_ablation:cicids2017 @ ad29867",
-  "e4_ablation:phiusiil @ ad29867"
+  "e4_ablation:phiusiil @ ad29867",
+  "e9_controls:cicids2017 @ 979bade",
+  "e9_controls:edgeiiot @ 979bade",
+  "e9_controls:edgeiiot:no_identifiers @ 979bade",
+  "e9_controls:ember2018 @ 979bade",
+  "e9_controls:kdd99 @ 979bade",
+  "e9_controls:nslkdd @ 979bade",
+  "e9_controls:phiusiil @ 979bade",
+  "e9_controls:sms_spam @ 979bade",
+  "e9_controls:uci_phishing @ 979bade",
+  "e9_controls:unsw_nb15 @ 979bade"
  ],
  "summary": {
   "datasets": 8,
@@ -1209,6 +1223,410 @@
    "source": {
     "ledger": "e0_synthetic",
     "commit": "0f452ad"
+   }
+  }
+ },
+ "phase3": {
+  "datasets": [
+   {
+    "id": "edgeiiot",
+    "name": "Edge-IIoTset (2022)",
+    "rows": 2219201,
+    "n_test": 443841,
+    "exact_as_distributed": 0.000367,
+    "near_as_distributed": 5e-05,
+    "exact_no_identifiers": 0.162385,
+    "near_no_identifiers": 0.38425,
+    "contradicted_no_identifiers": 0.0,
+    "identifier_columns": [
+     "frame.time",
+     "ip.src_host",
+     "ip.dst_host",
+     "icmp.transmit_timestamp",
+     "udp.port",
+     "udp.time_delta",
+     "mbtcp.trans_id"
+    ],
+    "best_single_feature": "dns.qry.name.len",
+    "best_single_feature_bacc": 1.0,
+    "verified": "the authors' own release",
+    "source": {
+     "ledger": "e1_audit:edgeiiot",
+     "commit": "0aadc6f"
+    }
+   },
+   {
+    "id": "cseids2018",
+    "name": "CSE-CIC-IDS2018",
+    "rows": 16232943,
+    "n_test": 3246589,
+    "exact_as_distributed": 0.049089,
+    "near_as_distributed": 0.19465,
+    "exact_no_identifiers": 0.402592,
+    "near_no_identifiers": 0.54935,
+    "contradicted_no_identifiers": 0.131352,
+    "identifier_columns": [
+     "Dst Port",
+     "Timestamp",
+     "Flow ID",
+     "Src IP",
+     "Src Port",
+     "Dst IP"
+    ],
+    "best_single_feature": "Dst Port",
+    "best_single_feature_bacc": 0.909079,
+    "verified": "byte-identical to the official S3 objects; label counts equal the published table",
+    "source": {
+     "ledger": "e1_audit:cseids2018",
+     "commit": "f8c3a34"
+    }
+   },
+   {
+    "id": "ciciot2023",
+    "name": "CIC-IoT2023",
+    "rows": 46686579,
+    "n_test": 9337316,
+    "exact_as_distributed": 0.442567,
+    "near_as_distributed": 0.32825,
+    "exact_no_identifiers": null,
+    "near_no_identifiers": null,
+    "contradicted_no_identifiers": null,
+    "identifier_columns": [],
+    "best_single_feature": "Weight",
+    "best_single_feature_bacc": 0.990827,
+    "verified": "label counts equal the published table",
+    "source": {
+     "ledger": "e1_audit:ciciot2023",
+     "commit": "cdf9b4f"
+    }
+   }
+  ],
+  "hypotheses": [
+   {
+    "id": "H10",
+    "text": "At least 2 of the 3 current benchmarks have >= 5% exact test copies (as distributed)",
+    "verdict": "not supported",
+    "evidence": "1 of 3: Edge-IIoTset (2022) 0.04%, CSE-CIC-IDS2018 4.91%, CIC-IoT2023 44.26%"
+   },
+   {
+    "id": "H11",
+    "text": "On every current benchmark with >= 5% exact copies, removing leaked rows costs some model >= 1 point (bootstrap interval above 0 in >= 2 of 3 seeds)",
+    "verdict": "pending",
+    "evidence": "needs E5/E6 on the current benchmarks"
+   },
+   {
+    "id": "H12",
+    "text": "Some current benchmark has a single feature at >= 95% balanced accuracy",
+    "verdict": "supported",
+    "evidence": "Edge-IIoTset (2022) 100.00%, CSE-CIC-IDS2018 90.91%, CIC-IoT2023 99.08%"
+   },
+   {
+    "id": "H13",
+    "text": "More leaked rows are memorised on KDD Cup 99 and NSL-KDD than on UCI Phishing",
+    "verdict": "not supported",
+    "evidence": "kdd99 0.00%, nslkdd 0.31%, uci_phishing 3.28% (mean over the four models)"
+   },
+   {
+    "id": "H14",
+    "text": "Wherever the leakage gap is >= 1 point, the random-removal gap is < 0.5",
+    "verdict": "not supported",
+    "evidence": "14 of 23 (dataset, model) cells; exceptions: nslkdd/lr +0.58, nslkdd/rf +0.67, nslkdd/hgb +0.61, nslkdd/mlp +0.50, unsw_nb15/lr +0.67, unsw_nb15/rf +0.59, unsw_nb15/hgb +0.58, unsw_nb15/mlp +0.54, uci_phishing/lr +1.51"
+   },
+   {
+    "id": "H15",
+    "text": "EMBER's conclusions hold on the official 2,381-dimension vectors",
+    "verdict": "pending",
+    "evidence": "needs EMBER's own code, run outside this repository"
+   },
+   {
+    "id": "H16",
+    "text": "With every attack type seen in training, CIC-IDS2017's time split costs <= 2 points relative to the random split",
+    "verdict": "supported",
+    "evidence": "lr +1.54, rf +1.22, hgb +0.47, mlp +1.29"
+   }
+  ],
+  "e9_e10": {
+   "kdd99": {
+    "lr": {
+     "leakage_gap": 0.173918,
+     "random_gap": -0.059069,
+     "memorised_share": 9.5e-05,
+     "correct_either_way_share": 0.970319
+    },
+    "rf": {
+     "leakage_gap": 0.162031,
+     "random_gap": -0.061334,
+     "memorised_share": 4.3e-05,
+     "correct_either_way_share": 0.970385
+    },
+    "hgb": {
+     "leakage_gap": 0.151559,
+     "random_gap": -0.058476,
+     "memorised_share": 3e-06,
+     "correct_either_way_share": 0.970423
+    },
+    "mlp": {
+     "leakage_gap": 0.156831,
+     "random_gap": -0.056633,
+     "memorised_share": 2.9e-05,
+     "correct_either_way_share": 0.970396
+    }
+   },
+   "nslkdd": {
+    "lr": {
+     "leakage_gap": 0.118618,
+     "random_gap": 0.005764,
+     "memorised_share": 0.000402,
+     "correct_either_way_share": 0.979879
+    },
+    "rf": {
+     "leakage_gap": 0.112212,
+     "random_gap": 0.006727,
+     "memorised_share": 0.0,
+     "correct_either_way_share": 0.981757
+    },
+    "hgb": {
+     "leakage_gap": 0.086085,
+     "random_gap": 0.006067,
+     "memorised_share": 4.5e-05,
+     "correct_either_way_share": 0.981757
+    },
+    "mlp": {
+     "leakage_gap": 0.084692,
+     "random_gap": 0.00505,
+     "memorised_share": 0.011894,
+     "correct_either_way_share": 0.969953
+    }
+   },
+   "unsw_nb15": {
+    "lr": {
+     "leakage_gap": 0.020093,
+     "random_gap": 0.006736,
+     "memorised_share": 0.000883,
+     "correct_either_way_share": 0.941604
+    },
+    "rf": {
+     "leakage_gap": 0.01153,
+     "random_gap": 0.005945,
+     "memorised_share": 0.008578,
+     "correct_either_way_share": 0.927842
+    },
+    "hgb": {
+     "leakage_gap": 0.010229,
+     "random_gap": 0.005798,
+     "memorised_share": 0.001086,
+     "correct_either_way_share": 0.931011
+    },
+    "mlp": {
+     "leakage_gap": 0.014278,
+     "random_gap": 0.005383,
+     "memorised_share": 0.003056,
+     "correct_either_way_share": 0.944184
+    }
+   },
+   "cicids2017": {
+    "lr": {
+     "leakage_gap": -0.002666,
+     "random_gap": 0.001183,
+     "memorised_share": 0.091172,
+     "correct_either_way_share": 0.889143
+    },
+    "rf": {
+     "leakage_gap": -0.00136,
+     "random_gap": 8.9e-05,
+     "memorised_share": 0.0368,
+     "correct_either_way_share": 0.96118
+    },
+    "hgb": {
+     "leakage_gap": -0.000872,
+     "random_gap": 0.000123,
+     "memorised_share": 0.039286,
+     "correct_either_way_share": 0.959488
+    },
+    "mlp": {
+     "leakage_gap": -0.00199,
+     "random_gap": 0.0003,
+     "memorised_share": 0.033701,
+     "correct_either_way_share": 0.963344
+    }
+   },
+   "ember2018": {
+    "lr": {
+     "leakage_gap": 0.024057,
+     "random_gap": 0.00421,
+     "memorised_share": 0.186154,
+     "correct_either_way_share": 0.747242
+    },
+    "rf": {
+     "leakage_gap": 0.014629,
+     "random_gap": -0.000251,
+     "memorised_share": 0.075429,
+     "correct_either_way_share": 0.923992
+    },
+    "hgb": {
+     "leakage_gap": 0.012998,
+     "random_gap": 0.000909,
+     "memorised_share": 0.094482,
+     "correct_either_way_share": 0.895319
+    },
+    "mlp": {
+     "leakage_gap": 0.013901,
+     "random_gap": 0.000208,
+     "memorised_share": 0.056956,
+     "correct_either_way_share": 0.937983
+    }
+   },
+   "uci_phishing": {
+    "lr": {
+     "leakage_gap": 0.017475,
+     "random_gap": 0.015086,
+     "memorised_share": 0.005091,
+     "correct_either_way_share": 0.931273
+    },
+    "rf": {
+     "leakage_gap": 0.014891,
+     "random_gap": 0.000676,
+     "memorised_share": 0.042369,
+     "correct_either_way_share": 0.933532
+    },
+    "hgb": {
+     "leakage_gap": 0.008471,
+     "random_gap": 0.002635,
+     "memorised_share": 0.038636,
+     "correct_either_way_share": 0.934478
+    },
+    "mlp": {
+     "leakage_gap": 0.020284,
+     "random_gap": 0.003343,
+     "memorised_share": 0.044939,
+     "correct_either_way_share": 0.923772
+    }
+   },
+   "phiusiil": {
+    "lr": {
+     "leakage_gap": 7e-06,
+     "random_gap": -1e-06,
+     "memorised_share": 0.0,
+     "correct_either_way_share": 1.0
+    },
+    "rf": {
+     "leakage_gap": 4e-06,
+     "random_gap": -1.1e-05,
+     "memorised_share": 0.0,
+     "correct_either_way_share": 1.0
+    },
+    "hgb": {
+     "leakage_gap": 0.0,
+     "random_gap": 0.0,
+     "memorised_share": 0.0,
+     "correct_either_way_share": 1.0
+    },
+    "mlp": {
+     "leakage_gap": 4e-06,
+     "random_gap": -4e-06,
+     "memorised_share": 0.0,
+     "correct_either_way_share": 1.0
+    }
+   },
+   "sms_spam": {
+    "lr": {
+     "leakage_gap": 0.034759,
+     "random_gap": 0.002025,
+     "memorised_share": 0.031554,
+     "correct_either_way_share": 0.943039
+    },
+    "rf": {
+     "leakage_gap": 0.041304,
+     "random_gap": -0.001115,
+     "memorised_share": 0.03589,
+     "correct_either_way_share": 0.96411
+    },
+    "hgb": {
+     "leakage_gap": 0.024246,
+     "random_gap": -0.000152,
+     "memorised_share": 0.031969,
+     "correct_either_way_share": 0.968031
+    },
+    "mlp": {
+     "leakage_gap": 0.019623,
+     "random_gap": 0.002812,
+     "memorised_share": 0.025212,
+     "correct_either_way_share": 0.974788
+    }
+   },
+   "edgeiiot": {
+    "lr": {
+     "leakage_gap": 0.0,
+     "random_gap": 0.0,
+     "memorised_share": 0.0,
+     "correct_either_way_share": 1.0
+    },
+    "rf": {
+     "leakage_gap": 0.0,
+     "random_gap": 0.0,
+     "memorised_share": 0.0,
+     "correct_either_way_share": 1.0
+    },
+    "hgb": {
+     "leakage_gap": 0.0,
+     "random_gap": 0.0,
+     "memorised_share": 0.0,
+     "correct_either_way_share": 1.0
+    },
+    "mlp": {
+     "leakage_gap": 0.0,
+     "random_gap": 0.0,
+     "memorised_share": 0.0,
+     "correct_either_way_share": 1.0
+    }
+   },
+   "edgeiiot:no_identifiers": {
+    "lr": {
+     "leakage_gap": 0.0,
+     "random_gap": 0.0,
+     "memorised_share": 0.0,
+     "correct_either_way_share": 1.0
+    },
+    "rf": {
+     "leakage_gap": 0.0,
+     "random_gap": 0.0,
+     "memorised_share": 0.0,
+     "correct_either_way_share": 1.0
+    },
+    "hgb": {
+     "leakage_gap": 0.0,
+     "random_gap": 0.0,
+     "memorised_share": 0.0,
+     "correct_either_way_share": 1.0
+    },
+    "mlp": {
+     "leakage_gap": 0.0,
+     "random_gap": 0.0,
+     "memorised_share": 0.002193,
+     "correct_either_way_share": 0.997807
+    }
+   }
+  },
+  "e12": {
+   "lr": {
+    "random": 0.970747,
+    "time_within_label": 0.95533,
+    "cost": 0.015417
+   },
+   "rf": {
+    "random": 0.997507,
+    "time_within_label": 0.985279,
+    "cost": 0.012228
+   },
+   "hgb": {
+    "random": 0.99851,
+    "time_within_label": 0.993776,
+    "cost": 0.004734
+   },
+   "mlp": {
+    "random": 0.996364,
+    "time_within_label": 0.98347,
+    "cost": 0.012894
    }
   }
  }

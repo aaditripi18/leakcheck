@@ -378,16 +378,18 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
                        f"{fpt(lo)} to {fpt(hi)}, which includes zero.")
 
     hyps = []
-    for h in d["hypotheses"]:
+    all_h = d["hypotheses"] + d.get("phase3", {}).get("hypotheses", [])
+    for h in all_h:
         ok = h["verdict"] == "supported"
+        label = ("SUPPORTED" if ok else "PENDING" if h["verdict"] == "pending" else "NOT SUPPORTED")
         pill = ('<span class="inline-flex items-center px-2.5 py-0.5 font-mono-data-sm text-mono-data-sm font-semibold '
-                + ('bg-success/10 text-success border border-success/30">SUPPORTED' if ok
-                   else 'bg-surface-container-high text-secondary border border-outline-variant">NOT SUPPORTED') + "</span>")
+                + ('bg-success/10 text-success border border-success/30">' if ok
+                   else 'bg-surface-container-high text-secondary border border-outline-variant">') + label + "</span>")
         hyps.append(f"""<div class="p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-sm hover:bg-surface-container-low transition-colors">
   <div class="flex items-start gap-space-md max-w-3xl">
     <span class="font-mono-data-md text-mono-data-md font-bold text-on-surface bg-surface-container px-2 py-0.5">{e(h['id'])}</span>
     <div class="flex flex-col">
-      <span class="font-body-md text-body-md font-medium text-on-surface">{e(SHORT_H[h['id']])}</span>
+      <span class="font-body-md text-body-md font-medium text-on-surface">{e(SHORT_H.get(h['id'], h.get('text', '')))}</span>
       <span class="font-mono-data-sm text-mono-data-sm text-secondary mt-0.5">{e(short_evidence(h, d))}</span>
     </div>
   </div>
@@ -402,12 +404,18 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
     cic_orig = [cic[m]["original"] for m in cic]
     cic_time = [cic[m]["time"] for m in cic]
     ember_audit = au["ember2018"]
+    p3 = d.get("phase3", {})
+    p3e = p3.get("e9_e10", {})
+    p3_kdd_either = min(v["correct_either_way_share"] for v in p3e["kdd99"].values())
+    p3_e12 = [v["cost"] * 100 for v in p3["e12"].values()]
+    p3_e12_lo, p3_e12_hi = min(p3_e12), max(p3_e12)
     findings = [
         ("Copying is not the same as inflation.",
          f"UCI Phishing copies about as much as KDD Cup 99 ({fpct(uci['exact_copies'])} vs {fpct(kdd['exact_copies'])} of test rows) "
          f"but loses only {fpt(uci_gap)} macro-F1 points when the copies go, against {fpt(kdd_gap)} for KDD Cup 99. "
-         "With 30 features of 2–3 values each, a UCI Phishing copy is just a common pattern a model gets right anyway; "
-         f"KDD Cup 99's copies are memorised exceptions, and {near_share * 100:.0f}% of its gap comes from near-copies rather than exact ones.",
+         f"Retrained without any copy, models still get {p3_kdd_either * 100:.0f}% of KDD Cup 99's copied rows right: the copies are "
+         "easy rows, not memorised ones. What they do is fill the test set; remove them and what is left is the hard part. "
+         f"{near_share * 100:.0f}% of KDD Cup 99's gap comes from near-copies rather than exact ones.",
          f"Logistic regression: KDD99 −{fpt(kdd_gap)} vs UCI −{fpt(uci_gap)}"),
         ("The control comes back clean.",
          f"EMBER 2018's official split is by time. leakcheck finds {fpct(ember_audit['exact_copies'])} exact copies, "
@@ -422,9 +430,37 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
         ("Random splits can hide a collapse.",
          f"On CIC-IDS2017 the baselines score {min(cic_orig) * 100:.1f}–{max(cic_orig) * 100:.1f}% macro-F1 on a random split, "
          f"and {min(cic_time) * 100:.1f}–{max(cic_time) * 100:.1f}% when trained on earlier capture days and tested on the last ones, "
-         "whose attack types (PortScan, DDoS) never appear in training.",
+         "whose attack types (PortScan, DDoS) never appear in training. Split by time within each attack type instead, "
+         f"the cost is {p3_e12_lo:.1f}–{p3_e12_hi:.1f} points: the collapse was the unseen attacks, not time.",
          f"Gradient boosting: random split {cic['hgb']['original'] * 100:.1f}% → later days {cic['hgb']['time'] * 100:.1f}%"),
     ]
+    p3_rows = "".join(f"""<tr>
+  <th scope="row" class="py-space-sm px-space-md font-medium text-left">{e(x['name'])}</th>
+  <td class="py-space-sm px-space-md text-right tabular">{x['n_test']:,}</td>
+  <td class="py-space-sm px-space-md text-right tabular{' text-primary font-semibold' if x['exact_as_distributed'] >= 0.05 else ''}">{fpct(x['exact_as_distributed'])}</td>
+  <td class="py-space-sm px-space-md text-right tabular{' text-primary font-semibold' if (x['exact_no_identifiers'] or 0) >= 0.05 else ''}">{fpct(x['exact_no_identifiers']) if x['exact_no_identifiers'] is not None else 'no identifier columns'}</td>
+  <td class="py-space-sm px-space-md text-right tabular">{e(x['best_single_feature'])} {fpct(x['best_single_feature_bacc'])}</td>
+</tr>""" for x in p3["datasets"])
+    p3_verified = " ".join(f"{x['name']}: {x['verified']}." for x in p3["datasets"])
+    nsl = p3e["nslkdd"]
+    p3_cards_data = [
+        ("Copies are easy, not memorised",
+         f"{p3_kdd_either * 100:.0f}%",
+         "of KDD Cup 99's copied test rows are still predicted correctly by a model trained without any copy (E9)."),
+        ("Most of a gap is which rows go",
+         f"{min(v['random_gap'] for v in nsl.values()) * 100:.1f}–{max(v['random_gap'] for v in nsl.values()) * 100:.1f} pts",
+         f"is what removing a random subset of the same size costs on NSL-KDD, against "
+         f"{min(v['leakage_gap'] for v in nsl.values()) * 100:.1f}–{max(v['leakage_gap'] for v in nsl.values()) * 100:.1f} "
+         "for removing the copies (E10)."),
+        ("Time was not the problem",
+         f"{p3_e12_lo:.1f}–{p3_e12_hi:.1f} pts",
+         "is what CIC-IDS2017's time split costs once every attack type is seen in training (E12)."),
+    ]
+    p3_cards = "".join(f"""<div class="p-space-md bg-surface-container-low border border-surface-container-high flex flex-col gap-space-xs">
+  <span class="sec-label text-on-surface-variant">{e(t)}</span>
+  <span class="font-mono-data-lg text-[32px] leading-tight text-on-surface font-bold tabular">{e(v)}</span>
+  <span class="font-body-sm text-body-sm text-on-surface-variant">{e(b)}</span>
+</div>""" for t, v, b in p3_cards_data)
     finding_cards = "".join(f"""<div class="p-space-lg bg-surface-container-low border border-surface-container-high flex flex-col justify-between">
   <div class="flex flex-col gap-space-xs">
     <span class="font-mono-data-sm text-mono-data-sm text-primary font-semibold">FINDING {i + 1:02d}</span>
@@ -450,12 +486,17 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
 
     recall = min(v for v in syn["minhash_recall"].values() if v is not None)
     limitations = [
-        "A copy is not always a bug: real traffic repeats. Both the original and the cleaned score are reported.",
-        "The cleaned test set is harder by construction; the gap measures how much of a score was earned on copies.",
-        "Near-copy thresholds (0.01 RMS, Jaccard 0.8) are fixed choices; a curve and a training-set baseline are reported alongside.",
-        "Baselines are untuned standard models, and training sets are capped at 300,000 rows.",
+        "A copy is not always a bug: real traffic repeats, and most copied rows are ones any model gets right. "
+        "Both the original and the cleaned score are reported.",
+        "The cleaned test set is harder by construction; a random removal of the same size is reported beside every gap "
+        "(it costs up to 1.5 points, against 15–17 on KDD Cup 99).",
+        "Near-copy thresholds (0.01 RMS, Jaccard 0.8) are fixed choices; a curve, a training-set baseline and a sweep are "
+        "reported alongside.",
+        "The baseline gaps are repeated with full training sets and a tuned model; on the two largest current benchmarks "
+        "that run scores a 200,000-row test sample.",
         "EMBER is scanned on leakcheck's own numeric view, not the official 2,381-dimension feature vector.",
-        "CIC-IDS2017's time split is confounded with unseen attack types, so H3 was decided on EMBER.",
+        "Two current benchmarks come from public copies: IDS2018's is byte-identical to the official bucket, "
+        "CIC-IoT2023's matches all 34 published label counts.",
     ]
     lim = "".join(f"<li>{e(x)}</li>" for x in limitations)
 
@@ -574,18 +615,39 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
 </section>
 
 <section class="flex flex-col gap-space-md">
-  {sec_head("05", "Pre-registered", f"{len(d['hypotheses'])} hypotheses, decided by rules fixed before the runs", "hypotheses")}
+  <div class="flex flex-col md:flex-row md:items-end justify-between border-b border-surface-container-high pb-space-sm gap-2">
+    {sec_head("05", "The benchmarks in use now", "Current benchmarks hide their copies", "current")}
+    <div class="font-mono-data-sm text-mono-data-sm text-secondary">Each checked against its publisher before use</div>
+  </div>
+  <div class="w-full overflow-x-auto" tabindex="0" role="region" aria-label="Current benchmarks, scrolls sideways">
+    <table class="w-full text-left border-collapse border border-surface-container-high min-w-[760px] bg-surface font-mono-data-sm text-mono-data-sm text-on-surface">
+      <caption class="sr-only">Exact test copies in three current benchmarks, as distributed and without identifier columns</caption>
+      <thead><tr class="bg-surface-container-low border-b border-on-surface sec-label text-secondary">
+        <th scope="col" class="py-space-sm px-space-md">Dataset</th><th scope="col" class="py-space-sm px-space-md text-right">Test rows</th>
+        <th scope="col" class="py-space-sm px-space-md text-right">Exact copies, as distributed</th>
+        <th scope="col" class="py-space-sm px-space-md text-right">Without identifier columns</th>
+        <th scope="col" class="py-space-sm px-space-md text-right">Best single feature</th>
+      </tr></thead>
+      <tbody class="divide-y divide-surface-container-high">{p3_rows}</tbody>
+    </table>
+  </div>
+  <p class="font-body-sm text-body-sm text-on-surface-variant">A timestamp, flow ID or port makes nearly every row unique, so a duplicate check on the files as shipped sees little. Without the columns leakcheck's identifier check flags (a view added after the first run), the repeats show. {p3_verified}</p>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">{p3_cards}</div>
+</section>
+
+<section class="flex flex-col gap-space-md">
+  {sec_head("06", "Pre-registered", f"{len(d['hypotheses']) + len(d.get('phase3', {}).get('hypotheses', []))} hypotheses, decided by rules fixed before the runs", "hypotheses")}
   <div class="flex flex-col border border-surface-container-high divide-y divide-surface-container-high bg-surface">{"".join(hyps)}</div>
   <p class="font-mono-data-sm text-mono-data-sm text-secondary">Each decision rule was committed to <a class="underline underline-offset-2 hover:text-on-surface" href="{REPO_URL}/blob/main/PLAN.md" rel="noopener noreferrer">PLAN.md</a> before the experiment it judges was run.</p>
 </section>
 
 <section class="flex flex-col gap-space-md">
-  {sec_head("06", "What we learned", "Four findings")}
+  {sec_head("07", "What we learned", "Four findings")}
   <div class="grid grid-cols-1 md:grid-cols-2 gap-space-lg">{finding_cards}</div>
 </section>
 
 <section class="flex flex-col gap-space-md">
-  {sec_head("07", "Validation", "Checked against the literature")}
+  {sec_head("08", "Validation", "Checked against the literature")}
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-start">
     <div class="lg:col-span-7 flex flex-col gap-space-xs">
       <p class="font-body-sm text-body-sm text-on-surface-variant">KDD Cup 99 records / distinct records, against Tables I and II of Tavallaee et al. (2009), the paper that introduced NSL-KDD:</p>
@@ -608,7 +670,7 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
 
 <section class="flex flex-col gap-space-md" aria-labelledby="reproduce-title">
   <div id="reproduce" class="scroll-mt-20">
-    <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">08</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">Reproduce</span></div>
+    <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">09</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">Reproduce</span></div>
     <h2 id="reproduce-title" class="font-headline-md text-headline-md text-on-surface mt-1">Reproduce every number</h2>
   </div>
   <div class="bg-[#111110] text-[#f4f4f1] p-space-md md:p-space-lg border border-[#2f312f]">
@@ -626,7 +688,7 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
 </section>
 
 <section class="flex flex-col gap-space-md pt-space-md border-t border-surface-container-high">
-  {sec_head("09", "Scope", "Limitations", level="h2")}
+  {sec_head("10", "Scope", "Limitations", level="h2")}
   <ul class="grid grid-cols-1 md:grid-cols-2 gap-x-space-xl gap-y-space-xs font-body-sm text-body-sm text-on-surface-variant list-disc pl-4">{lim}</ul>
 </section>
 

@@ -572,6 +572,39 @@ def site_data(runs: dict) -> dict:
                                    "minhash_recall": {k: v["recall"] for k, v in r["minhash"]["recall_by_jaccard"].items()},
                                    "source": ref("e0_synthetic")}
     rows = sum(a["n_train"] + a["n_test"] for a in audit)
+    phase3 = {"datasets": [], "hypotheses": phase3_hypotheses(runs)}
+    for n in PHASE3:
+        if f"e1_audit:{n}" not in runs:
+            continue
+        d = runs[f"e1_audit:{n}"]
+        a, b = _view(d, "all"), _view(d, "no_identifiers")
+        top = a["f"].get("L5.shortcut", {}).get("top", [{}])[0]
+        src0 = runs.get(f"e0_sources_phase3:{n}", {}).get("results", {})
+        phase3["datasets"].append({
+            "id": n, "name": PHASE3_NAMES[n], "rows": src0.get("total"), "n_test": a["meta"]["n_test"],
+            "exact_as_distributed": _num(a["f"]["L1.cross"]["value"]),
+            "near_as_distributed": _num(a["f"]["L2.near"]["value"]),
+            "exact_no_identifiers": _num(b["f"]["L1.cross"]["value"]) if b else None,
+            "near_no_identifiers": _num(b["f"]["L2.near"]["value"]) if b else None,
+            "contradicted_no_identifiers": _num(b["f"]["L3.conflict"]["value"]) if b else None,
+            "identifier_columns": [c["feature"] for c in a["f"].get("L5.identifier", {}).get("columns", [])],
+            "best_single_feature": top.get("feature"), "best_single_feature_bacc": _num(a["f"]["L5.shortcut"]["value"]),
+            "verified": ("byte-identical to the official S3 objects; label counts equal the published table"
+                         if src0.get("identical_to_official_s3") else
+                         "label counts equal the published table" if src0.get("matches_published") else
+                         "the authors' own release"),
+            "source": ref(f"e1_audit:{n}")})
+    e9 = {n: runs[f"e9_controls:{n}"]["results"]["summary"] for n in E9_ORDER if f"e9_controls:{n}" in runs}
+    if e9:
+        phase3["e9_e10"] = {n: {m: {k: _num(v[k]) for k in ("leakage_gap", "random_gap", "memorised_share",
+                                                             "correct_either_way_share")} for m, v in sm.items()}
+                            for n, sm in e9.items()}
+        for n in e9:
+            ref(f"e9_controls:{n}")
+    if "e12_cic_within" in runs:
+        phase3["e12"] = {m: {k: _num(x) for k, x in v.items()}
+                         for m, v in runs["e12_cic_within"]["results"]["summary"].items()}
+        ref("e12_cic_within")
     return {
         "generated_from": "results/ledger.jsonl via scripts/report.py",
         "ledger_lines": sorted(set(used)),
@@ -579,7 +612,7 @@ def site_data(runs: dict) -> dict:
                     "datasets_with_5pct_exact_copies": sum((a["exact_copies"] or 0) >= 0.05 for a in audit),
                     "models": list(MODELS), "seeds": 5},
         "checks": CHECKS, "hypotheses": hypotheses(runs) + phase2_hypotheses(runs), "audit": audit, "retrain": retrain,
-        "ablation": ablation, "validation": validation,
+        "ablation": ablation, "validation": validation, "phase3": phase3,
     }
 
 
