@@ -77,6 +77,26 @@ leakcheck findings on the binary attack/normal task (features only, label column
 
 KDD99 L1.cross by class: normal 12.69% of 60,593, attack 81.83% of 250,436
 
+## Phase 3 hypotheses (PLAN.md)
+
+| | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| H10 | At least 2 of the 3 current benchmarks have >= 5% exact test copies (as distributed) | **not supported** | 1 of 3: Edge-IIoTset (2022) 0.04%, CSE-CIC-IDS2018 4.91%, CIC-IoT2023 44.26% |
+| H11 | On every current benchmark with >= 5% exact copies, removing leaked rows costs some model >= 1 point (bootstrap interval above 0 in >= 2 of 3 seeds) | **pending** | needs E5/E6 on the current benchmarks |
+| H12 | Some current benchmark has a single feature at >= 95% balanced accuracy | **supported** | Edge-IIoTset (2022) 100.00%, CSE-CIC-IDS2018 90.91%, CIC-IoT2023 99.08% |
+| H13 | More leaked rows are memorised on KDD Cup 99 and NSL-KDD than on UCI Phishing | **not supported** | kdd99 0.00%, nslkdd 0.31%, uci_phishing 3.28% (mean over the four models) |
+| H14 | Wherever the leakage gap is >= 1 point, the random-removal gap is < 0.5 | **not supported** | 14 of 23 (dataset, model) cells; exceptions: nslkdd/lr +0.58, nslkdd/rf +0.67, nslkdd/hgb +0.61, nslkdd/mlp +0.50, unsw_nb15/lr +0.67, unsw_nb15/rf +0.59, unsw_nb15/hgb +0.58, unsw_nb15/mlp +0.54, uci_phishing/lr +1.51 |
+| H15 | EMBER's conclusions hold on the official 2,381-dimension vectors | **pending** | needs EMBER's own code, run outside this repository |
+| H16 | With every attack type seen in training, CIC-IDS2017's time split costs <= 2 points relative to the random split | **supported** | lr +1.54, rf +1.22, hgb +0.47, mlp +1.29 |
+
+## Phase 3 sources: each current benchmark checked against its publisher
+
+| Dataset | Rows | Check |
+|---|--:|---|
+| Edge-IIoTset (2022) | 2,219,201 | authors' release; 1,615,643 normal and 14 attack types, as later papers describe it |
+| CSE-CIC-IDS2018 | 16,232,943 | label counts equal the published table; every CSV identical to the official S3 object (multipart ETag) |
+| CIC-IoT2023 | 46,686,579 | label counts equal the published table |
+
 ## E1: leakage audit
 
 Binary task per dataset; official split where one exists, otherwise stratified random 80/20 (seed 0). `n/a` = not applicable (no timestamp / text column / group column).
@@ -93,6 +113,21 @@ Binary task per dataset; official split where one exists, otherwise stratified r
 | sms_spam | random 80/20 | 1,115 | 11.03% | n/a | 2.24% | 100.00% | 0.00% | n/a | message 58.05% | n/a |
 
 Ledger lines: `e1_audit:kdd99` @ `6780929`, `e1_audit:nslkdd` @ `6780929`, `e1_audit:unsw_nb15` @ `6780929`, `e1_audit:cicids2017` @ `6780929`, `e1_audit:ember2018` @ `5074849`, `e1_audit:uci_phishing` @ `6780929`, `e1_audit:phiusiil` @ `6780929`, `e1_audit:sms_spam` @ `6780929`
+
+## E1 on the current benchmarks: as distributed, and without identifiers
+
+Stratified random 80/20 (seed 0). `as distributed` keeps every column (pre-registered). `no identifiers` drops the columns leakcheck's own L5 identifier check flags (post hoc, PLAN.md amendment); when it flags none, the two views are the same data.
+
+| Dataset | View | Test rows | Exact copies of train | Near-copies | Contradicted | Best single feature | Identifier columns |
+|---|---|--:|---|---|---|---|---|
+| Edge-IIoTset (2022) | as distributed | 443,841 | 0.04% | 0.01% | 0.00% | dns.qry.name.len 100.00% | frame.time, ip.src_host, ip.dst_host, icmp.transmit_timestamp, udp.port, udp.time_delta, mbtcp.trans_id |
+| Edge-IIoTset (2022) | no identifiers | 443,841 | 16.24% | 38.42% | 0.00% | dns.qry.name.len 100.00% | none |
+| CSE-CIC-IDS2018 | as distributed | 3,246,589 | 4.91% | 19.46% | 0.72% | Dst Port 90.91% | Dst Port, Timestamp, Flow ID, Src IP, Src Port, Dst IP |
+| CSE-CIC-IDS2018 | no identifiers | 3,246,589 | 40.26% | 54.94% | 13.14% | Init Fwd Win Byts 85.64% | none |
+| CIC-IoT2023 | as distributed | 9,337,316 | 44.26% | 32.82% | 0.00% | Weight 99.08% | none |
+| CIC-IoT2023 | no identifiers | same as above | (no identifier column flagged) | | | | |
+
+Ledger lines: `e1_audit:edgeiiot` @ `0aadc6f`, `e1_audit:cseids2018` @ `f8c3a34`, `e1_audit:ciciot2023` @ `cdf9b4f`
 
 ## E2: retraining the baselines
 
@@ -201,6 +236,98 @@ Training rows used: 4,459; test rows: 1,115; leaked test rows: exact 11.43%, exa
 | rf | 0.9386 ± 0.0102 | 0.9204 ± 0.0113 | 0.8991 ± 0.0127 | 1.0000 ± 0.0000 | +1.82 | +3.95 |
 | hgb | 0.9585 ± 0.0038 | 0.9468 ± 0.0036 | 0.9336 ± 0.0042 | 1.0000 ± 0.0000 | +1.16 | +2.49 |
 | mlp | 0.9681 ± 0.0097 | 0.9594 ± 0.0112 | 0.9499 ± 0.0125 | 1.0000 ± 0.0000 | +0.87 | +1.82 |
+
+## E2 on the current benchmarks
+
+Macro-F1, mean over 5 seeds (± sd). Each model is trained once and scored on the full test set (original), on test rows with no exact training copy (no_exact), on rows with neither an exact nor a near copy (no_near), and on the removed rows alone (leaked). `time` = retrained on a chronological split. Gap = original minus cleaned, in points.
+
+### edgeiiot
+
+_ledger: `e2_retrain:edgeiiot` @ `b73762d`, 2026-11-02T13:49:31+00:00_
+
+Training rows used: 300,000; test rows: 443,841; leaked test rows: exact 0.04%, exact or near 0.04%.
+
+| Model | original | no_exact | no_near | leaked | gap no_exact | gap no_near |
+|---|---|---|---|---|---|---|
+| lr | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | +0.00 | +0.00 |
+| rf | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | +0.00 | +0.00 |
+| hgb | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | +0.00 | +0.00 |
+| mlp | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | +0.00 | +0.00 |
+
+### edgeiiot:no_identifiers
+
+_ledger: `e2_retrain:edgeiiot:no_identifiers` @ `b73762d`, 2026-11-02T14:02:52+00:00_
+
+Training rows used: 300,000; test rows: 443,841; leaked test rows: exact 3.69%, exact or near 44.24%.
+
+| Model | original | no_exact | no_near | leaked | gap no_exact | gap no_near |
+|---|---|---|---|---|---|---|
+| lr | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | +0.00 | +0.00 |
+| rf | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | +0.00 | +0.00 |
+| hgb | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | +0.00 | +0.00 |
+| mlp | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | +0.00 | +0.00 |
+
+## E9 and E10: are the copies memorised, and is the gap more than removing rows?
+
+Mean over seeds 0-2, E2's split and training cap. `gap` = macro-F1 on the full test set minus on the test set without leaked rows, in points; `random` = the same for a random subset of the same size and class mix (E10). `memorised` = share of leaked rows the full model gets right and a model trained without any training copy of them gets wrong; `either way` = share both get right (E9). Every copy within eps is removed; the check after removal finds none left on any dataset.
+
+| Dataset | Model | gap | random | memorised | either way |
+|---|---|--:|--:|--:|--:|
+| kdd99 | lr | +17.39 | -5.91 | 0.01% | 97.03% |
+| kdd99 | rf | +16.20 | -6.13 | 0.00% | 97.04% |
+| kdd99 | hgb | +15.16 | -5.85 | 0.00% | 97.04% |
+| kdd99 | mlp | +15.68 | -5.66 | 0.00% | 97.04% |
+| nslkdd | lr | +11.86 | +0.58 | 0.04% | 97.99% |
+| nslkdd | rf | +11.22 | +0.67 | 0.00% | 98.18% |
+| nslkdd | hgb | +8.61 | +0.61 | 0.00% | 98.18% |
+| nslkdd | mlp | +8.47 | +0.50 | 1.19% | 97.00% |
+| unsw_nb15 | lr | +2.01 | +0.67 | 0.09% | 94.16% |
+| unsw_nb15 | rf | +1.15 | +0.59 | 0.86% | 92.78% |
+| unsw_nb15 | hgb | +1.02 | +0.58 | 0.11% | 93.10% |
+| unsw_nb15 | mlp | +1.43 | +0.54 | 0.31% | 94.42% |
+| cicids2017 | lr | -0.27 | +0.12 | 9.12% | 88.91% |
+| cicids2017 | rf | -0.14 | +0.01 | 3.68% | 96.12% |
+| cicids2017 | hgb | -0.09 | +0.01 | 3.93% | 95.95% |
+| cicids2017 | mlp | -0.20 | +0.03 | 3.37% | 96.33% |
+| ember2018 | lr | +2.41 | +0.42 | 18.62% | 74.72% |
+| ember2018 | rf | +1.46 | -0.03 | 7.54% | 92.40% |
+| ember2018 | hgb | +1.30 | +0.09 | 9.45% | 89.53% |
+| ember2018 | mlp | +1.39 | +0.02 | 5.70% | 93.80% |
+| uci_phishing | lr | +1.75 | +1.51 | 0.51% | 93.13% |
+| uci_phishing | rf | +1.49 | +0.07 | 4.24% | 93.35% |
+| uci_phishing | hgb | +0.85 | +0.26 | 3.86% | 93.45% |
+| uci_phishing | mlp | +2.03 | +0.33 | 4.49% | 92.38% |
+| phiusiil | lr | +0.00 | -0.00 | 0.00% | 100.00% |
+| phiusiil | rf | +0.00 | -0.00 | 0.00% | 100.00% |
+| phiusiil | hgb | +0.00 | +0.00 | 0.00% | 100.00% |
+| phiusiil | mlp | +0.00 | -0.00 | 0.00% | 100.00% |
+| sms_spam | lr | +3.48 | +0.20 | 3.16% | 94.30% |
+| sms_spam | rf | +4.13 | -0.11 | 3.59% | 96.41% |
+| sms_spam | hgb | +2.42 | -0.02 | 3.20% | 96.80% |
+| sms_spam | mlp | +1.96 | +0.28 | 2.52% | 97.48% |
+| edgeiiot | lr | +0.00 | +0.00 | 0.00% | 100.00% |
+| edgeiiot | rf | +0.00 | +0.00 | 0.00% | 100.00% |
+| edgeiiot | hgb | +0.00 | +0.00 | 0.00% | 100.00% |
+| edgeiiot | mlp | +0.00 | +0.00 | 0.00% | 100.00% |
+| edgeiiot:no_identifiers | lr | +0.00 | +0.00 | 0.00% | 100.00% |
+| edgeiiot:no_identifiers | rf | +0.00 | +0.00 | 0.00% | 100.00% |
+| edgeiiot:no_identifiers | hgb | +0.00 | +0.00 | 0.00% | 100.00% |
+| edgeiiot:no_identifiers | mlp | +0.00 | +0.00 | 0.22% | 99.78% |
+
+Ledger lines: `e9_controls:kdd99` @ `979bade`, `e9_controls:nslkdd` @ `979bade`, `e9_controls:unsw_nb15` @ `979bade`, `e9_controls:cicids2017` @ `979bade`, `e9_controls:ember2018` @ `979bade`, `e9_controls:uci_phishing` @ `979bade`, `e9_controls:phiusiil` @ `979bade`, `e9_controls:sms_spam` @ `979bade`, `e9_controls:edgeiiot` @ `979bade`, `e9_controls:edgeiiot:no_identifiers` @ `979bade`
+
+## E12: CIC-IDS2017 split by time within each label
+
+_ledger: `e12_cic_within` @ `cdf9b4f`, 2026-11-02T20:03:56+00:00_
+
+Every label's earliest 80% of flows train and its latest 20% test, so every test label is also in training (labels unseen in training: 0). Macro-F1, mean of seeds 0-2, E2's training cap.
+
+| Model | random split | time within label | cost (points) |
+|---|--:|--:|--:|
+| lr | 0.9707 | 0.9553 | +1.54 |
+| rf | 0.9975 | 0.9853 | +1.22 |
+| hgb | 0.9985 | 0.9938 | +0.47 |
+| mlp | 0.9964 | 0.9835 | +1.29 |
 
 ## E2 uncertainty (post hoc)
 

@@ -150,11 +150,11 @@ def pt(x: float | None) -> str:
     return "n/a" if x is None or x != x else f"{x * 100:+.2f}"
 
 
-def e2(runs: dict) -> list[str]:
-    done = [n for n in E1_ORDER if f"e2_retrain:{n}" in runs]
+def e2(runs: dict, names: list[str] | None = None, title: str = "## E2: retraining the baselines") -> list[str]:
+    done = [n for n in (names or E1_ORDER) if f"e2_retrain:{n}" in runs]
     if not done:
         return []
-    out = ["## E2: retraining the baselines", "",
+    out = [title, "",
            "Macro-F1, mean over 5 seeds (± sd). Each model is trained once and scored on the full test set "
            "(original), on test rows with no exact training copy (no_exact), on rows with neither an exact nor a near "
            "copy (no_near), and on the removed rows alone (leaked). `time` = retrained on a chronological split. "
@@ -583,6 +583,160 @@ def site_data(runs: dict) -> dict:
     }
 
 
+# --- phase 3 (PLAN.md): current benchmarks, and the caveats measured ---------------------
+
+PHASE3 = ["edgeiiot", "cseids2018", "ciciot2023"]
+PHASE3_NAMES = {"edgeiiot": "Edge-IIoTset (2022)", "cseids2018": "CSE-CIC-IDS2018",
+                "ciciot2023": "CIC-IoT2023"}
+E9_ORDER = E1_ORDER + ["edgeiiot", "edgeiiot:no_identifiers"]
+
+
+def _view(d: dict, view: str) -> dict | None:
+    v = d["results"]["views"].get(view)
+    return None if v is None else {"f": v["findings"], "meta": v["meta"]}
+
+
+def e0_phase3(runs: dict) -> list[str]:
+    done = [n for n in PHASE3 if f"e0_sources_phase3:{n}" in runs]
+    if not done:
+        return []
+    out = ["## Phase 3 sources: each current benchmark checked against its publisher", "",
+           "| Dataset | Rows | Check |", "|---|--:|---|"]
+    for n in done:
+        r = runs[f"e0_sources_phase3:{n}"]["results"]
+        if n == "edgeiiot":
+            check = (f"authors' release; {r['normal']:,} normal and {r['attack_types']} attack types, as later "
+                     "papers describe it")
+        else:
+            check = ("label counts equal the published table" if r["matches_published"]
+                     else f"DIFFERS from the published table in {len(r['differences'])} labels")
+            if "identical_to_official_s3" in r:
+                check += ("; every CSV identical to the official S3 object (multipart ETag)"
+                          if r["identical_to_official_s3"] else "; NOT identical to the official S3 objects")
+        out.append(f"| {PHASE3_NAMES[n]} | {r['total']:,} | {check} |")
+    return out + [""]
+
+
+def e1_phase3(runs: dict) -> list[str]:
+    done = [n for n in PHASE3 if f"e1_audit:{n}" in runs]
+    if not done:
+        return []
+    out = ["## E1 on the current benchmarks: as distributed, and without identifiers", "",
+           "Stratified random 80/20 (seed 0). `as distributed` keeps every column (pre-registered). "
+           "`no identifiers` drops the columns leakcheck's own L5 identifier check flags (post hoc, PLAN.md "
+           "amendment); when it flags none, the two views are the same data.", "",
+           "| Dataset | View | Test rows | Exact copies of train | Near-copies | Contradicted | Best single feature "
+           "| Identifier columns |", "|---|---|--:|---|---|---|---|---|"]
+    for n in done:
+        d = runs[f"e1_audit:{n}"]
+        for view, label in (("all", "as distributed"), ("no_identifiers", "no identifiers")):
+            v = _view(d, view)
+            if v is None:
+                if view == "no_identifiers":
+                    out.append(f"| {PHASE3_NAMES[n]} | no identifiers | same as above | (no identifier column "
+                               "flagged) | | | | |")
+                continue
+            f, meta = v["f"], v["meta"]
+            top = f.get("L5.shortcut", {}).get("top", [{}])
+            best = f"{top[0].get('feature', '')} {pct(f['L5.shortcut']['value'])}" if "L5.shortcut" in f else "n/a"
+            ids = ", ".join(c["feature"] for c in f.get("L5.identifier", {}).get("columns", [])) or "none"
+            out.append(f"| {PHASE3_NAMES[n]} | {label} | {meta['n_test']:,} | {pct(f['L1.cross']['value'])} "
+                       f"| {pct(f['L2.near']['value'])} | {pct(f['L3.conflict']['value'])} | {best} | {ids} |")
+    out += ["", "Ledger lines: " + ", ".join(f"`e1_audit:{n}` @ `{runs['e1_audit:' + n]['git']['commit']}`"
+                                             for n in done), ""]
+    return out
+
+
+def e9_e10(runs: dict) -> list[str]:
+    done = [n for n in E9_ORDER if f"e9_controls:{n}" in runs]
+    if not done:
+        return []
+    out = ["## E9 and E10: are the copies memorised, and is the gap more than removing rows?", "",
+           "Mean over seeds 0-2, E2's split and training cap. `gap` = macro-F1 on the full test set minus on the test "
+           "set without leaked rows, in points; `random` = the same for a random subset of the same size and class "
+           "mix (E10). `memorised` = share of leaked rows the full model gets right and a model trained without any "
+           "training copy of them gets wrong; `either way` = share both get right (E9). Every copy within eps is "
+           "removed; the check after removal finds none left on any dataset.", "",
+           "| Dataset | Model | gap | random | memorised | either way |", "|---|---|--:|--:|--:|--:|"]
+    for n in done:
+        r = runs[f"e9_controls:{n}"]["results"]
+        for m in MODELS:
+            v = r["summary"][m]
+            mem = "n/a" if v["memorised_share"] is None else pct(v["memorised_share"])
+            ew = "n/a" if v["correct_either_way_share"] is None else pct(v["correct_either_way_share"])
+            out.append(f"| {n} | {m} | {pt(v['leakage_gap'])} | {pt(v['random_gap'])} | {mem} | {ew} |")
+    out += ["", "Ledger lines: " + ", ".join(f"`e9_controls:{n}` @ `{runs['e9_controls:' + n]['git']['commit']}`"
+                                             for n in done), ""]
+    return out
+
+
+def e12(runs: dict) -> list[str]:
+    d = runs.get("e12_cic_within")
+    if d is None:
+        return []
+    r = d["results"]
+    out = ["## E12: CIC-IDS2017 split by time within each label", "", src(d), "",
+           f"Every label's earliest 80% of flows train and its latest 20% test, so every test label is also in "
+           f"training (labels unseen in training: {len(r['unseen_test_labels'])}). Macro-F1, mean of seeds 0-2, "
+           "E2's training cap.", "",
+           "| Model | random split | time within label | cost (points) |", "|---|--:|--:|--:|"]
+    for m, v in r["summary"].items():
+        out.append(f"| {m} | {v['random']:.4f} | {v['time_within_label']:.4f} | {pt(v['cost'])} |")
+    return out + [""]
+
+
+def phase3_hypotheses(runs: dict) -> list[dict]:
+    hs = []
+    e1v = {n: _view(runs[f"e1_audit:{n}"], "all") for n in PHASE3 if f"e1_audit:{n}" in runs}
+    if len(e1v) == len(PHASE3):
+        rates = {n: v["f"]["L1.cross"]["value"] for n, v in e1v.items()}
+        n5 = sum(x >= 0.05 for x in rates.values())
+        hs.append({"id": "H10", "text": "At least 2 of the 3 current benchmarks have >= 5% exact test copies "
+                                        "(as distributed)",
+                   "verdict": _verdict(n5 >= 2),
+                   "evidence": f"{n5} of 3: " + ", ".join(f"{PHASE3_NAMES[n]} {pct(x)}" for n, x in rates.items())})
+        best = {n: v["f"]["L5.shortcut"]["value"] for n, v in e1v.items() if "L5.shortcut" in v["f"]}
+        hs.append({"id": "H12", "text": "Some current benchmark has a single feature at >= 95% balanced accuracy",
+                   "verdict": _verdict(any(x >= 0.95 for x in best.values())),
+                   "evidence": ", ".join(f"{PHASE3_NAMES[n]} {pct(x)}" for n, x in best.items())})
+    hs.append({"id": "H11", "text": "On every current benchmark with >= 5% exact copies, removing leaked rows costs "
+                                    "some model >= 1 point (bootstrap interval above 0 in >= 2 of 3 seeds)",
+               "verdict": "pending", "evidence": "needs E5/E6 on the current benchmarks"})
+    e9 = {n: runs[f"e9_controls:{n}"]["results"]["summary"] for n in E9_ORDER if f"e9_controls:{n}" in runs}
+    if all(n in e9 for n in ("kdd99", "nslkdd", "uci_phishing")):
+        mean = {n: sum(e9[n][m]["memorised_share"] for m in MODELS) / len(MODELS)
+                for n in ("kdd99", "nslkdd", "uci_phishing")}
+        ok = mean["kdd99"] > mean["uci_phishing"] and mean["nslkdd"] > mean["uci_phishing"]
+        hs.append({"id": "H13", "text": "More leaked rows are memorised on KDD Cup 99 and NSL-KDD than on UCI Phishing",
+                   "verdict": _verdict(ok),
+                   "evidence": ", ".join(f"{n} {pct(x)}" for n, x in mean.items()) + " (mean over the four models)"})
+    if e9:
+        cells = [(n, m, v[m]) for n, v in e9.items() for m in MODELS
+                 if v[m]["leakage_gap"] is not None and v[m]["leakage_gap"] >= 0.01]
+        bad = [(n, m, c) for n, m, c in cells if c["random_gap"] >= 0.005]
+        hs.append({"id": "H14", "text": "Wherever the leakage gap is >= 1 point, the random-removal gap is < 0.5",
+                   "verdict": _verdict(not bad),
+                   "evidence": f"{len(cells) - len(bad)} of {len(cells)} (dataset, model) cells; exceptions: "
+                               + (", ".join(f"{n}/{m} {pt(c['random_gap'])}" for n, m, c in bad) or "none")})
+    hs.append({"id": "H15", "text": "EMBER's conclusions hold on the official 2,381-dimension vectors",
+               "verdict": "pending", "evidence": "needs EMBER's own code, run outside this repository"})
+    d = runs.get("e12_cic_within")
+    if d is not None:
+        costs = {m: v["cost"] for m, v in d["results"]["summary"].items()}
+        hs.append({"id": "H16", "text": "With every attack type seen in training, CIC-IDS2017's time split costs "
+                                        "<= 2 points relative to the random split",
+                   "verdict": _verdict(all(c <= 0.02 for c in costs.values())),
+                   "evidence": ", ".join(f"{m} {pt(c)}" for m, c in costs.items())})
+    return sorted(hs, key=lambda h: int(h["id"][1:]))
+
+
+def phase3_hypotheses_md(runs: dict) -> list[str]:
+    hs = phase3_hypotheses(runs)
+    out = ["## Phase 3 hypotheses (PLAN.md)", "", "| | Hypothesis | Verdict | Evidence |", "|---|---|---|---|"]
+    out += [f"| {h['id']} | {h['text']} | **{h['verdict']}** | {h['evidence']} |" for h in hs]
+    return out + [""]
+
+
 def main() -> None:
     runs = latest()
     lines = ["# Results", "",
@@ -591,8 +745,15 @@ def main() -> None:
     for name, fn in (("e0_sources", e0_sources), ("e0_synthetic", e0_synthetic), ("e0_kdd", e0_kdd)):
         if name in runs:
             lines += fn(runs[name])
+    lines += phase3_hypotheses_md(runs)
+    lines += e0_phase3(runs)
     lines += e1(runs)
+    lines += e1_phase3(runs)
     lines += e2(runs)
+    lines += e2(runs, PHASE3 + ["cseids2018:no_identifiers", "edgeiiot:no_identifiers"],
+                "## E2 on the current benchmarks")
+    lines += e9_e10(runs)
+    lines += e12(runs)
     lines += e2_stats(runs)
     lines += e6(runs)
     lines += e7(runs)
