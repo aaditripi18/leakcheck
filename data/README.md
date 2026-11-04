@@ -8,7 +8,12 @@ whose hash differs. `data/manifest.json` records what was fetched and when.
 python scripts/fetch.py            # all datasets (resumes interrupted downloads)
 python -m experiments.e0_sources          # KDD99 / NSL-KDD copies vs verified originals
 python -m experiments.e0_sources_week4    # the other six datasets vs independent references
+python -m experiments.e0_sources_phase3   # Edge-IIoTset, IDS2018 (+ S3 ETags), CIC-IoT2023
 ```
+
+The three phase-3 datasets are fetched by hand (the `url` field of each file in
+`data/registry.json` gives the official object or the `kaggle datasets download`
+command) into `data/raw/<dataset>/`; `fetch.py` then verifies their pinned hashes.
 
 ## Provenance
 
@@ -21,6 +26,9 @@ python -m experiments.e0_sources_week4    # the other six datasets vs independen
 | `cicids2017` (MachineLearningCSV.zip, 2,830,743 flows) | Hugging Face `bencorn/CICIDS2017` @ 811c007 (official download is behind a registration form; no official checksum exists) | All 8 CSVs inside are byte-identical to the independent upload `c01dsnap/CIC-IDS2017` @ 4e9edfa; all 15 label counts match Ahmim et al. 2018, Table II |
 | `ember2018` (1M PE files, raw JSON features) | official ember.elastic.co | SHA-256 published in the elastic/ember README |
 | `uci_phishing`, `phiusiil`, `sms_spam` | official UCI downloads | Row counts match the UCI API; SMS ham/spam counts match the shipped readme |
+| `edgeiiot` (DNN-EdgeIIoT-dataset.csv, 2,219,201 rows) | the authors' Kaggle dataset `mohamedamineferrag/edgeiiotset-cyber-security-dataset-of-iot-iiot` (IEEE DataPort points there for updates), `kaggle datasets download ... -f "Edge-IIoTset dataset/Selected dataset for ML and DL/DNN-EdgeIIoT-dataset.csv"` | Published by the dataset's authors; no checksum is published. 1,615,643 normal rows and 14 attack types, as later papers describe the file |
+| `cseids2018` (10 CSVs, 16,232,943 rows) | Kaggle copy `solarmainframe/ids-intrusion-csv` (the official bucket `s3://cse-cic-ids2018` served about 60 KB/s here) | Every file's size and recomputed multipart ETag equal the official S3 object's (`python -m experiments.verify_s3_etag`), i.e. byte-identical; all 15 label counts equal Sensors 22(19):7409, Table 3 |
+| `ciciot2023` (169 CSV parts, 46,686,579 rows) | Kaggle copy `madhavmalhotra/unb-cic-iot-dataset` (the official UNB download asks for name and email) | All 34 label counts equal Table 3 of the dataset's own paper (Neto et al., Sensors 23(13):5941). No checksum is published, so this is the strongest check available |
 
 Not used, and why:
 - UCI dataset page 130 zip: contains link stubs, not data. The old

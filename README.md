@@ -8,6 +8,12 @@ near-duplicates, contradictory labels, future data in training, and single
 columns that give the label away. It also removes the leakage, and proves the
 removal worked by re-scanning its own output.
 
+The problem is not confined to old benchmarks. In the datasets current papers
+use, **40% of CSE-CIC-IDS2018's test rows and 44% of CIC-IoT2023's are exact
+copies of training rows**; in IDS2018 (and in Edge-IIoTset, 16%) the copies only
+show once timestamp, address and port columns, which make every row unique, are
+set aside.
+
 ## Results
 
 8 benchmarks, 9.5M rows, 4 untuned baselines × 5 seeds. Every number below is
@@ -42,13 +48,52 @@ H6–H9 are phase 2 (PLAN.md): full training sets, a tuned model, every test
 prediction saved, a paired bootstrap over test rows, a threshold sweep, and the
 raw UNSW-NB15 records.
 
+**Phase 3: the benchmarks in use now** (2018-2023; [docs/RESULTS.md](docs/RESULTS.md)).
+Each was checked against its publisher before use: IDS2018's ten CSVs are
+byte-identical to the official AWS objects; IDS2018's and CIC-IoT2023's label
+counts equal the published tables (16,232,943 and 46,686,579 rows).
+
+| Dataset | Test rows | Exact copies of train, as distributed | ... without identifier columns | Best single feature |
+|---|--:|--:|--:|---|
+| Edge-IIoTset (2022) | 443,841 | 0.04% | **16.2%** (38.4% near) | `dns.qry.name.len` 100% |
+| CSE-CIC-IDS2018 | 3,246,589 | 4.9% | **40.3%** (54.9% near; 13.1% contradicted) | `Dst Port` 90.9% |
+| CIC-IoT2023 | 9,337,316 | **44.3%** (32.8% near) | (no identifier columns) | `Weight` 99.1% |
+
+The "without identifiers" view drops the columns leakcheck's own identifier
+check flags; it was added after the first of these runs and is reported as post
+hoc. The pre-registered view is the first column.
+
+**The caveats, measured** (phase 3b): each statement this README used to make
+as a caveat now has an experiment.
+
+| Caveat | Measurement |
+|---|---|
+| "A copy is not always a bug" | Retrained with every training copy removed, models still get **97% of KDD99's copied test rows right** (98% NSL-KDD, 92-93% UCI Phishing); 0-1% are memorised (EMBER 6-19%). The copies are easy rows, not memorised exceptions (E9) |
+| "The cleaned test set is harder by construction" | Removing a random subset of the same size and class mix costs **-6 points on KDD99 and 0.5-0.7 on NSL-KDD**, against 15-17 and 8.5-11.9 for removing the copies: the gap comes from which rows go, mostly (E10) |
+| "CIC-IDS2017's time split is confounded with unseen attacks" | Split by time **within each attack type**, it costs 0.5-1.5 points: the collapse to 0.46-0.57 on the file-wise time split was the unseen attack types (E12) |
+
+| | Hypothesis (phase 3) | Verdict |
+|---|---|---|
+| H10 | At least 2 of the 3 current benchmarks have >= 5% exact copies, as distributed | **not supported**: 1 of 3 (IDS2018 4.91%, just under) |
+| H12 | Some current benchmark has a single feature at >= 95% | **supported**: Edge-IIoTset 100%, CIC-IoT2023 99.1% |
+| H13 | KDD99 and NSL-KDD memorise more copied rows than UCI Phishing | **not supported**: 0.0% and 0.3% vs 3.3% |
+| H14 | Wherever copies cost >= 1 point, random removal costs < 0.5 | **not supported**: 9 of 23 cells (NSL-KDD, UNSW-NB15, UCI Phishing LR at 1.5) |
+| H16 | With every attack type seen in training, CIC-IDS2017's time split costs <= 2 points | **supported**: 0.5-1.5 |
+
 What the numbers say:
 
-- **The copy rate alone does not predict inflation.** UCI Phishing has as many
-  copies as KDD99 but loses about a point: with 30 features of 2–3 values
-  each, a copy is a common pattern that a model would get right anyway. KDD99's
-  copies are memorised exceptions, and nearly three quarters of its gap (72%)
-  comes from *near*-copies.
+- **Copies inflate scores by being easy, not by being memorised.** A model
+  trained without any copy still gets 97% of KDD99's copied test rows right
+  (E9). What the copies do is fill the test set with repeated, easy traffic:
+  remove them and what is left is the hard part, where KDD99 loses 15-17
+  macro-F1 points and NSL-KDD 8.5-11.9. Nearly three quarters of KDD99's gap
+  (72%) comes from *near*-copies. (This README used to call KDD99's copies
+  "memorised exceptions"; E9 measured it and that was wrong.)
+- **Today's benchmarks hide their copies behind identifiers.** A timestamp or a
+  flow ID makes every row unique, so an exact-duplicate check sees nothing;
+  without those columns, 40% of IDS2018's test set and 16% of Edge-IIoTset's
+  copy a training row. CIC-IoT2023 ships no identifiers and 44% of its test rows
+  are copies as distributed.
 - **Validated against the literature.** leakcheck reproduces the KDD99
   redundancy tables of Tavallaee et al. (2009) exactly for the training set,
   and to within 2 records for the test set. On synthetic data it recovers
@@ -175,23 +220,33 @@ wiring are generated.
 
 ## Limitations
 
-- **A copy is not always a bug.** Real traffic repeats. The finding is that a
-  benchmark which rewards memorised repeats does not measure detection of new
-  attacks; both scores are reported.
-- **The cleaned test set is harder by construction**: it is the part unlike
-  the training data. The gap measures how much of a headline score was earned
-  on copies, not that a model is worse in every sense.
+- **A copy is not always a bug.** Real traffic repeats, and E9 shows the copies
+  are mostly rows any model gets right. The finding is about the benchmark: a
+  test set that is mostly repeats measures little about new attacks. Both scores
+  are reported.
+- **The cleaned test set is harder by construction.** E10 measures how much: a
+  random removal of the same size costs up to 1.5 points (UCI Phishing, LR),
+  against 15-17 on KDD99. Where the two are close, the README says so.
 - **Thresholds are choices.** Near-duplicate distance (0.01 RMS in scaled
   space) and Jaccard (0.8) are fixed defaults; L2 also reports a curve and a
   training-set baseline. The identifier heuristic is advisory, and has one
   known false positive (KDD99 `dst_host_same_src_port_rate`).
-- **Baselines are untuned and training sets are capped at 300k rows**, so the
-  scores are typical, not state of the art.
+- **E2's baselines are untuned and capped at 300k training rows.** Phase 2 (E5,
+  E6) repeats every classic benchmark with full training sets and a tuned
+  gradient-boosting model: the gaps hold (H6, H7). On the two largest current
+  benchmarks, E5 scores a 200k-row test sample and trains RF/MLP on 2M rows
+  (PLAN.md amendment: the full nearest-neighbour evidence would be ~10^14
+  distance computations).
 - **EMBER** is scanned on leakcheck's own ~680-column numeric view, not the
   official 2,381-dimension vector (EMBER's code is AGPL and is not used); exact
   duplicates use a digest of every raw feature instead.
 - **CIC-IDS2017's chronological split is confounded** with unseen attack types,
-  so H3 was decided on EMBER.
+  so H3 was decided on EMBER; E12 then separates the two (time within each
+  attack type costs 0.5-1.5 points).
+- **Two current benchmarks come from copies, not their official download pages**
+  (which sit behind registration forms or served about 60 KB/s): IDS2018's copy is
+  proven byte-identical to the official bucket; CIC-IoT2023's matches all 34
+  published label counts, which a different file could also do.
 - Open items before publication are listed at the end of
   [docs/FINDINGS.md](docs/FINDINGS.md).
 
@@ -205,7 +260,7 @@ reference, is in [data/README.md](data/README.md).
 ```
 python -m venv .venv
 .venv/Scripts/python -m pip install -e ".[dev]"
-.venv/Scripts/python -m pytest                       # 91 tests
+.venv/Scripts/python -m pytest                       # 121 tests
 
 python scripts/fetch.py                              # ~2.1 GB, hash-verified
 python -m experiments.e0_sources && python -m experiments.e0_sources_week4
@@ -213,6 +268,15 @@ python -m experiments.e0_synthetic && python -m experiments.e0_kdd
 python -m experiments.e1_audit                       # ~45 min, EMBER is 30 of them
 python -m experiments.e2_retrain uci_phishing sms_spam unsw_nb15 kdd99 cicids2017 nslkdd phiusiil ember2018
 python -m experiments.e4_ablation phiusiil cicids2017
+
+# phase 3: current benchmarks (see data/README.md for the three downloads)
+python -m experiments.verify_s3_etag                 # IDS2018 copies == official S3 objects
+python -m experiments.e0_sources_phase3              # label counts == published tables
+python -m experiments.e1_audit edgeiiot cseids2018 ciciot2023
+python -m experiments.e2_retrain edgeiiot edgeiiot:no_identifiers cseids2018 cseids2018:no_identifiers ciciot2023
+python -m experiments.e9_controls kdd99 nslkdd unsw_nb15 cicids2017 uci_phishing phiusiil sms_spam ember2018 edgeiiot
+python -m experiments.e12_cic_within
+python -m experiments.e5_predictions edgeiiot cseids2018 ciciot2023 && python -m experiments.e6_analysis
 python scripts/report.py                             # docs/RESULTS.md + site/data.json
 ```
 
