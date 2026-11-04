@@ -1,10 +1,12 @@
-# Findings (E0, E1, E2 on all 8 datasets, E4)
+# Findings (phases 1-3)
 
 Every number here is in [RESULTS.md](RESULTS.md), which is generated from
 `results/ledger.jsonl`. E0 ran at commit `0f452ad`, E1 at `6780929`. This file
 is the narrative. E2 ran at `42caa56` (week 5: five leakiest datasets),
 `8821fdf` (NSL-KDD) and `ad29867` (PhiUSIIL, EMBER, E4). All H2–H4 decision
-rules were committed in PLAN.md before the runs they govern.
+rules were committed in PLAN.md before the runs they govern. Phase 3 (sections
+23-27) adds three current benchmarks and turns the README's caveats into
+measurements; its runs are named in RESULTS.md with their commits.
 
 ## 1. leakcheck recovers planted leakage exactly
 
@@ -183,6 +185,11 @@ subsampled (KDD99, CIC-IDS2017), so "leaked" means a copy in the rows the model
 actually saw.
 
 ## 12. H2 not supported: copies inflate scores only when they are memorised exceptions
+
+> **Corrected by E9 (section 25).** The explanation below, that KDD99's copies
+> are memorised exceptions, was an inference, and the measurement contradicts
+> it: a model trained without any copy still gets 97% of KDD99's copied test
+> rows right. The gaps in this table stand; the reason for them is in section 25.
 
 | Dataset | Leaked test rows (exact / exact or near) | Macro-F1 gap, original → no_near (LR / RF / HGB / MLP) |
 |---|---|---|
@@ -419,6 +426,92 @@ behind (L5). That points to the testbed: the attacking and the normal hosts sent
 packets with different initial TTLs. It is a measured property of this capture,
 not evidence that TTL detects attacks elsewhere; it is the same kind of shortcut
 as PhiUSIIL's (section 8).
+
+## 23. Phase 3: the benchmarks in use now
+
+Three datasets that current intrusion-detection papers report on, each from its
+publishers' release and checked before use:
+
+- **CSE-CIC-IDS2018** (16,232,943 rows): the ten CSVs are byte-identical to the
+  official AWS objects (recomputed multipart ETags; the copy came from Kaggle
+  because the bucket served about 60 KB/s), and all 15 label counts equal the
+  published table.
+- **CIC-IoT2023** (46,686,579 rows): all 34 label counts equal Table 3 of the
+  authors' paper. The official download asks for a name and email, so a public
+  copy was used; matching every count is the strongest check available, not a
+  byte check.
+- **Edge-IIoTset** (2,219,201 rows): the authors' own release.
+
+The pre-registered audit keeps every distributed column (H10-H12 are judged on
+it). After the first run a second view was added, post hoc: the same split
+without the columns leakcheck's own identifier check flags.
+
+| Dataset | Exact test copies, as distributed | Without identifiers | Near copies (without identifiers) | Best single feature |
+|---|--:|--:|--:|---|
+| Edge-IIoTset | 0.04% | 16.2% | 38.4% | `dns.qry.name.len` 100% |
+| CSE-CIC-IDS2018 | 4.9% | 40.3% | 54.9% | `Dst Port` 90.9% |
+| CIC-IoT2023 | 44.3% | (no identifier column) | 32.8% | `Weight` 99.1% |
+
+**H10 not supported** (1 of 3 reaches 5% as distributed; IDS2018 is at 4.91%).
+**H12 supported** (two benchmarks have a single feature at 99-100%).
+
+The two views together are the finding. A timestamp, flow ID or port makes
+nearly every row unique, so an exact-duplicate check on the files as shipped
+sees almost nothing in Edge-IIoTset and little in IDS2018; the same rows without
+those columns repeat heavily. IDS2018 also has 13.1% of its test rows in groups
+whose identical features carry different labels. CIC-IoT2023 ships no
+identifier columns, and 44% of its test set is copied as distributed.
+
+## 24. Edge-IIoTset: every model is perfect, before and after
+
+On Edge-IIoTset's binary task all four E2 models score macro-F1 1.000 on every
+seed, on the full test set and with the copies removed, in both views: five
+single features separate attack from normal traffic perfectly (MQTT fields and
+`dns.qry.name.len`, consistent with the attack captures and the normal sensor traffic using
+different protocols; not verified further). There is no score left for leakage to inflate; like
+PhiUSIIL (section 19), it cannot rank models.
+
+## 25. E9: the copies are easy, not memorised (H13 not supported)
+
+For every dataset, model and seed, a second model was trained without every
+training row within eps of a leaked test row (exact copies by hash; near ones by
+radius search; a check confirms none is left) and scored on the leaked rows.
+
+| Dataset | Leaked rows right without any copy | Memorised (right only with copies) |
+|---|--:|--:|
+| KDD Cup 99 | 97% | 0.0% |
+| NSL-KDD | 97-98% | 0.0-1.2% |
+| UCI Phishing | 92-93% | 0.5-4.5% |
+| EMBER (random split) | 75-94% | 6-19% |
+
+**H13 not supported**: KDD99 and NSL-KDD memorise *less* than UCI Phishing. The
+copies are rows a model gets right anyway. They inflate a score by filling the
+test set: remove them and what remains is the hard part, where KDD99 loses
+15-17 points. EMBER is the one dataset where a model genuinely leans on copies
+(LR memorises 19%).
+
+The first E9 implementation removed one nearest copy per round for 20 rounds and
+left 148k KDD99 rows with a copy; it was replaced before these numbers (PLAN.md
+note), and that run is superseded.
+
+## 26. E10: most of the gap is which rows are removed, not how many (H14 not supported)
+
+The same models scored on the test set minus a random subset of the same size
+and class mix: KDD99 -6 points (random removal *raises* the score), NSL-KDD
+0.5-0.7, UNSW-NB15 0.5-0.7, EMBER 0.0-0.4, UCI Phishing 0.1-1.5. Against the
+leakage gaps (15-17, 8.5-11.9, 1.0-2.0, 1.3-2.4, 0.9-2.0) the copies explain
+most of each gap, but **H14 is not supported**: in 9 of 23 (dataset, model)
+cells random removal alone costs 0.5 points or more, and for UCI Phishing's LR
+(1.51 of 1.75) it explains nearly all of it.
+
+## 27. E12: CIC-IDS2017's collapse was the unseen attacks (H16 supported)
+
+E2's chronological split of CIC-IDS2017 (train on early capture files, test on
+later ones) dropped every model to 0.46-0.57 macro-F1, but most test attack types
+never appear in training. Splitting by time *within* each label, every test
+label is seen in training, and the cost against a random split is 0.5-1.5
+points (LR 97.1 -> 95.5, HGB 99.9 -> 99.4). **H16 supported**: time is not what
+broke the models; novelty was.
 
 ## Open items before any of this is published
 
