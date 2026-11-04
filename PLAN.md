@@ -343,3 +343,14 @@ two only:
   stratified 2,000,000-row sample of it (seed = the run's seed).
 Edge-IIoTset (1.8M training rows) runs exactly as specified. H11 is judged on
 these runs; its rule ("some model") does not depend on rf or mlp.
+
+**Note on E11 (2026-11-04, before any E11 run).** EMBER's code (elastic/ember @
+d97a0b5) was installed in a separate environment outside the repository. Its files
+are unmodified, but it does not run against current scikit-learn: it passes one
+string per sample to `FeatureHasher(input_type="string")`, which 2019 versions
+hashed character by character and current versions reject. The driver
+(`_ember_official/vectorize.py`) restores the 2019 behaviour before importing
+EMBER (a string sample becomes the list of its characters). The vectors are
+accepted only because EMBER's own published 2018 model scores ROC AUC 0.996429 on
+their test set, the figure EMBER's notebook reports (0.9964289468); the four files
+are pinned by SHA-256 in `experiments/ember_official.py`.
