@@ -1,0 +1,30 @@
+{
+ "dataset": "cseids2018",
+ "seed": 2,
+ "commit": "0723f17",
+ "code": "946ae2f25e6194df",
+ "n_train": 12986354,
+ "n_test": 200000,
+ "npz": "cseids2018_seed2.npz",
+ "fit_seconds": {
+  "lr": 858.9,
+  "rf": 96.1,
+  "hgb": 322.2,
+  "mlp": 267.6,
+  "hgb_tuned": 423.0
+ },
+ "evidence_seconds": 798.9,
+ "test_sample": 200000,
+ "rf_mlp_train_rows": 2000000,
+ "hgb_tuned": {
+  "params": {
+   "max_leaf_nodes": 63,
+   "max_iter": 800,
+   "max_depth": 16,
+   "learning_rate": 0.1,
+   "l2_regularization": 0.0
+  },
+  "cv_macro_f1": 0.9830573585020739
+ },
+ "seconds": 2924.8
+}

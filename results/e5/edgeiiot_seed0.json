@@ -1,0 +1,28 @@
+{
+ "dataset": "edgeiiot",
+ "seed": 0,
+ "commit": "0723f17",
+ "code": "946ae2f25e6194df",
+ "n_train": 1775360,
+ "n_test": 443841,
+ "npz": "edgeiiot_seed0.npz",
+ "fit_seconds": {
+  "lr": 39.0,
+  "rf": 38.9,
+  "hgb": 46.8,
+  "mlp": 190.4,
+  "hgb_tuned": 64.3
+ },
+ "evidence_seconds": 46.3,
+ "hgb_tuned": {
+  "params": {
+   "max_leaf_nodes": 63,
+   "max_iter": 400,
+   "max_depth": 10,
+   "learning_rate": 0.03,
+   "l2_regularization": 1.0
+  },
+  "cv_macro_f1": 1.0
+ },
+ "seconds": 571.4
+}
