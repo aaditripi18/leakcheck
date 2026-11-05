@@ -354,3 +354,34 @@ EMBER (a string sample becomes the list of its characters). The vectors are
 accepted only because EMBER's own published 2018 model scores ROC AUC 0.996429 on
 their test set, the figure EMBER's notebook reports (0.9964289468); the four files
 are pinned by SHA-256 in `experiments/ember_official.py`.
+
+## Amendment 2026-11-05: are duplicated test rows simply easy? (E13, H17-H18)
+
+Written before any E13 number exists. Motivation: E9 (H13, not supported) found that on
+KDD Cup 99 most leaked test rows are classified correctly *whether or not* their training
+copies are present ("correct either way"). That suggests a different explanation for
+the leakage gap: duplicated rows are easy rows (floods of near-identical attack traffic),
+so removing them from the test set makes the test harder, not just less leaked. E9 never
+measured the copy-free model on the *other* test rows, so it could not test this.
+
+**E13. Difficulty of the leaked rows.** Same splits, seeds (0-2), models and copy
+removal as E9. For the full model and the copy-free model (trained without every
+training row within eps of a leaked test row): macro-F1 on the whole test set and on the
+test set without its leaked rows, and accuracy on the leaked rows and on the rest.
+
+- **Dev** (method checked, may be inspected): the phase-3b E9 datasets (kdd99, nslkdd,
+  uci_phishing, edgeiiot and the rest of E9's list).
+- **Fresh** (judged once; E13's quantities have never been computed on them):
+  cseids2018, cseids2018:no_identifiers, ciciot2023, ember2018_official.
+
+Hypotheses (12 cells per dataset = 4 models x 3 seeds):
+
+- **H17 (the gap is difficulty, not memory)** On every fresh dataset whose full-model
+  leakage gap is >= 1 point, the copy-free model's gap (macro-F1 whole test minus
+  without leaked rows) is at least 80% of the full model's gap in >= 10 of 12 cells.
+- **H18 (duplicated rows are easy)** On every fresh dataset with >= 1% leaked test rows,
+  the copy-free model's accuracy on the leaked rows is higher than on the remaining
+  test rows in >= 10 of 12 cells.
+
+A fresh dataset that does not meet a hypothesis's entry condition is reported, not
+counted. Both verdicts are reported as supported or not supported, as all others.
