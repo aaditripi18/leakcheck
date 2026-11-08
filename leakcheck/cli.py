@@ -2,6 +2,7 @@
 
   python -m leakcheck scan  --train a.csv --test b.csv --label y [...]
   python -m leakcheck clean --train a.csv --test b.csv --label y --out DIR [...]
+  python -m leakcheck explain --train a.csv --test b.csv --label y [...]
 """
 
 from __future__ import annotations
@@ -69,13 +70,41 @@ def main(argv: list[str] | None = None) -> int:
     c.add_argument("--dedup-within", action="store_true", help="drop repeated rows inside each split")
     c.add_argument("--conflicts", choices=CONFLICT_MODES, default="drop")
 
+    x = sub.add_parser("explain", help="are the leaked test rows memorised or merely easy? (no model trained)")
+    _split_args(x)
+    x.add_argument("--sample", type=int, default=20_000, help="leaked / other test rows voted on, each")
+    x.add_argument("--seed", type=int, default=0)
+    x.add_argument("--json", help="write the result as JSON to this path")
+
     args = p.parse_args(argv)
     try:
         split = _load(args)
     except (ValueError, FileNotFoundError) as e:
         print(f"leakcheck: {e}", file=sys.stderr)
         return 3
+    if args.cmd == "explain":
+        return _explain(args, split)
     return _scan(args, split) if args.cmd == "scan" else _clean(args, split)
+
+
+def _explain(args, split: Split) -> int:
+    from . import explain as ex
+
+    r = ex.explain(split, sample=args.sample, seed=args.seed)
+    print(f"test rows {r['n_test']}, leaked (exact or near copy in train) {r['leaked']}, exact {r['exact']}")
+    if r["leaked"]:
+        print(f"training rows that copy a leaked row: {r['train_rows_removed']} (left after removal: {r['copies_left']})")
+        print(f"nearest-neighbour vote accuracy: leaked rows without their copies {r['vote_acc_leaked']:.4f} "
+              f"({r['sampled_leaked']} rows), other rows {r['vote_acc_rest']:.4f} ({r['sampled_rest']} rows)")
+        print(f"S = {r['S']:+.4f}" + ("" if r["threshold"] is None else f", threshold {r['threshold']:+.4f}"))
+    print(f"verdict: {r['verdict']}")
+    if r["threshold"] is not None and r["leaked"]:
+        print("  easy: a model can get these rows right without their copies, so removing the copies will not "
+              "close the leakage gap; memorised: the gap comes from the copies themselves.")
+        print(f"  {ex.THRESHOLD_NOTE}")
+    if args.json:
+        Path(args.json).write_text(json.dumps(r, indent=2, default=str), encoding="utf-8")
+    return 0
 
 
 def _scan(args, split: Split) -> int:

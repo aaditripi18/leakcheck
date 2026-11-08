@@ -1,6 +1,7 @@
 """E14 (PLAN.md, amendment 2026-11-09): H19's statistic S and H20's per-class gaps.
 
     python -m experiments.e14_explain stat kdd99 nslkdd ...    S only (seed 0; no model trained)
+    python -m experiments.e14_explain predict ton_network ...  S and H19's prediction (fresh cases)
     python -m experiments.e14_explain full ton_network ...     E13 + per-class F1 + S
 
 `stat` records `e14_stat:<case>`. `full` records `e14:<case>`: per seed and model, the
@@ -97,7 +98,19 @@ def _predicted(case: str) -> bool:
 def main(mode: str, names: list[str]) -> None:
     for name in names:
         print(f"== {name} ({mode})", flush=True)
-        if mode == "stat":
+        if mode == "predict":
+            from leakcheck import explain as ex
+            if ex.S_THRESHOLD is None:
+                sys.exit("H19's threshold is not fixed yet (scripts/h19_threshold.py)")
+            if _predicted(name):
+                print(f"   {name}: prediction already recorded, not repeated", flush=True)
+                continue
+            st = run_stat(name)
+            pred = None if st["S"] is None else ("easy" if st["S"] > ex.S_THRESHOLD else "memorised")
+            record("h19_prediction:" + name, {"seed": 0, "s_star": ex.S_THRESHOLD, "near_eps": NEAR_EPS},
+                   {**st, "prediction": pred}, _hashes(name))
+            print(f"   {name}: predicted {pred}", flush=True)
+        elif mode == "stat":
             record("e14_stat:" + name, {"seed": 0, "near_eps": NEAR_EPS, "text_tau": TEXT_TAU, "rounds": ROUNDS},
                    run_stat(name), _hashes(name))
         else:
