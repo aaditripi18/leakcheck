@@ -35,19 +35,13 @@ from experiments.ledger import git_state, record
 from experiments.models import MODELS, build
 from leakcheck import Split
 from leakcheck.checks import near, near_text
+from leakcheck.explain import NEAR_EPS, TEXT_TAU, leak_masks, with_train as like  # noqa: F401
 
 SEEDS = tuple(range(5))
 MAX_TRAIN = 300_000
-NEAR_EPS = 0.01
-TEXT_TAU = 0.8
 TIME_FRACTION = 0.8
 OUT = data.ROOT / "results" / "e2"
 RETRAIN_CSV = data.ROOT / "results" / "retrain.csv"
-
-
-def like(split: Split, train: pd.DataFrame, test: pd.DataFrame) -> Split:
-    return Split(train, test, split.label, time=split.time, group=split.group, ignore=list(split.ignore),
-                 text=split.text)
 
 
 def subsample(split: Split, seed: int, cap: int = MAX_TRAIN) -> Split:
@@ -56,22 +50,6 @@ def subsample(split: Split, seed: int, cap: int = MAX_TRAIN) -> Split:
     idx, _ = train_test_split(np.arange(len(split.train)), train_size=cap, random_state=seed,
                               stratify=split.train[split.label])
     return like(split, split.train.iloc[np.sort(idx)], split.test)
-
-
-def leak_masks(split: Split) -> dict[str, np.ndarray]:
-    """exact / near (exact or near) per test row, against the training data used."""
-    exact = np.isin(split.test_hash, split.train_hash)
-    near_any = exact.copy()
-    todo = np.flatnonzero(~exact)
-    if near.numeric_columns(split) and len(todo):
-        dist, _ = near.nearest(split, todo)
-        near_any[todo[dist <= NEAR_EPS]] = True
-    if split.text is not None and len(todo):
-        sim, _ = near_text.nearest_text(split.train[split.text], split.test[split.text], todo, TEXT_TAU)
-        tr_norm = set(split.train[split.text].fillna("").map(near_text.normalize))
-        same = split.test[split.text].fillna("").map(near_text.normalize).iloc[todo].isin(tr_norm).to_numpy()
-        near_any[todo[(sim >= TEXT_TAU) | same]] = True
-    return {"exact": exact, "near": near_any}
 
 
 def scores(y: np.ndarray, pred: np.ndarray) -> dict:
