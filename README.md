@@ -21,74 +21,18 @@ generated from `results/ledger.jsonl` into [docs/RESULTS.md](docs/RESULTS.md);
 the narrative is in [docs/FINDINGS.md](docs/FINDINGS.md). The decision rules
 for each hypothesis were committed before the runs they govern.
 
-| Dataset | Test rows exactly copying a training row | Macro-F1 lost when leaked rows are removed (LR → HistGB) |
-|---|---|---|
-| KDD Cup 99 | **68.4%** | **17.5 → 15.0 points** |
-| NSL-KDD | 3.0% | 11.9 → 8.8 |
-| SMS Spam Collection | 11.0% | 3.1 → 2.5 |
-| EMBER 2018 (random split) | 0.01% | 2.4 → 1.3 |
-| UNSW-NB15 (official split) | 10.4% | 2.0 → 1.0 |
-| UCI Phishing Websites | **64.4%** | 1.5 → 0.8 |
-| CIC-IDS2017 | 14.1% | ≈ 0 |
-| PhiUSIIL | 0.0% | 0 (every model at 0.9999+) |
+### What the numbers say
 
-| | Hypothesis | Verdict |
-|---|---|---|
-| H1 | At least half of the benchmarks have ≥ 5% of test rows copying a training row | **supported** (5 of 8) |
-| H2 | Removing the copies costs ≥ 5 macro-F1 points on the two most-copied benchmarks | **not supported**: KDD99 loses 15–17.5, UCI Phishing ≤ 1.7 |
-| H3 | A time-aware split costs more than deduplication | **supported** on EMBER, by a small margin (0.3–0.9 points) |
-| H4 | Weaker models lean harder on leaked rows | **supported** (LR gap > HistGB gap on 6 of 6 eligible datasets) |
-| H5 | Some benchmark has a single feature at ≥ 95% balanced accuracy | **supported** (PhiUSIIL `URLSimilarityIndex`, 99.6%) |
-| H6 | Tuning and all the training data do not remove the gap | **supported**: tuned HistGB on all 4.9M KDD99 rows loses 22.2 points, NSL-KDD 8.6; every seed's interval above 5 |
-| H7 | LR's gap exceeds tuned HistGB's, interval above zero | **supported** on 4 of 4 large benchmarks, 3 of 3 seeds each |
-| H8 | Whether a gap clears one point does not depend on the threshold | **not supported**: same in 32 of 40 cells; every change is a gap near one point |
-| H9 | On network traffic, a time split costs more than removing copies | **not supported**: raw UNSW-NB15, time split 0.2–0.5 points vs near-copies 4.3–6.5 |
-
-H6–H9 are phase 2 (PLAN.md): full training sets, a tuned model, every test
-prediction saved, a paired bootstrap over test rows, a threshold sweep, and the
-raw UNSW-NB15 records.
-
-**Phase 3: the benchmarks in use now** (2018-2023; [docs/RESULTS.md](docs/RESULTS.md)).
-Each was checked against its publisher before use: IDS2018's ten CSVs are
-byte-identical to the official AWS objects; IDS2018's and CIC-IoT2023's label
-counts equal the published tables (16,232,943 and 46,686,579 rows).
-
-| Dataset | Test rows | Exact copies of train, as distributed | ... without identifier columns | Best single feature |
-|---|--:|--:|--:|---|
-| Edge-IIoTset (2022) | 443,841 | 0.04% | **16.2%** (38.4% near) | `dns.qry.name.len` 100% |
-| CSE-CIC-IDS2018 | 3,246,589 | 4.9% | **40.3%** (54.9% near; 13.1% contradicted) | `Dst Port` 90.9% |
-| CIC-IoT2023 | 9,337,316 | **44.3%** (32.8% near) | (no identifier columns) | `Weight` 99.1% |
-
-The "without identifiers" view drops the columns leakcheck's own identifier
-check flags; it was added after the first of these runs and is reported as post
-hoc. The pre-registered view is the first column.
-
-**The caveats, measured** (phase 3b): each statement this README used to make
-as a caveat now has an experiment.
-
-| Caveat | Measurement |
-|---|---|
-| "A copy is not always a bug" | Retrained with every training copy removed, models still get **97% of KDD99's copied test rows right** (98% NSL-KDD, 92-93% UCI Phishing); 0-1% are memorised (EMBER 6-19%). The copies are easy rows, not memorised exceptions (E9) |
-| "The cleaned test set is harder by construction" | Removing a random subset of the same size and class mix costs **-6 points on KDD99 and 0.5-0.7 on NSL-KDD**, against 15-17 and 8.5-11.9 for removing the copies: the gap comes from which rows go, mostly (E10) |
-| "CIC-IDS2017's time split is confounded with unseen attacks" | Split by time **within each attack type**, it costs 0.5-1.5 points: the collapse to 0.46-0.57 on the file-wise time split was the unseen attack types (E12) |
-
-| | Hypothesis (phase 3) | Verdict |
-|---|---|---|
-| H10 | At least 2 of the 3 current benchmarks have >= 5% exact copies, as distributed | **not supported**: 1 of 3 (IDS2018 4.91%, just under) |
-| H12 | Some current benchmark has a single feature at >= 95% | **supported**: Edge-IIoTset 100%, CIC-IoT2023 99.1% |
-| H13 | KDD99 and NSL-KDD memorise more copied rows than UCI Phishing | **not supported**: 0.0% and 0.3% vs 3.3% |
-| H14 | Wherever copies cost >= 1 point, random removal costs < 0.5 | **not supported**: 9 of 23 cells (NSL-KDD, UNSW-NB15, UCI Phishing LR at 1.5) |
-| H16 | With every attack type seen in training, CIC-IDS2017's time split costs <= 2 points | **supported**: 0.5-1.5 |
-
-What the numbers say:
-
-- **Copies inflate scores by being easy, not by being memorised.** A model
-  trained without any copy still gets 97% of KDD99's copied test rows right
-  (E9). What the copies do is fill the test set with repeated, easy traffic:
-  remove them and what is left is the hard part, where KDD99 loses 15-17
-  macro-F1 points and NSL-KDD 8.5-11.9. Nearly three quarters of KDD99's gap
-  (72%) comes from *near*-copies. (This README used to call KDD99's copies
-  "memorised exceptions"; E9 measured it and that was wrong.)
+- **Whether copies are memorised depends on the benchmark, and E13 can tell which.**
+  Retrain without every training copy of the leaked test rows and score that
+  copy-free model on the same split. On **KDD99 and NSL-KDD** it keeps the whole
+  gap (16.2 and 10.1 points): the copied rows are easy traffic any model gets
+  right, and removing them leaves the hard part (E9: 97% of KDD99's copied rows
+  are right without their copies). On **CSE-CIC-IDS2018** (identifiers set aside)
+  and **EMBER's official vectors** the gap disappears and reverses (+11.7 → -17.8
+  and +1.5 → -0.2 points): the copy-free model is *worse* on the leaked rows than
+  on the rest, so the score was coming from the copies themselves. Nearly three
+  quarters of KDD99's gap (72%) comes from *near*-copies.
 - **Today's benchmarks hide their copies behind identifiers.** A timestamp or a
   flow ID makes every row unique, so an exact-duplicate check sees nothing;
   without those columns, 40% of IDS2018's test set and 16% of Edge-IIoTset's
@@ -218,10 +162,81 @@ Deployed on Vercel from `site/` (`cd site && vercel deploy --prod` after
 send the same policy as an HTTP header. Design from Stitch; content and
 wiring are generated.
 
+### The numbers
+
+| Dataset | Test rows exactly copying a training row | Macro-F1 lost when leaked rows are removed (LR → HistGB) |
+|---|---|---|
+| KDD Cup 99 | **68.4%** | **17.5 → 15.0 points** |
+| NSL-KDD | 3.0% | 11.9 → 8.8 |
+| SMS Spam Collection | 11.0% | 3.1 → 2.5 |
+| EMBER 2018 (random split) | 0.01% | 2.4 → 1.3 |
+| UNSW-NB15 (official split) | 10.4% | 2.0 → 1.0 |
+| UCI Phishing Websites | **64.4%** | 1.5 → 0.8 |
+| CIC-IDS2017 | 14.1% | ≈ 0 |
+| PhiUSIIL | 0.0% | 0 (every model at 0.9999+) |
+
+| | Hypothesis | Verdict |
+|---|---|---|
+| H1 | At least half of the benchmarks have ≥ 5% of test rows copying a training row | **supported** (5 of 8) |
+| H2 | Removing the copies costs ≥ 5 macro-F1 points on the two most-copied benchmarks | **not supported**: KDD99 loses 15–17.5, UCI Phishing ≤ 1.7 |
+| H3 | A time-aware split costs more than deduplication | **supported** on EMBER, by a small margin (0.3–0.9 points) |
+| H4 | Weaker models lean harder on leaked rows | **supported** (LR gap > HistGB gap on 6 of 6 eligible datasets) |
+| H5 | Some benchmark has a single feature at ≥ 95% balanced accuracy | **supported** (PhiUSIIL `URLSimilarityIndex`, 99.6%) |
+| H6 | Tuning and all the training data do not remove the gap | **supported**: tuned HistGB on all 4.9M KDD99 rows loses 22.2 points, NSL-KDD 8.6; every seed's interval above 5 |
+| H7 | LR's gap exceeds tuned HistGB's, interval above zero | **supported** on 4 of 4 large benchmarks, 3 of 3 seeds each |
+| H8 | Whether a gap clears one point does not depend on the threshold | **not supported**: same in 32 of 40 cells; every change is a gap near one point |
+| H9 | On network traffic, a time split costs more than removing copies | **not supported**: raw UNSW-NB15, time split 0.2–0.5 points vs near-copies 4.3–6.5 |
+
+H6–H9 are phase 2 (PLAN.md): full training sets, a tuned model, every test
+prediction saved, a paired bootstrap over test rows, a threshold sweep, and the
+raw UNSW-NB15 records.
+
+**Phase 3: the benchmarks in use now** (2018-2023; [docs/RESULTS.md](docs/RESULTS.md)).
+Each was checked against its publisher before use: IDS2018's ten CSVs are
+byte-identical to the official AWS objects; IDS2018's and CIC-IoT2023's label
+counts equal the published tables (16,232,943 and 46,686,579 rows).
+
+| Dataset | Test rows | Exact copies of train, as distributed | ... without identifier columns | Best single feature |
+|---|--:|--:|--:|---|
+| Edge-IIoTset (2022) | 443,841 | 0.04% | **16.2%** (38.4% near) | `dns.qry.name.len` 100% |
+| CSE-CIC-IDS2018 | 3,246,589 | 4.9% | **40.3%** (54.9% near; 13.1% contradicted) | `Dst Port` 90.9% |
+| CIC-IoT2023 | 9,337,316 | **44.3%** (32.8% near) | (no identifier columns) | `Weight` 99.1% |
+
+The "without identifiers" view drops the columns leakcheck's own identifier
+check flags; it was added after the first of these runs and is reported as post
+hoc. The pre-registered view is the first column.
+
+**The caveats, measured** (phase 3b): each statement this README used to make
+as a caveat now has an experiment.
+
+| Caveat | Measurement |
+|---|---|
+| "A copy is not always a bug" | Retrained with every training copy removed, models still get **97% of KDD99's copied test rows right** (98% NSL-KDD, 92-93% UCI Phishing); 0-1% are memorised (EMBER 6-19%). The copies are easy rows, not memorised exceptions (E9) |
+| "The cleaned test set is harder by construction" | Removing a random subset of the same size and class mix costs **-6 points on KDD99 and 0.5-0.7 on NSL-KDD**, against 15-17 and 8.5-11.9 for removing the copies: the gap comes from which rows go, mostly (E10) |
+| "Duplicated rows may just be easy rows" | A model trained without the copies keeps the gap on KDD99/NSL-KDD (easy rows) but loses it on IDS2018 and EMBER, where it is worse on the leaked rows than on the rest (memorised copies) (E13) |
+| "EMBER is scanned on leakcheck's own view" | On EMBER's official 2,381-dimension vectors (EMBER's code, run outside the repository; its published model reproduces AUC 0.996429): the same 0.009% exact copies and gaps within 0.4 points (E11) |
+| "CIC-IDS2017's time split is confounded with unseen attacks" | Split by time **within each attack type**, it costs 0.5-1.5 points: the collapse to 0.46-0.57 on the file-wise time split was the unseen attack types (E12) |
+
+| | Hypothesis (phase 3) | Verdict |
+|---|---|---|
+| H10 | At least 2 of the 3 current benchmarks have >= 5% exact copies, as distributed | **not supported**: 1 of 3 (IDS2018 4.91%, just under) |
+| H11 | On every current benchmark with >= 5% exact copies, removing leaked rows costs some model >= 1 point (interval above 0) | **not supported**: only CIC-IoT2023 qualifies; its largest gap is 0.98 points (LR, interval above 0 in 3 of 3 seeds) |
+| H12 | Some current benchmark has a single feature at >= 95% | **supported**: Edge-IIoTset 100%, CIC-IoT2023 99.1% |
+| H13 | KDD99 and NSL-KDD memorise more copied rows than UCI Phishing | **not supported**: 0.0% and 0.3% vs 3.3% |
+| H14 | Wherever copies cost >= 1 point, random removal costs < 0.5 | **not supported**: 9 of 23 cells (NSL-KDD, UNSW-NB15, UCI Phishing LR at 1.5) |
+| H16 | With every attack type seen in training, CIC-IDS2017's time split costs <= 2 points | **supported**: 0.5-1.5 |
+| H15 | EMBER's conclusions hold on the official 2,381-dimension vectors (within 1 point) | **supported**: same exact-copy rate; gaps differ by at most 0.36 points |
+| H17 | The leakage gap is difficulty, not memory (copy-free model keeps >= 80% of it) | **not supported**: 0 of 12 cells on IDS2018 (no identifiers) and on EMBER official |
+| H18 | Duplicated rows are easy (copy-free model more accurate on them than on the rest) | **not supported**: 12/12 on CIC-IoT2023, 6/12 on EMBER, 0/12 on IDS2018 |
+
+H17 and H18 were added after H13 failed (PLAN.md amendment 2026-11-05) and were
+judged once on four datasets their quantities had never been computed on.
+
 ## Limitations
 
-- **A copy is not always a bug.** Real traffic repeats, and E9 shows the copies
-  are mostly rows any model gets right. The finding is about the benchmark: a
+- **A copy is not always a bug.** Real traffic repeats, and on KDD99 and NSL-KDD
+  E9 and E13 show the copies are mostly rows any model gets right (on IDS2018 and
+  EMBER they are not). The finding is about the benchmark: a
   test set that is mostly repeats measures little about new attacks. Both scores
   are reported.
 - **The cleaned test set is harder by construction.** E10 measures how much: a
@@ -237,9 +252,9 @@ wiring are generated.
   benchmarks, E5 scores a 200k-row test sample and trains RF/MLP on 2M rows
   (PLAN.md amendment: the full nearest-neighbour evidence would be ~10^14
   distance computations).
-- **EMBER** is scanned on leakcheck's own ~680-column numeric view, not the
-  official 2,381-dimension vector (EMBER's code is AGPL and is not used); exact
-  duplicates use a digest of every raw feature instead.
+- **EMBER** is scanned on leakcheck's own ~680-column numeric view; E11 repeats
+  the audit and the retraining on the official 2,381-dimension vectors (EMBER's
+  AGPL code, run unmodified outside this repository) and finds the same (H15).
 - **CIC-IDS2017's chronological split is confounded** with unseen attack types,
   so H3 was decided on EMBER; E12 then separates the two (time within each
   attack type costs 0.5-1.5 points).

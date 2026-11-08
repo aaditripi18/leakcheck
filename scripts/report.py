@@ -601,6 +601,15 @@ def site_data(runs: dict) -> dict:
                             for n, sm in e9.items()}
         for n in e9:
             ref(f"e9_controls:{n}")
+    e13s = {n: _e13(runs, n) for n in ("kdd99", "nslkdd", "cseids2018:no_identifiers", "ember2018_official",
+                                         "ciciot2023")}
+    if all(e13s.values()):
+        phase3["e13"] = {n: {"full_gap": _num(v["full_gap"]), "copy_free_gap": _num(v["copy_free_gap"]),
+                             "acc_leaked": _num(sum(c["copy_free"]["acc_leaked"] for c in v["cells"]) / len(v["cells"])),
+                             "acc_rest": _num(sum(c["copy_free"]["acc_rest"] for c in v["cells"]) / len(v["cells"]))}
+                         for n, v in e13s.items()}
+        for n in e13s:
+            ref(f"e13_difficulty:{n}")
     if "e12_cic_within" in runs:
         phase3["e12"] = {m: {k: _num(x) for k, x in v.items()}
                          for m, v in runs["e12_cic_within"]["results"]["summary"].items()}
@@ -732,9 +741,7 @@ def phase3_hypotheses(runs: dict) -> list[dict]:
         hs.append({"id": "H12", "text": "Some current benchmark has a single feature at >= 95% balanced accuracy",
                    "verdict": _verdict(any(x >= 0.95 for x in best.values())),
                    "evidence": ", ".join(f"{PHASE3_NAMES[n]} {pct(x)}" for n, x in best.items())})
-    hs.append({"id": "H11", "text": "On every current benchmark with >= 5% exact copies, removing leaked rows costs "
-                                    "some model >= 1 point (bootstrap interval above 0 in >= 2 of 3 seeds)",
-               "verdict": "pending", "evidence": "needs E5/E6 on the current benchmarks"})
+    hs.append(h11(runs))
     e9 = {n: runs[f"e9_controls:{n}"]["results"]["summary"] for n in E9_ORDER if f"e9_controls:{n}" in runs}
     if all(n in e9 for n in ("kdd99", "nslkdd", "uci_phishing")):
         mean = {n: sum(e9[n][m]["memorised_share"] for m in MODELS) / len(MODELS)
@@ -751,8 +758,8 @@ def phase3_hypotheses(runs: dict) -> list[dict]:
                    "verdict": _verdict(not bad),
                    "evidence": f"{len(cells) - len(bad)} of {len(cells)} (dataset, model) cells; exceptions: "
                                + (", ".join(f"{n}/{m} {pt(c['random_gap'])}" for n, m, c in bad) or "none")})
-    hs.append({"id": "H15", "text": "EMBER's conclusions hold on the official 2,381-dimension vectors",
-               "verdict": "pending", "evidence": "needs EMBER's own code, run outside this repository"})
+    hs.append(h15(runs))
+    hs += h17_h18(runs)
     d = runs.get("e12_cic_within")
     if d is not None:
         costs = {m: v["cost"] for m, v in d["results"]["summary"].items()}
@@ -761,6 +768,121 @@ def phase3_hypotheses(runs: dict) -> list[dict]:
                    "verdict": _verdict(all(c <= 0.02 for c in costs.values())),
                    "evidence": ", ".join(f"{m} {pt(c)}" for m, c in costs.items())})
     return sorted(hs, key=lambda h: int(h["id"][1:]))
+
+
+def h11(runs: dict) -> dict:
+    """H11: on every current benchmark (as distributed) with >= 5% exact copies, some model loses
+    >= 1 point when leaked rows are removed, bootstrap interval above zero in >= 2 of 3 seeds."""
+    text = ("On every current benchmark with >= 5% exact copies, removing leaked rows costs some model >= 1 point "
+            "(bootstrap interval above 0 in >= 2 of 3 seeds)")
+    cells = _cells(runs)
+    e1v = {n: _view(runs[f"e1_audit:{n}"], "all") for n in PHASE3 if f"e1_audit:{n}" in runs}
+    if len(e1v) < len(PHASE3) or not all(f"{n}|eps|0.01|lr" in cells for n in PHASE3):
+        return {"id": "H11", "text": text, "verdict": "pending", "evidence": "needs E5/E6 on the current benchmarks"}
+    eligible = [n for n, v in e1v.items() if v["f"]["L1.cross"]["value"] >= 0.05]
+    ev, ok = [], True
+    for n in eligible:
+        best = []
+        for m in ("lr", "rf", "hgb", "mlp", "hgb_tuned"):
+            c = cells.get(f"{n}|eps|0.01|{m}")
+            if c is None:
+                continue
+            above = sum(lo > 0 for lo in c["lo"])
+            best.append((c["gap_mean"] >= 0.01 and above >= 2, c["gap_mean"], above, m))
+        hit = [b for b in best if b[0]]
+        ok &= bool(hit)
+        top = max(best, key=lambda b: b[1])
+        ev.append(f"{PHASE3_NAMES[n]}: largest gap {top[3]} {pt(top[1])} (interval above 0 in {top[2]}/3 seeds); "
+                  f"{len(hit)} model(s) meet the rule")
+    skipped = [PHASE3_NAMES[n] for n in PHASE3 if n not in eligible]
+    return {"id": "H11", "text": text, "verdict": _verdict(ok if eligible else None),
+            "evidence": "; ".join(ev) + (f". Below 5% exact copies, not counted: {', '.join(skipped)}" if skipped else "")}
+
+
+def h15(runs: dict) -> dict:
+    text = "EMBER's conclusions hold on the official 2,381-dimension vectors (exact-copy rate and E2 gap within 1 point)"
+    need = ("e1_audit:ember2018", "e1_audit:ember2018_official", "e2_retrain:ember2018", "e2_retrain:ember2018_official")
+    if not all(k in runs for k in need):
+        return {"id": "H15", "text": text, "verdict": "pending", "evidence": "needs E11"}
+    a, b = (_merged(runs[f"e1_audit:{n}"])[0]["L1.cross"]["value"] for n in ("ember2018", "ember2018_official"))
+    ga, gb = (runs[f"e2_retrain:{n}"]["results"]["macro_f1_gap"] for n in ("ember2018", "ember2018_official"))
+    diffs = {m: abs(ga[m]["orig_minus_no_near"] - gb[m]["orig_minus_no_near"]) for m in MODELS}
+    ok = abs(a - b) <= 0.01 and all(d <= 0.01 for d in diffs.values())
+    return {"id": "H15", "text": text, "verdict": _verdict(ok),
+            "evidence": f"exact copies {pct(a)} (leakcheck's view) vs {pct(b)} (official); E2 gap (no_near) "
+                        + ", ".join(f"{m} {pt(ga[m]['orig_minus_no_near'])} vs {pt(gb[m]['orig_minus_no_near'])}"
+                                    for m in MODELS)
+                        + f"; largest difference {max(diffs.values()) * 100:.2f} points"}
+
+
+E13_FRESH = ["cseids2018", "cseids2018:no_identifiers", "ciciot2023", "ember2018_official"]
+
+
+def _e13(runs: dict, name: str) -> dict | None:
+    d = runs.get(f"e13_difficulty:{name}")
+    if d is None:
+        return None
+    ps = d["results"]["per_seed"]
+    cells = [v for s in ps for v in s["models"].values()]
+    return {"cells": cells, "leaked_share": sum(s["leaked_share"] for s in ps) / len(ps),
+            "full_gap": sum(c["full"]["gap"] for c in cells) / len(cells),
+            "copy_free_gap": sum(c["copy_free"]["gap"] for c in cells) / len(cells),
+            "h17": sum(c["copy_free"]["gap"] >= 0.8 * c["full"]["gap"] for c in cells),
+            "h18": sum(c["copy_free"]["acc_leaked"] > c["copy_free"]["acc_rest"] for c in cells),
+            "commit": d["git"]["commit"]}
+
+
+def h17_h18(runs: dict) -> list[dict]:
+    t17 = ("The leakage gap is difficulty, not memory: on every fresh dataset with a full-model gap >= 1 point, the "
+           "copy-free model keeps >= 80% of the gap in >= 10 of 12 cells")
+    t18 = ("Duplicated rows are easy: on every fresh dataset with >= 1% leaked rows, the copy-free model is more "
+           "accurate on the leaked rows than on the rest in >= 10 of 12 cells")
+    e = {n: _e13(runs, n) for n in E13_FRESH}
+    if any(v is None for v in e.values()):
+        return [{"id": "H17", "text": t17, "verdict": "pending", "evidence": "needs E13 on the fresh datasets"},
+                {"id": "H18", "text": t18, "verdict": "pending", "evidence": "needs E13 on the fresh datasets"}]
+    in17 = [n for n, v in e.items() if v["full_gap"] >= 0.01]
+    in18 = [n for n, v in e.items() if v["leaked_share"] >= 0.01]
+    out17 = [n for n in E13_FRESH if n not in in17]
+    return [
+        {"id": "H17", "text": t17, "verdict": _verdict(all(e[n]["h17"] >= 10 for n in in17) if in17 else None),
+         "evidence": "; ".join(f"{n}: full gap {pt(e[n]['full_gap'])}, copy-free {pt(e[n]['copy_free_gap'])}, "
+                               f"{e[n]['h17']}/12 cells" for n in in17)
+                     + (f". Full gap below 1 point, not counted: {', '.join(out17)}" if out17 else "")},
+        {"id": "H18", "text": t18, "verdict": _verdict(all(e[n]["h18"] >= 10 for n in in18) if in18 else None),
+         "evidence": "; ".join(f"{n} ({pct(e[n]['leaked_share'])} leaked): {e[n]['h18']}/12 cells" for n in in18)}]
+
+
+def e13(runs: dict) -> list[str]:
+    names = list(dict.fromkeys(n for n in E9_ORDER + E13_FRESH if f"e13_difficulty:{n}" in runs))
+    if not names:
+        return []
+    out = ["## E13: are duplicated test rows simply easy?", "",
+           "Same splits, seeds (0-2), models and copy removal as E9. *Gap* = macro-F1 on the whole test set minus "
+           "macro-F1 without the leaked rows. The *copy-free* model is trained without every training row within "
+           "eps of a leaked test row. If duplicated rows were merely easy, the copy-free model would keep the gap; "
+           "if the gap comes from memorised copies, it disappears. Means over 12 cells (4 models x 3 seeds); "
+           "`fresh` datasets judge H17/H18, `dev` ones were inspected while the method was written.", "",
+           "| Dataset | Set | Leaked rows | Gap, full model | Gap, copy-free | Copy-free acc. leaked / rest "
+           "| H17 cells | H18 cells |", "|---|---|--:|--:|--:|--:|--:|--:|"]
+    for n in names:
+        v = _e13(runs, n)
+        al = sum(c["copy_free"]["acc_leaked"] for c in v["cells"]) / len(v["cells"])
+        ar = sum(c["copy_free"]["acc_rest"] for c in v["cells"]) / len(v["cells"])
+        out.append(f"| {n} | {'fresh' if n in E13_FRESH else 'dev'} | {pct(v['leaked_share'])} | {pt(v['full_gap'])} "
+                   f"| {pt(v['copy_free_gap'])} | {al:.4f} / {ar:.4f} | {v['h17']}/12 | {v['h18']}/12 |")
+    out += ["", "Ledger lines: " + ", ".join(f"`e13_difficulty:{n}` @ `{_e13(runs, n)['commit']}`" for n in names), ""]
+    return out
+
+
+def e11(runs: dict) -> list[str]:
+    if "e2_retrain:ember2018_official" not in runs:
+        return []
+    h = h15(runs)
+    return ["## E11: EMBER on its official 2,381-dimension vectors", "",
+            "EMBER's own (AGPL) code ran unmodified outside this repository; its published 2018 model scores ROC AUC "
+            "0.996429 on the vectors, the figure EMBER reports. The audit and the retraining then ran on them.", "",
+            f"**H15 {h['verdict']}.** {h['evidence']}.", ""]
 
 
 def phase3_hypotheses_md(runs: dict) -> list[str]:
@@ -787,6 +909,8 @@ def main() -> None:
                 "## E2 on the current benchmarks")
     lines += e9_e10(runs)
     lines += e12(runs)
+    lines += e11(runs)
+    lines += e13(runs)
     lines += e2_stats(runs)
     lines += e6(runs)
     lines += e7(runs)

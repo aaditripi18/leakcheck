@@ -4,6 +4,11 @@
   "e0_kdd @ 0f452ad",
   "e0_synthetic @ 0f452ad",
   "e12_cic_within @ cdf9b4f",
+  "e13_difficulty:ciciot2023 @ be9ffcb",
+  "e13_difficulty:cseids2018:no_identifiers @ be9ffcb",
+  "e13_difficulty:ember2018_official @ be9ffcb",
+  "e13_difficulty:kdd99 @ be9ffcb",
+  "e13_difficulty:nslkdd @ be9ffcb",
   "e1_audit:cicids2017 @ 6780929",
   "e1_audit:ciciot2023 @ cdf9b4f",
   "e1_audit:cseids2018 @ f8c3a34",
@@ -150,10 +155,10 @@
    "id": "H8",
    "statement": "Conclusions do not hinge on the near-copy threshold: whether a gap is >= 1 point is the same at eps 0.003, 0.01 and 0.03 in >= 90% of dataset x model cells.",
    "verdict": "not supported",
-   "evidence": "same in 32 of 40 cells; changes: unsw_nb15/rf, unsw_nb15/hgb, unsw_nb15/hgb_tuned, cicids2017/lr, ember2018/rf, ember2018/hgb, ember2018/mlp, ember2018/hgb_tuned",
+   "evidence": "same in 46 of 55 cells; changes: unsw_nb15/rf, unsw_nb15/hgb, unsw_nb15/hgb_tuned, cicids2017/lr, ember2018/rf, ember2018/hgb, ember2018/mlp, ember2018/hgb_tuned, ciciot2023/lr",
    "numbers": {
-    "same": 32,
-    "total": 40
+    "same": 46,
+    "total": 55
    }
   },
   {
@@ -1311,8 +1316,8 @@
    {
     "id": "H11",
     "text": "On every current benchmark with >= 5% exact copies, removing leaked rows costs some model >= 1 point (bootstrap interval above 0 in >= 2 of 3 seeds)",
-    "verdict": "pending",
-    "evidence": "needs E5/E6 on the current benchmarks"
+    "verdict": "not supported",
+    "evidence": "CIC-IoT2023: largest gap lr +0.98 (interval above 0 in 3/3 seeds); 0 model(s) meet the rule. Below 5% exact copies, not counted: Edge-IIoTset (2022), CSE-CIC-IDS2018"
    },
    {
     "id": "H12",
@@ -1334,15 +1339,27 @@
    },
    {
     "id": "H15",
-    "text": "EMBER's conclusions hold on the official 2,381-dimension vectors",
-    "verdict": "pending",
-    "evidence": "needs EMBER's own code, run outside this repository"
+    "text": "EMBER's conclusions hold on the official 2,381-dimension vectors (exact-copy rate and E2 gap within 1 point)",
+    "verdict": "supported",
+    "evidence": "exact copies 0.01% (leakcheck's view) vs 0.01% (official); E2 gap (no_near) lr +2.39 vs +2.03, rf +1.47 vs +1.54, hgb +1.30 vs +1.18, mlp +1.38 vs +1.19; largest difference 0.36 points"
    },
    {
     "id": "H16",
     "text": "With every attack type seen in training, CIC-IDS2017's time split costs <= 2 points relative to the random split",
     "verdict": "supported",
     "evidence": "lr +1.54, rf +1.22, hgb +0.47, mlp +1.29"
+   },
+   {
+    "id": "H17",
+    "text": "The leakage gap is difficulty, not memory: on every fresh dataset with a full-model gap >= 1 point, the copy-free model keeps >= 80% of the gap in >= 10 of 12 cells",
+    "verdict": "not supported",
+    "evidence": "cseids2018:no_identifiers: full gap +11.67, copy-free -17.79, 0/12 cells; ember2018_official: full gap +1.48, copy-free -0.18, 0/12 cells. Full gap below 1 point, not counted: cseids2018, ciciot2023"
+   },
+   {
+    "id": "H18",
+    "text": "Duplicated rows are easy: on every fresh dataset with >= 1% leaked rows, the copy-free model is more accurate on the leaked rows than on the rest in >= 10 of 12 cells",
+    "verdict": "not supported",
+    "evidence": "cseids2018 (8.27% leaked): 0/12 cells; cseids2018:no_identifiers (87.22% leaked): 0/12 cells; ciciot2023 (64.84% leaked): 12/12 cells; ember2018_official (26.90% leaked): 6/12 cells"
    }
   ],
   "e9_e10": {
@@ -1605,6 +1622,38 @@
      "memorised_share": 0.002193,
      "correct_either_way_share": 0.997807
     }
+   }
+  },
+  "e13": {
+   "kdd99": {
+    "full_gap": 0.161085,
+    "copy_free_gap": 0.161471,
+    "acc_leaked": 0.970382,
+    "acc_rest": 0.759843
+   },
+   "nslkdd": {
+    "full_gap": 0.100402,
+    "copy_free_gap": 0.100663,
+    "acc_leaked": 0.978605,
+    "acc_rest": 0.68123
+   },
+   "cseids2018:no_identifiers": {
+    "full_gap": 0.116717,
+    "copy_free_gap": -0.177881,
+    "acc_leaked": 0.860014,
+    "acc_rest": 0.983764
+   },
+   "ember2018_official": {
+    "full_gap": 0.014768,
+    "copy_free_gap": -0.001765,
+    "acc_leaked": 0.928203,
+    "acc_rest": 0.942812
+   },
+   "ciciot2023": {
+    "full_gap": 0.002989,
+    "copy_free_gap": 0.002902,
+    "acc_leaked": 1.0,
+    "acc_rest": 0.983756
    }
   },
   "e12": {

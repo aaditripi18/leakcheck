@@ -82,12 +82,14 @@ KDD99 L1.cross by class: normal 12.69% of 60,593, attack 81.83% of 250,436
 | | Hypothesis | Verdict | Evidence |
 |---|---|---|---|
 | H10 | At least 2 of the 3 current benchmarks have >= 5% exact test copies (as distributed) | **not supported** | 1 of 3: Edge-IIoTset (2022) 0.04%, CSE-CIC-IDS2018 4.91%, CIC-IoT2023 44.26% |
-| H11 | On every current benchmark with >= 5% exact copies, removing leaked rows costs some model >= 1 point (bootstrap interval above 0 in >= 2 of 3 seeds) | **pending** | needs E5/E6 on the current benchmarks |
+| H11 | On every current benchmark with >= 5% exact copies, removing leaked rows costs some model >= 1 point (bootstrap interval above 0 in >= 2 of 3 seeds) | **not supported** | CIC-IoT2023: largest gap lr +0.98 (interval above 0 in 3/3 seeds); 0 model(s) meet the rule. Below 5% exact copies, not counted: Edge-IIoTset (2022), CSE-CIC-IDS2018 |
 | H12 | Some current benchmark has a single feature at >= 95% balanced accuracy | **supported** | Edge-IIoTset (2022) 100.00%, CSE-CIC-IDS2018 90.91%, CIC-IoT2023 99.08% |
 | H13 | More leaked rows are memorised on KDD Cup 99 and NSL-KDD than on UCI Phishing | **not supported** | kdd99 0.00%, nslkdd 0.31%, uci_phishing 3.28% (mean over the four models) |
 | H14 | Wherever the leakage gap is >= 1 point, the random-removal gap is < 0.5 | **not supported** | 14 of 23 (dataset, model) cells; exceptions: nslkdd/lr +0.58, nslkdd/rf +0.67, nslkdd/hgb +0.61, nslkdd/mlp +0.50, unsw_nb15/lr +0.67, unsw_nb15/rf +0.59, unsw_nb15/hgb +0.58, unsw_nb15/mlp +0.54, uci_phishing/lr +1.51 |
-| H15 | EMBER's conclusions hold on the official 2,381-dimension vectors | **pending** | needs EMBER's own code, run outside this repository |
+| H15 | EMBER's conclusions hold on the official 2,381-dimension vectors (exact-copy rate and E2 gap within 1 point) | **supported** | exact copies 0.01% (leakcheck's view) vs 0.01% (official); E2 gap (no_near) lr +2.39 vs +2.03, rf +1.47 vs +1.54, hgb +1.30 vs +1.18, mlp +1.38 vs +1.19; largest difference 0.36 points |
 | H16 | With every attack type seen in training, CIC-IDS2017's time split costs <= 2 points relative to the random split | **supported** | lr +1.54, rf +1.22, hgb +0.47, mlp +1.29 |
+| H17 | The leakage gap is difficulty, not memory: on every fresh dataset with a full-model gap >= 1 point, the copy-free model keeps >= 80% of the gap in >= 10 of 12 cells | **not supported** | cseids2018:no_identifiers: full gap +11.67, copy-free -17.79, 0/12 cells; ember2018_official: full gap +1.48, copy-free -0.18, 0/12 cells. Full gap below 1 point, not counted: cseids2018, ciciot2023 |
+| H18 | Duplicated rows are easy: on every fresh dataset with >= 1% leaked rows, the copy-free model is more accurate on the leaked rows than on the rest in >= 10 of 12 cells | **not supported** | cseids2018 (8.27% leaked): 0/12 cells; cseids2018:no_identifiers (87.22% leaked): 0/12 cells; ciciot2023 (64.84% leaked): 12/12 cells; ember2018_official (26.90% leaked): 6/12 cells |
 
 ## Phase 3 sources: each current benchmark checked against its publisher
 
@@ -254,6 +256,45 @@ Training rows used: 300,000; test rows: 443,841; leaked test rows: exact 0.04%, 
 | hgb | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | +0.00 | +0.00 |
 | mlp | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | 1.0000 ± 0.0000 | +0.00 | +0.00 |
 
+### cseids2018
+
+_ledger: `e2_retrain:cseids2018` @ `144475a`, 2026-11-04T06:34:49+00:00_
+
+Training rows used: 300,000; test rows: 3,246,589; leaked test rows: exact 0.58%, exact or near 8.27%.
+
+| Model | original | no_exact | no_near | leaked | gap no_exact | gap no_near |
+|---|---|---|---|---|---|---|
+| lr | 0.9488 ± 0.0002 | 0.9475 ± 0.0002 | 0.9327 ± 0.0002 | 0.9626 ± 0.0006 | +0.13 | +1.61 |
+| rf | 0.9808 ± 0.0001 | 0.9805 ± 0.0001 | 0.9740 ± 0.0001 | 0.9901 ± 0.0003 | +0.03 | +0.69 |
+| hgb | 0.9835 ± 0.0004 | 0.9832 ± 0.0004 | 0.9773 ± 0.0006 | 0.9929 ± 0.0001 | +0.03 | +0.62 |
+| mlp | 0.9812 ± 0.0001 | 0.9807 ± 0.0002 | 0.9761 ± 0.0003 | 0.9813 ± 0.0004 | +0.04 | +0.50 |
+
+### ciciot2023
+
+_ledger: `e2_retrain:ciciot2023` @ `0723f17`, 2026-11-04T18:41:51+00:00_
+
+Training rows used: 300,000; test rows: 9,337,316; leaked test rows: exact 7.48%, exact or near 64.83%.
+
+| Model | original | no_exact | no_near | leaked | gap no_exact | gap no_near |
+|---|---|---|---|---|---|---|
+| lr | 0.8944 ± 0.0006 | 0.8942 ± 0.0006 | 0.8891 ± 0.0006 | 0.5000 ± 0.0000 | +0.02 | +0.54 |
+| rf | 0.9673 ± 0.0006 | 0.9672 ± 0.0006 | 0.9658 ± 0.0006 | 1.0000 ± 0.0000 | +0.01 | +0.15 |
+| hgb | 0.9573 ± 0.0010 | 0.9572 ± 0.0010 | 0.9553 ± 0.0011 | 1.0000 ± 0.0000 | +0.01 | +0.20 |
+| mlp | 0.9369 ± 0.0004 | 0.9368 ± 0.0004 | 0.9339 ± 0.0005 | 0.8000 ± 0.2739 | +0.01 | +0.30 |
+
+### cseids2018:no_identifiers
+
+_ledger: `e2_retrain:cseids2018:no_identifiers` @ `0723f17`, 2026-11-04T09:56:58+00:00_
+
+Training rows used: 300,000; test rows: 3,246,589; leaked test rows: exact 22.25%, exact or near 87.20%.
+
+| Model | original | no_exact | no_near | leaked | gap no_exact | gap no_near |
+|---|---|---|---|---|---|---|
+| lr | 0.9253 ± 0.0005 | 0.9260 ± 0.0007 | 0.7169 ± 0.0024 | 0.9306 ± 0.0006 | -0.07 | +20.84 |
+| rf | 0.9776 ± 0.0002 | 0.9778 ± 0.0003 | 0.8964 ± 0.0028 | 0.9795 ± 0.0002 | -0.02 | +8.12 |
+| hgb | 0.9807 ± 0.0001 | 0.9807 ± 0.0002 | 0.8934 ± 0.0031 | 0.9829 ± 0.0001 | -0.01 | +8.73 |
+| mlp | 0.9775 ± 0.0002 | 0.9763 ± 0.0002 | 0.8909 ± 0.0033 | 0.9795 ± 0.0002 | +0.12 | +8.66 |
+
 ### edgeiiot:no_identifiers
 
 _ledger: `e2_retrain:edgeiiot:no_identifiers` @ `b73762d`, 2026-11-02T14:02:52+00:00_
@@ -329,6 +370,35 @@ Every label's earliest 80% of flows train and its latest 20% test, so every test
 | hgb | 0.9985 | 0.9938 | +0.47 |
 | mlp | 0.9964 | 0.9835 | +1.29 |
 
+## E11: EMBER on its official 2,381-dimension vectors
+
+EMBER's own (AGPL) code ran unmodified outside this repository; its published 2018 model scores ROC AUC 0.996429 on the vectors, the figure EMBER reports. The audit and the retraining then ran on them.
+
+**H15 supported.** exact copies 0.01% (leakcheck's view) vs 0.01% (official); E2 gap (no_near) lr +2.39 vs +2.03, rf +1.47 vs +1.54, hgb +1.30 vs +1.18, mlp +1.38 vs +1.19; largest difference 0.36 points.
+
+## E13: are duplicated test rows simply easy?
+
+Same splits, seeds (0-2), models and copy removal as E9. *Gap* = macro-F1 on the whole test set minus macro-F1 without the leaked rows. The *copy-free* model is trained without every training row within eps of a leaked test row. If duplicated rows were merely easy, the copy-free model would keep the gap; if the gap comes from memorised copies, it disappears. Means over 12 cells (4 models x 3 seeds); `fresh` datasets judge H17/H18, `dev` ones were inspected while the method was written.
+
+| Dataset | Set | Leaked rows | Gap, full model | Gap, copy-free | Copy-free acc. leaked / rest | H17 cells | H18 cells |
+|---|---|--:|--:|--:|--:|--:|--:|
+| kdd99 | dev | 78.01% | +16.11 | +16.15 | 0.9704 / 0.7598 | 12/12 | 12/12 |
+| nslkdd | dev | 33.07% | +10.04 | +10.07 | 0.9786 / 0.6812 | 12/12 | 12/12 |
+| unsw_nb15 | dev | 17.89% | +1.40 | +1.51 | 0.9431 / 0.8443 | 12/12 | 12/12 |
+| cicids2017 | dev | 66.91% | -0.17 | -6.00 | 0.9458 / 0.9974 | 0/12 | 0/12 |
+| ember2018 | dev | 23.61% | +1.64 | -0.79 | 0.8785 / 0.9224 | 0/12 | 2/12 |
+| uci_phishing | dev | 65.14% | +1.53 | -0.13 | 0.9390 / 0.9418 | 2/12 | 5/12 |
+| phiusiil | dev | 4.43% | +0.00 | +0.00 | 1.0000 / 0.9999 | 8/12 | 9/12 |
+| sms_spam | dev | 14.14% | +3.00 | +2.01 | 0.9625 / 0.9729 | 1/12 | 3/12 |
+| edgeiiot | dev | 0.04% | +0.00 | +0.00 | 1.0000 / 1.0000 | 12/12 | 0/12 |
+| edgeiiot:no_identifiers | dev | 44.28% | +0.00 | -0.03 | 0.9995 / 1.0000 | 9/12 | 0/12 |
+| cseids2018 | fresh | 8.27% | +0.85 | -1.91 | 0.8032 / 0.9820 | 0/12 | 0/12 |
+| cseids2018:no_identifiers | fresh | 87.22% | +11.67 | -17.79 | 0.8600 / 0.9838 | 0/12 | 0/12 |
+| ciciot2023 | fresh | 64.84% | +0.30 | +0.29 | 1.0000 / 0.9838 | 12/12 | 12/12 |
+| ember2018_official | fresh | 26.90% | +1.48 | -0.18 | 0.9282 / 0.9428 | 0/12 | 6/12 |
+
+Ledger lines: `e13_difficulty:kdd99` @ `be9ffcb`, `e13_difficulty:nslkdd` @ `be9ffcb`, `e13_difficulty:unsw_nb15` @ `be9ffcb`, `e13_difficulty:cicids2017` @ `be9ffcb`, `e13_difficulty:ember2018` @ `be9ffcb`, `e13_difficulty:uci_phishing` @ `68eb06d`, `e13_difficulty:phiusiil` @ `be9ffcb`, `e13_difficulty:sms_spam` @ `be9ffcb`, `e13_difficulty:edgeiiot` @ `be9ffcb`, `e13_difficulty:edgeiiot:no_identifiers` @ `be9ffcb`, `e13_difficulty:cseids2018` @ `be9ffcb`, `e13_difficulty:cseids2018:no_identifiers` @ `be9ffcb`, `e13_difficulty:ciciot2023` @ `be9ffcb`, `e13_difficulty:ember2018_official` @ `be9ffcb`
+
 ## E2 uncertainty (post hoc)
 
 _ledger: `e2_stats` @ `347deca`, 2026-10-16T10:10:47+00:00_
@@ -385,7 +455,7 @@ H4, paired by seed: LR gap minus HistGB gap (macro-F1 points), 95% t interval.
 
 ## E5/E6: uncapped and tuned models, threshold sweeps, bootstrap intervals
 
-_ledger: `e6_analysis` @ `112f619`, 2026-10-17T01:34:28+00:00_
+_ledger: `e6_analysis` @ `af74939`, 2026-11-08T06:21:54+00:00_
 
 Full training sets (no cap), 3 seeds, plus `hgb_tuned` (randomised search, PLAN.md phase 2). Macro-F1 gap original - clean in points, mean over seeds; the bracket is the range of the seeds' 95% bootstrap intervals (1,000 resamples over test rows).
 
@@ -429,7 +499,7 @@ Full training sets (no cap), 3 seeds, plus `hgb_tuned` (randomised search, PLAN.
 |---|---|---|---|
 | H6 | Tuning and full training data do not remove the leakage gap (tuned HistGB loses >= 5 macro-F1 points on KDD99 and NSL-KDD). | **supported** | kdd99: tuned HistGB loses +22.16 (interval above 5 points in 3/3 seeds); nslkdd: tuned HistGB loses +8.63 (interval above 5 points in 3/3 seeds) |
 | H7 | LR's leakage gap exceeds tuned HistGB's, with a bootstrap interval above zero, on at least 3 of the 4 large benchmarks. | **supported** | kdd99: LR - tuned HistGB +3.43, interval above zero in 3/3 seeds; nslkdd: LR - tuned HistGB +3.23, interval above zero in 3/3 seeds; unsw_nb15: LR - tuned HistGB +0.98, interval above zero in 3/3 seeds; ember2018: LR - tuned HistGB +1.50, interval above zero in 3/3 seeds |
-| H8 | Conclusions do not hinge on the near-copy threshold: whether a gap is >= 1 point is the same at eps 0.003, 0.01 and 0.03 in >= 90% of dataset x model cells. | **not supported** | same in 32 of 40 cells; changes: unsw_nb15/rf, unsw_nb15/hgb, unsw_nb15/hgb_tuned, cicids2017/lr, ember2018/rf, ember2018/hgb, ember2018/mlp, ember2018/hgb_tuned |
+| H8 | Conclusions do not hinge on the near-copy threshold: whether a gap is >= 1 point is the same at eps 0.003, 0.01 and 0.03 in >= 90% of dataset x model cells. | **not supported** | same in 46 of 55 cells; changes: unsw_nb15/rf, unsw_nb15/hgb, unsw_nb15/hgb_tuned, cicids2017/lr, ember2018/rf, ember2018/hgb, ember2018/mlp, ember2018/hgb_tuned, ciciot2023/lr |
 | H9 | On network-intrusion data too, a chronological split costs more accuracy than removing near-copies (raw UNSW-NB15, every attack family on both sides). | **not supported** | chronological drop > no_near drop for 0 of 5 models: lr +0.15 vs +6.46, rf +0.48 vs +4.26, hgb +0.33 vs +4.43, mlp +0.31 vs +5.03, hgb_tuned +0.39 vs +4.38 |
 
 ## E7: raw UNSW-NB15, chronological split (PLAN.md, phase 2)

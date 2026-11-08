@@ -315,9 +315,9 @@
   </div>
   <p class="font-body-sm text-body-sm text-on-surface-variant">A timestamp, flow ID or port makes nearly every row unique, so a duplicate check on the files as shipped sees little. Without the columns leakcheck's identifier check flags (a view added after the first run), the repeats show. Edge-IIoTset (2022): the authors' own release. CSE-CIC-IDS2018: byte-identical to the official S3 objects; label counts equal the published table. CIC-IoT2023: label counts equal the published table.</p>
   <div class="grid grid-cols-1 md:grid-cols-3 gap-space-md"><div class="p-space-md bg-surface-container-low border border-surface-container-high flex flex-col gap-space-xs">
-  <span class="sec-label text-on-surface-variant">Copies are easy, not memorised</span>
-  <span class="font-mono-data-lg text-[32px] leading-tight text-on-surface font-bold tabular">97%</span>
-  <span class="font-body-sm text-body-sm text-on-surface-variant">of KDD Cup 99&#x27;s copied test rows are still predicted correctly by a model trained without any copy (E9).</span>
+  <span class="sec-label text-on-surface-variant">Easy on KDD99, memorised on IDS2018</span>
+  <span class="font-mono-data-lg text-[32px] leading-tight text-on-surface font-bold tabular">+11.7 → -17.8 pts</span>
+  <span class="font-body-sm text-body-sm text-on-surface-variant">is CSE-CIC-IDS2018&#x27;s leakage gap for a model trained without the copies: it vanishes, so the copies were memorised. On KDD Cup 99 it stays (+16.1 → +16.1): easy rows (E13).</span>
 </div><div class="p-space-md bg-surface-container-low border border-surface-container-high flex flex-col gap-space-xs">
   <span class="sec-label text-on-surface-variant">Most of a gap is which rows go</span>
   <span class="font-mono-data-lg text-[32px] leading-tight text-on-surface font-bold tabular">0.5–0.7 pts</span>
@@ -332,7 +332,7 @@
 <section class="flex flex-col gap-space-md">
   <div id="hypotheses" class="scroll-mt-20">
   <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">06</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">Pre-registered</span></div>
-  <h2 class="font-headline-md text-headline-md text-on-surface mt-1">16 hypotheses, decided by rules fixed before the runs</h2>
+  <h2 class="font-headline-md text-headline-md text-on-surface mt-1">18 hypotheses, decided by rules fixed before the runs</h2>
 </div>
   <div class="flex flex-col border border-surface-container-high divide-y divide-surface-container-high bg-surface"><div class="p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-sm hover:bg-surface-container-low transition-colors">
   <div class="flex items-start gap-space-md max-w-3xl">
@@ -402,7 +402,7 @@
     <span class="font-mono-data-md text-mono-data-md font-bold text-on-surface bg-surface-container px-2 py-0.5">H8</span>
     <div class="flex flex-col">
       <span class="font-body-md text-body-md font-medium text-on-surface">Whether a gap clears one point does not depend on the near-copy threshold.</span>
-      <span class="font-mono-data-sm text-mono-data-sm text-secondary mt-0.5">The same in 32 of 40 cells; every change is a gap near one point. The large gaps hold at every threshold.</span>
+      <span class="font-mono-data-sm text-mono-data-sm text-secondary mt-0.5">The same in 46 of 55 cells; every change is a gap near one point. The large gaps hold at every threshold.</span>
     </div>
   </div>
   <div class="self-start md:self-center shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 font-mono-data-sm text-mono-data-sm font-semibold bg-surface-container-high text-secondary border border-outline-variant">NOT SUPPORTED</span></div>
@@ -429,10 +429,10 @@
     <span class="font-mono-data-md text-mono-data-md font-bold text-on-surface bg-surface-container px-2 py-0.5">H11</span>
     <div class="flex flex-col">
       <span class="font-body-md text-body-md font-medium text-on-surface">On every current benchmark with &gt;= 5% exact copies, removing leaked rows costs some model &gt;= 1 point (bootstrap interval above 0 in &gt;= 2 of 3 seeds)</span>
-      <span class="font-mono-data-sm text-mono-data-sm text-secondary mt-0.5">needs E5/E6 on the current benchmarks</span>
+      <span class="font-mono-data-sm text-mono-data-sm text-secondary mt-0.5">CIC-IoT2023: largest gap lr +0.98 (interval above 0 in 3/3 seeds); 0 model(s) meet the rule. Below 5% exact copies, not counted: Edge-IIoTset (2022), CSE-CIC-IDS2018</span>
     </div>
   </div>
-  <div class="self-start md:self-center shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 font-mono-data-sm text-mono-data-sm font-semibold bg-surface-container-high text-secondary border border-outline-variant">PENDING</span></div>
+  <div class="self-start md:self-center shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 font-mono-data-sm text-mono-data-sm font-semibold bg-surface-container-high text-secondary border border-outline-variant">NOT SUPPORTED</span></div>
 </div><div class="p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-sm hover:bg-surface-container-low transition-colors">
   <div class="flex items-start gap-space-md max-w-3xl">
     <span class="font-mono-data-md text-mono-data-md font-bold text-on-surface bg-surface-container px-2 py-0.5">H12</span>
@@ -464,11 +464,11 @@
   <div class="flex items-start gap-space-md max-w-3xl">
     <span class="font-mono-data-md text-mono-data-md font-bold text-on-surface bg-surface-container px-2 py-0.5">H15</span>
     <div class="flex flex-col">
-      <span class="font-body-md text-body-md font-medium text-on-surface">EMBER&#x27;s conclusions hold on the official 2,381-dimension vectors</span>
-      <span class="font-mono-data-sm text-mono-data-sm text-secondary mt-0.5">needs EMBER&#x27;s own code, run outside this repository</span>
+      <span class="font-body-md text-body-md font-medium text-on-surface">EMBER&#x27;s conclusions hold on the official 2,381-dimension vectors (exact-copy rate and E2 gap within 1 point)</span>
+      <span class="font-mono-data-sm text-mono-data-sm text-secondary mt-0.5">exact copies 0.01% (leakcheck&#x27;s view) vs 0.01% (official); E2 gap (no_near) lr +2.39 vs +2.03, rf +1.47 vs +1.54, hgb +1.30 vs +1.18, mlp +1.38 vs +1.19; largest difference 0.36 points</span>
     </div>
   </div>
-  <div class="self-start md:self-center shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 font-mono-data-sm text-mono-data-sm font-semibold bg-surface-container-high text-secondary border border-outline-variant">PENDING</span></div>
+  <div class="self-start md:self-center shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 font-mono-data-sm text-mono-data-sm font-semibold bg-success/10 text-success border border-success/30">SUPPORTED</span></div>
 </div><div class="p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-sm hover:bg-surface-container-low transition-colors">
   <div class="flex items-start gap-space-md max-w-3xl">
     <span class="font-mono-data-md text-mono-data-md font-bold text-on-surface bg-surface-container px-2 py-0.5">H16</span>
@@ -478,6 +478,24 @@
     </div>
   </div>
   <div class="self-start md:self-center shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 font-mono-data-sm text-mono-data-sm font-semibold bg-success/10 text-success border border-success/30">SUPPORTED</span></div>
+</div><div class="p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-sm hover:bg-surface-container-low transition-colors">
+  <div class="flex items-start gap-space-md max-w-3xl">
+    <span class="font-mono-data-md text-mono-data-md font-bold text-on-surface bg-surface-container px-2 py-0.5">H17</span>
+    <div class="flex flex-col">
+      <span class="font-body-md text-body-md font-medium text-on-surface">The leakage gap is difficulty, not memory: on every fresh dataset with a full-model gap &gt;= 1 point, the copy-free model keeps &gt;= 80% of the gap in &gt;= 10 of 12 cells</span>
+      <span class="font-mono-data-sm text-mono-data-sm text-secondary mt-0.5">cseids2018:no_identifiers: full gap +11.67, copy-free -17.79, 0/12 cells; ember2018_official: full gap +1.48, copy-free -0.18, 0/12 cells. Full gap below 1 point, not counted: cseids2018, ciciot2023</span>
+    </div>
+  </div>
+  <div class="self-start md:self-center shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 font-mono-data-sm text-mono-data-sm font-semibold bg-surface-container-high text-secondary border border-outline-variant">NOT SUPPORTED</span></div>
+</div><div class="p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-sm hover:bg-surface-container-low transition-colors">
+  <div class="flex items-start gap-space-md max-w-3xl">
+    <span class="font-mono-data-md text-mono-data-md font-bold text-on-surface bg-surface-container px-2 py-0.5">H18</span>
+    <div class="flex flex-col">
+      <span class="font-body-md text-body-md font-medium text-on-surface">Duplicated rows are easy: on every fresh dataset with &gt;= 1% leaked rows, the copy-free model is more accurate on the leaked rows than on the rest in &gt;= 10 of 12 cells</span>
+      <span class="font-mono-data-sm text-mono-data-sm text-secondary mt-0.5">cseids2018 (8.27% leaked): 0/12 cells; cseids2018:no_identifiers (87.22% leaked): 0/12 cells; ciciot2023 (64.84% leaked): 12/12 cells; ember2018_official (26.90% leaked): 6/12 cells</span>
+    </div>
+  </div>
+  <div class="self-start md:self-center shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 font-mono-data-sm text-mono-data-sm font-semibold bg-surface-container-high text-secondary border border-outline-variant">NOT SUPPORTED</span></div>
 </div></div>
   <p class="font-mono-data-sm text-mono-data-sm text-secondary">Each decision rule was committed to <a class="underline underline-offset-2 hover:text-on-surface" href="https://github.com/aaditripi18/leakcheck/blob/main/PLAN.md" rel="noopener noreferrer">PLAN.md</a> before the experiment it judges was run.</p>
 </section>
@@ -491,7 +509,7 @@
   <div class="flex flex-col gap-space-xs">
     <span class="font-mono-data-sm text-mono-data-sm text-primary font-semibold">FINDING 01</span>
     <h3 class="font-headline-sm text-headline-sm text-on-surface">Copying is not the same as inflation.</h3>
-    <p class="font-body-md text-body-md text-on-surface-variant mt-2">UCI Phishing copies about as much as KDD Cup 99 (64.4% vs 68.4% of test rows) but loses only 1.5 macro-F1 points when the copies go, against 17.5 for KDD Cup 99. Retrained without any copy, models still get 97% of KDD Cup 99&#x27;s copied rows right: the copies are easy rows, not memorised ones. What they do is fill the test set; remove them and what is left is the hard part. 73% of KDD Cup 99&#x27;s gap comes from near-copies rather than exact ones.</p>
+    <p class="font-body-md text-body-md text-on-surface-variant mt-2">UCI Phishing copies about as much as KDD Cup 99 (64.4% vs 68.4% of test rows) but loses only 1.5 macro-F1 points when the copies go, against 17.5 for KDD Cup 99. Retrained without any copy, models still get 97% of KDD Cup 99&#x27;s copied rows right: there the copies are easy rows; remove them and what is left is the hard part. On CSE-CIC-IDS2018 the same test fails: a model that never saw the copies is less accurate on the copied rows (86%) than on the rest (98%), so its 11.7-point gap is memorised copies (E13). 73% of KDD Cup 99&#x27;s gap comes from near-copies rather than exact ones.</p>
   </div>
   <div class="mt-space-md pt-space-xs border-t border-surface-container-high font-mono-data-sm text-mono-data-sm text-secondary">Logistic regression: KDD99 −17.5 vs UCI −1.5</div>
 </div><div class="p-space-lg bg-surface-container-low border border-surface-container-high flex flex-col justify-between">
@@ -609,7 +627,7 @@ python -m experiments.e4_ablation phiusiil cicids2017
 python scripts/report.py</pre>
     <div class="mt-space-md pt-space-sm border-t border-[#2f312f] flex flex-col md:flex-row md:items-center justify-between gap-1 font-mono-data-sm text-mono-data-sm text-[#8c8c88]">
       <span>Every run appends a line to an append-only ledger; this page is generated from it.</span>
-      <span class="text-white font-medium">35 ledger lines behind this page</span>
+      <span class="text-white font-medium">40 ledger lines behind this page</span>
     </div>
   </div>
 </section>
@@ -641,7 +659,7 @@ python scripts/report.py</pre>
   </div>
   <div class="max-w-[1100px] mx-auto px-margin-mobile md:px-gutter mt-space-lg pt-space-md border-t border-surface-container-highest flex flex-col sm:flex-row gap-space-xs justify-between text-on-surface-variant font-mono-data-sm text-mono-data-sm">
     <span>Every number on this site is generated from <code>results/ledger.jsonl</code>.</span>
-    <span>Generated 2026-11-03</span>
+    <span>Generated 2026-11-08</span>
   </div>
 </footer>
 <script src="assets/site.js"></script>

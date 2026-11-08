@@ -471,7 +471,7 @@ single features separate attack from normal traffic perfectly (MQTT fields and
 different protocols; not verified further). There is no score left for leakage to inflate; like
 PhiUSIIL (section 19), it cannot rank models.
 
-## 25. E9: the copies are easy, not memorised (H13 not supported)
+## 25. E9: the copies are easy, not memorised (H13 not supported; E13, §30, qualifies this)
 
 For every dataset, model and seed, a second model was trained without every
 training row within eps of a leaked test row (exact copies by hash; near ones by
@@ -512,6 +512,55 @@ never appear in training. Splitting by time *within* each label, every test
 label is seen in training, and the cost against a random split is 0.5-1.5
 points (LR 97.1 -> 95.5, HGB 99.9 -> 99.4). **H16 supported**: time is not what
 broke the models; novelty was.
+
+## 28. E11: EMBER on its official vectors says the same (H15 supported)
+
+EMBER's own code (AGPL, elastic/ember @ d97a0b5) ran unmodified in a separate
+environment outside this repository; the vectors were accepted only once EMBER's
+published 2018 model scored ROC AUC 0.996429 on them, the figure EMBER reports.
+On the official 2,381-dimension vectors the exact-copy rate is the same 0.009%
+as on leakcheck's own view, and the E2 gaps (no_near) are LR 2.03 vs 2.39, RF
+1.54 vs 1.47, HGB 1.18 vs 1.30, MLP 1.19 vs 1.38 points: **H15 supported**, the
+largest difference 0.36 points. The limitation "EMBER was scanned on our own
+view" is now a measurement.
+
+## 29. H11 not supported, by 0.02 points
+
+Of the three current benchmarks only CIC-IoT2023 has >= 5% exact copies as
+distributed (IDS2018 4.91%, Edge-IIoTset 0.04%). On it, E5/E6 (full training
+data, tuned HistGB, every prediction saved, paired bootstrap) give a largest
+gap of 0.98 macro-F1 points (LR), with the interval above zero in 3 of 3 seeds:
+real, but under the 1-point bar. CIC-IoT2023's 44% copies cost little because
+its models are near-perfect either way (E13: the copy-free model gets every
+leaked row right). **H11 not supported**, reported as measured.
+
+## 30. E13: copies are easy on the old benchmarks, memorised on the new ones (H17, H18 not supported)
+
+H13's failure (§25) suggested the leakage gap might be *difficulty*: duplicated
+rows are easy, so removing them makes any test harder. E13 tests that directly.
+The copy-free model (trained without every training copy of a leaked row) is
+scored on the whole test set and without the leaked rows. If the rows are just
+easy, it keeps the gap; if the score came from the copies, the gap disappears.
+
+| Dataset | Set | Gap, full model | Gap, copy-free | Copy-free acc. leaked / rest |
+|---|---|--:|--:|--:|
+| KDD Cup 99 | dev | +16.11 | +16.15 | 0.970 / 0.760 |
+| NSL-KDD | dev | +10.04 | +10.07 | 0.979 / 0.681 |
+| CSE-CIC-IDS2018, no identifiers | fresh | +11.67 | **-17.79** | 0.860 / 0.984 |
+| EMBER, official vectors | fresh | +1.48 | **-0.18** | 0.928 / 0.943 |
+| CIC-IoT2023 | fresh | +0.30 | +0.29 | 1.000 / 0.984 |
+
+(Every dataset is in docs/RESULTS.md.) **H17 not supported**: on both fresh
+datasets with a gap of 1 point or more, the copy-free model keeps 80% of it in
+0 of 12 cells. **H18 not supported**: the copy-free model is more accurate on the
+leaked rows in 12/12 cells on CIC-IoT2023, 6/12 on EMBER and 0/12 on IDS2018.
+
+The two failures together are the finding. On KDD99 and NSL-KDD the copies are
+easy rows (the explanation §25 gave stands there). On CSE-CIC-IDS2018 the
+copied rows are *harder* than the rest for a model that never saw them (86% vs
+98% accuracy), so its 11.7-point gap is the copies being memorised, not easy
+rows being removed. The difficulty explanation, the strongest objection to the
+leakage gap, holds on the 1999 benchmarks and fails on the current ones.
 
 ## Open items before any of this is published
 

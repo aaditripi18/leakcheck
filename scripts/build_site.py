@@ -407,14 +407,18 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
     p3 = d.get("phase3", {})
     p3e = p3.get("e9_e10", {})
     p3_kdd_either = min(v["correct_either_way_share"] for v in p3e["kdd99"].values())
+    e13 = p3["e13"]
     p3_e12 = [v["cost"] * 100 for v in p3["e12"].values()]
     p3_e12_lo, p3_e12_hi = min(p3_e12), max(p3_e12)
     findings = [
         ("Copying is not the same as inflation.",
          f"UCI Phishing copies about as much as KDD Cup 99 ({fpct(uci['exact_copies'])} vs {fpct(kdd['exact_copies'])} of test rows) "
          f"but loses only {fpt(uci_gap)} macro-F1 points when the copies go, against {fpt(kdd_gap)} for KDD Cup 99. "
-         f"Retrained without any copy, models still get {p3_kdd_either * 100:.0f}% of KDD Cup 99's copied rows right: the copies are "
-         "easy rows, not memorised ones. What they do is fill the test set; remove them and what is left is the hard part. "
+         f"Retrained without any copy, models still get {p3_kdd_either * 100:.0f}% of KDD Cup 99's copied rows right: there the copies are "
+         "easy rows; remove them and what is left is the hard part. On CSE-CIC-IDS2018 the same test fails: a model that never saw "
+         f"the copies is less accurate on the copied rows ({e13['cseids2018:no_identifiers']['acc_leaked'] * 100:.0f}%) than on the rest "
+         f"({e13['cseids2018:no_identifiers']['acc_rest'] * 100:.0f}%), so its {e13['cseids2018:no_identifiers']['full_gap'] * 100:.1f}-point "
+         "gap is memorised copies (E13). "
          f"{near_share * 100:.0f}% of KDD Cup 99's gap comes from near-copies rather than exact ones.",
          f"Logistic regression: KDD99 −{fpt(kdd_gap)} vs UCI −{fpt(uci_gap)}"),
         ("The control comes back clean.",
@@ -444,9 +448,10 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
     p3_verified = " ".join(f"{x['name']}: {x['verified']}." for x in p3["datasets"])
     nsl = p3e["nslkdd"]
     p3_cards_data = [
-        ("Copies are easy, not memorised",
-         f"{p3_kdd_either * 100:.0f}%",
-         "of KDD Cup 99's copied test rows are still predicted correctly by a model trained without any copy (E9)."),
+        ("Easy on KDD99, memorised on IDS2018",
+         f"{e13['cseids2018:no_identifiers']['full_gap'] * 100:+.1f} → {e13['cseids2018:no_identifiers']['copy_free_gap'] * 100:+.1f} pts",
+         "is CSE-CIC-IDS2018's leakage gap for a model trained without the copies: it vanishes, so the copies were memorised. "
+         f"On KDD Cup 99 it stays ({e13['kdd99']['full_gap'] * 100:+.1f} → {e13['kdd99']['copy_free_gap'] * 100:+.1f}): easy rows (E13)."),
         ("Most of a gap is which rows go",
          f"{min(v['random_gap'] for v in nsl.values()) * 100:.1f}–{max(v['random_gap'] for v in nsl.values()) * 100:.1f} pts",
          f"is what removing a random subset of the same size costs on NSL-KDD, against "
