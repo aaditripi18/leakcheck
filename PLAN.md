@@ -439,3 +439,26 @@ are easy even without their copies.
   neighbour-vote accuracy of each, and the verdict H19's frozen threshold gives ("leaked rows
   look easy" or "look memorised"), stating that the threshold was fixed on the eight dev
   cases and how it fared on the fresh ones.
+
+**Sourcing note (2026-11-09, before any leakage number on these files).** Fetched and pinned
+in data/registry.json (`ton_iot`, `botiot`, `xiiotid`), with the checks in each entry:
+
+- *TON_IoT* (the authors' OneDrive share): train_test_network.csv and the seven
+  Train_Test_IoT files. Every attack-class count matches the authors' statistics tables; the
+  normal class does not (15,000 rows per device file where the table says 35,000; 50,000 in
+  the network file where it says 300,000), so the amendment's rule is met for the attack
+  classes only. The files are used as distributed: they are the authors' own current
+  release, and the network file is byte-identical to an independent upload. This is stated
+  wherever their results appear.
+- *BoT-IoT* (the authors' OneDrive share): the 5% 10-best Training and Testing files, whose
+  normal and attack totals (477; 3,668,045) equal those of the paper's 10-best confusion
+  matrices.
+- *X-IIoTID* (its first author's Kaggle upload): 820,834 rows and 68 columns, as published.
+
+Fixed now, for every fresh case: the label is the dataset's multi-class attack type (`type`,
+`category`, `class1`; H20 concerns rare classes), and the other label columns are excluded
+(`label`; `attack`, `subcategory`; `class2`, `class3`). Splits: BoT-IoT's official files; the
+others stratified random 80/20 by that label, seed 0 (seeds 0-2 in E14, as E13). Views: as
+distributed, and without identifiers where the L5 identifier check flags columns. This gives
+19 fresh cases: ton_network and the seven ton_<device> files in both views, botiot (no column
+flagged, one view), xiiotid in both views.

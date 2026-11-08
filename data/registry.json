@@ -1380,5 +1380,101 @@
         "url": "kaggle datasets download madhavmalhotra/unb-cic-iot-dataset -f \"wataiData/csv/CICIoT2023/part-00168-363d1ba3-8ab5-4f96-bc25-4d5862db7cb9-c000.csv\""
       }
     ]
+  },
+  "ton_iot": {
+    "description": "TON_IoT Train_Test_datasets: train_test_network.csv (211,043 rows) and the seven Train_Test_IoT_<device>.csv files (31,106-39,944 rows each)",
+    "source": "The authors' public OneDrive share linked from https://research.unsw.edu.au/projects/toniot-datasets (folder Train_Test_datasets); downloaded 2026-11-09",
+    "provenance": "Checked against the authors' 'Statistics of IoT Records' and 'Statistics of Network Records' (folder Description_stats_datasets): every attack class count matches in all eight files; the normal class does not: the files hold 15,000 normal rows per device (table: 35,000) and 50,000 in the network file (table: 300,000). The network file is byte-identical (SHA-256) to the independent upload codymlewis/TON_IoT_network on Hugging Face. Used as distributed (PLAN.md sourcing note 2026-11-09).",
+    "citation": "N. Moustafa, A new distributed architecture for evaluating AI-based security systems at the edge: Network TON_IoT datasets, Sustainable Cities and Society 72 (2021); A. Alsaedi et al., TON_IoT telemetry dataset, IEEE Access 8 (2020)",
+    "licence": "Free use for academic research; commercial use needs the author's permission; not redistributed here",
+    "manual_download": true,
+    "files": [
+      {
+        "path": "ton_iot/train_test_network.csv",
+        "sha256": "26ddc513552de36de6428b2e578efaed2b57504c716dfba847cc0109a64e1974",
+        "bytes": 29902775,
+        "url": "https://unsw-my.sharepoint.com/:f:/g/personal/z5025758_ad_unsw_edu_au/EvBTaetotpdGnW7rJQ8fCvYBh8063CNeY9W33MpRsarJaQ (folder Train_Test_datasets)"
+      },
+      {
+        "path": "ton_iot/Train_Test_IoT_Fridge.csv",
+        "sha256": "56377a00b97204ea65f8912eadea9e626fe05d091f975f5be64c94c85efe3149",
+        "bytes": 1678744,
+        "url": "https://unsw-my.sharepoint.com/:f:/g/personal/z5025758_ad_unsw_edu_au/EvBTaetotpdGnW7rJQ8fCvYBh8063CNeY9W33MpRsarJaQ (folder Train_Test_datasets)"
+      },
+      {
+        "path": "ton_iot/Train_Test_IoT_Garage_Door.csv",
+        "sha256": "44b2d63f233ed239d604815f53e2b2ba6ec2b9bc604a9f6fbed6b98d55e53188",
+        "bytes": 1739414,
+        "url": "https://unsw-my.sharepoint.com/:f:/g/personal/z5025758_ad_unsw_edu_au/EvBTaetotpdGnW7rJQ8fCvYBh8063CNeY9W33MpRsarJaQ (folder Train_Test_datasets)"
+      },
+      {
+        "path": "ton_iot/Train_Test_IoT_GPS_Tracker.csv",
+        "sha256": "71c6cc302b14822aea699cf41a02dad36089ea59b87a28000b38a44b2d23cb9b",
+        "bytes": 2122967,
+        "url": "https://unsw-my.sharepoint.com/:f:/g/personal/z5025758_ad_unsw_edu_au/EvBTaetotpdGnW7rJQ8fCvYBh8063CNeY9W33MpRsarJaQ (folder Train_Test_datasets)"
+      },
+      {
+        "path": "ton_iot/Train_Test_IoT_Modbus.csv",
+        "sha256": "78345a857244e671b0c255ca65aac619049632448fc5aa736f1cea255f308cbb",
+        "bytes": 1694191,
+        "url": "https://unsw-my.sharepoint.com/:f:/g/personal/z5025758_ad_unsw_edu_au/EvBTaetotpdGnW7rJQ8fCvYBh8063CNeY9W33MpRsarJaQ (folder Train_Test_datasets)"
+      },
+      {
+        "path": "ton_iot/Train_Test_IoT_Motion_Light.csv",
+        "sha256": "e0e145ff3d8145d4ad713380a291248dba74e75a70bd75525719ffaaaf2f5242",
+        "bytes": 1469248,
+        "url": "https://unsw-my.sharepoint.com/:f:/g/personal/z5025758_ad_unsw_edu_au/EvBTaetotpdGnW7rJQ8fCvYBh8063CNeY9W33MpRsarJaQ (folder Train_Test_datasets)"
+      },
+      {
+        "path": "ton_iot/Train_Test_IoT_Thermostat.csv",
+        "sha256": "b475654a43ec885fd8c3409d9e85b7902ecc3ad47440948466f4fe3559fd1f6d",
+        "bytes": 1464768,
+        "url": "https://unsw-my.sharepoint.com/:f:/g/personal/z5025758_ad_unsw_edu_au/EvBTaetotpdGnW7rJQ8fCvYBh8063CNeY9W33MpRsarJaQ (folder Train_Test_datasets)"
+      },
+      {
+        "path": "ton_iot/Train_Test_IoT_Weather.csv",
+        "sha256": "10c49fe8a6eae98db688e277e96218c9a9bf587cc5aee5962833470366dafdba",
+        "bytes": 2587701,
+        "url": "https://unsw-my.sharepoint.com/:f:/g/personal/z5025758_ad_unsw_edu_au/EvBTaetotpdGnW7rJQ8fCvYBh8063CNeY9W33MpRsarJaQ (folder Train_Test_datasets)"
+      }
+    ]
+  },
+  "botiot": {
+    "description": "BoT-IoT 5% subset, 10-best features, the authors' training/testing split: UNSW_2018_IoT_Botnet_Final_10_best_Training.csv (2,934,817 rows) and _Testing.csv (733,705 rows)",
+    "source": "The authors' public OneDrive share linked from https://research.unsw.edu.au/projects/bot-iot-dataset (Dataset/5%/10-best features/10-best Training-Testing split); downloaded 2026-11-09",
+    "provenance": "Normal 370 + 107 = 477 and attack 2,934,447 + 733,598 = 3,668,045, exactly the totals of the 10-best confusion matrices in Koroniotis et al. (arXiv 1811.00701, Tables 10-12), which cover the 5% subset. Per category: train DDoS 1,541,315, DoS 1,320,148, Reconnaissance 72,919, Normal 370, Theft 65; test 385,309, 330,112, 18,163, 107, 14.",
+    "citation": "N. Koroniotis, N. Moustafa, E. Sitnikova, B. Turnbull, Towards the development of realistic botnet dataset in the Internet of Things for network forensic analytics: Bot-IoT dataset, Future Generation Computer Systems 100 (2019)",
+    "licence": "Free use for academic research; commercial use needs the authors' agreement; not redistributed here",
+    "manual_download": true,
+    "files": [
+      {
+        "path": "botiot/UNSW_2018_IoT_Botnet_Final_10_best_Training.csv",
+        "sha256": "047e577cd9c7f8f61d44ac170114497904c33091bf80d1dd5e682e353a69c15b",
+        "bytes": 369103929,
+        "url": "https://unsw-my.sharepoint.com/:f:/g/personal/z5131399_ad_unsw_edu_au/EjlBDf2KODxPgXmqbO3MxxsBBVARCKZxGUG47OiFHb_AnQ (Dataset/5%/10-best features/10-best Training-Testing split)"
+      },
+      {
+        "path": "botiot/UNSW_2018_IoT_Botnet_Final_10_best_Testing.csv",
+        "sha256": "8617de2ac5d6ca4c2f77272c7409253a396f2a9e667c29c8e797ab9f57a1868e",
+        "bytes": 92281052,
+        "url": "https://unsw-my.sharepoint.com/:f:/g/personal/z5131399_ad_unsw_edu_au/EjlBDf2KODxPgXmqbO3MxxsBBVARCKZxGUG47OiFHb_AnQ (Dataset/5%/10-best features/10-best Training-Testing split)"
+      }
+    ]
+  },
+  "xiiotid": {
+    "description": "X-IIoTID: one file, 820,834 rows, 65 features and three labels (class1: 19 attack types and Normal; class2: 10 stages; class3: Normal/Attack)",
+    "source": "The first author's Kaggle dataset munaalhawawreh/xiiotid-iiot-intrusion-dataset (file 'X-IIoTID dataset.csv', created 2021-10-08), fetched with the Kaggle CLI 2026-11-09",
+    "provenance": "820,834 instances and 68 columns, as the paper states (Al-Hawawreh, Sitnikova, Aboutorab, IEEE IoT Journal 9(5), 2022). Distributed by its first author; no official checksum is published.",
+    "citation": "M. Al-Hawawreh, E. Sitnikova, N. Aboutorab, X-IIoTID: A connectivity-agnostic and device-agnostic intrusion data set for Industrial Internet of Things, IEEE Internet of Things Journal 9(5) (2022) 3962-3977",
+    "licence": "As published by the authors for research; not redistributed here",
+    "manual_download": true,
+    "files": [
+      {
+        "path": "xiiotid/X-IIoTID dataset.csv",
+        "sha256": "7b9290057ee42e784da3c0d84b781815502c9205c74175c96374e71a5ffd98a0",
+        "bytes": 355308902,
+        "url": "https://www.kaggle.com/datasets/munaalhawawreh/xiiotid-iiot-intrusion-dataset"
+      }
+    ]
   }
 }

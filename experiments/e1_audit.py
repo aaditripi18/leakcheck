@@ -208,11 +208,44 @@ def prep_ember_official(seed: int = SEED) -> Prepared:
                     ("ember2018",))
 
 
+# --- phase 4 fresh datasets (PLAN.md amendment and sourcing note 2026-11-09) ----------
+# Label: each dataset's multi-class attack type (H20 is about rare classes); the other
+# label columns are excluded. Views: as distributed, and without identifiers (views()).
+
+
+def prep_ton(part: str):
+    def prep(seed: int = SEED) -> Prepared:
+        df = data.cached(data.load_ton, part)
+        tr, te = random_split(df, df["type"], seed)
+        s = Split(tr.drop(columns=["label"]), te.drop(columns=["label"]), "type")
+        return Prepared(views(s), f"stratified random {1 - TEST_SIZE:.0%}/{TEST_SIZE:.0%} by type, seed {seed}",
+                        {"excluded": ["label (binary)"], "file": part}, ("ton_iot",))
+    return prep
+
+
+def prep_botiot(seed: int = SEED) -> Prepared:
+    tr, te = data.load_botiot("Training"), data.load_botiot("Testing")
+    drop = ["attack", "subcategory"]
+    s = Split(tr.drop(columns=drop), te.drop(columns=drop), "category")
+    return Prepared(views(s), "official (the authors' 10-best Training vs Testing files)",
+                    {"excluded": ["attack (binary)", "subcategory (finer label)"]}, ("botiot",))
+
+
+def prep_xiiotid(seed: int = SEED) -> Prepared:
+    df = data.load_xiiotid()
+    tr, te = random_split(df, df["class1"], seed)
+    drop = ["class2", "class3"]
+    s = Split(tr.drop(columns=drop), te.drop(columns=drop), "class1")
+    return Prepared(views(s), f"stratified random {1 - TEST_SIZE:.0%}/{TEST_SIZE:.0%} by class1, seed {seed}",
+                    {"excluded": ["class2 (attack stage)", "class3 (binary)"]}, ("xiiotid",))
+
 PREP = {
     "kdd99": prep_kdd99, "nslkdd": prep_nslkdd, "unsw_nb15": prep_unsw, "cicids2017": prep_cic,
     "ember2018": prep_ember, "uci_phishing": prep_uci_phishing, "phiusiil": prep_phiusiil, "sms_spam": prep_sms,
     "edgeiiot": prep_edgeiiot, "cseids2018": prep_cseids2018, "ciciot2023": prep_ciciot2023,
     "ember2018_official": prep_ember_official,
+    "ton_network": prep_ton("network"), **{f"ton_{d}": prep_ton(d) for d in data.TON_DEVICES},
+    "botiot": prep_botiot, "xiiotid": prep_xiiotid,
 }
 
 

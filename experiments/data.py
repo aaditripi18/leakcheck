@@ -354,6 +354,31 @@ def load_edgeiiot() -> pd.DataFrame:
     return _numeric_where_possible(df, keep=("Attack_type",))
 
 
+TON_DEVICES = ("fridge", "garage_door", "gps_tracker", "modbus", "motion_light", "thermostat", "weather")
+
+
+def load_ton(part: str) -> pd.DataFrame:
+    """A TON_IoT Train_Test file as distributed: part = "network" or a device in TON_DEVICES."""
+    paths = verify_local("ton_iot")
+    want = "train_test_network.csv" if part == "network" else         "Train_Test_IoT_" + "_".join(w.upper() if w == "gps" else w.capitalize() for w in part.split("_")) + ".csv"
+    (path,) = [q for q in paths if q.name == want]
+    df = pd.read_csv(path, encoding="utf-8-sig", low_memory=False)
+    df.columns = [c.strip() for c in df.columns]
+    return _numeric_where_possible(df, keep=("type",))
+
+
+def load_botiot(part: str) -> pd.DataFrame:
+    """BoT-IoT 5% 10-best split as distributed: part = "Training" or "Testing"."""
+    (path,) = [q for q in verify_local("botiot") if q.name.endswith(f"_{part}.csv")]
+    return _numeric_where_possible(pd.read_csv(path, low_memory=False), keep=("category", "subcategory"))
+
+
+def load_xiiotid() -> pd.DataFrame:
+    """X-IIoTID as distributed: 65 features and the labels class1, class2, class3."""
+    (path,) = verify_local("xiiotid")
+    return _numeric_where_possible(pd.read_csv(path, low_memory=False), keep=("class1", "class2", "class3"))
+
+
 def run_file(name: str) -> str:
     """A run name as a file-name stem: "dataset:view" would make Windows write an
     alternate data stream of a file called "dataset" instead of a file."""
