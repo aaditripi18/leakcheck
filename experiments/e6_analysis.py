@@ -27,7 +27,8 @@ TAU_GRID = (0.6, 0.7, 0.8, 0.9, 0.95)
 EPS, TAU = 0.01, 0.8  # E2's defaults
 B = 1000
 CSV = data.ROOT / "results" / "e6_sweep.csv"
-ORDER = ["kdd99", "nslkdd", "unsw_nb15", "cicids2017", "ember2018", "uci_phishing", "phiusiil", "sms_spam"]
+ORDER = ["kdd99", "nslkdd", "unsw_nb15", "cicids2017", "ember2018", "uci_phishing", "phiusiil", "sms_spam",
+         "edgeiiot", "cseids2018", "ciciot2023"]  # phase 3: E5/E6 unchanged (PLAN.md)
 
 
 def macro_f1_from_counts(cm: np.ndarray) -> np.ndarray:
