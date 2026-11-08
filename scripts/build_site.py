@@ -491,17 +491,16 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
 
     recall = min(v for v in syn["minhash_recall"].values() if v is not None)
     limitations = [
-        "A copy is not always a bug: real traffic repeats, and most copied rows are ones any model gets right. "
-        "Both the original and the cleaned score are reported.",
-        "The cleaned test set is harder by construction; a random removal of the same size is reported beside every gap "
-        "(it costs up to 1.5 points, against 15–17 on KDD Cup 99).",
-        "Near-copy thresholds (0.01 RMS, Jaccard 0.8) are fixed choices; a curve, a training-set baseline and a sweep are "
-        "reported alongside.",
-        "The baseline gaps are repeated with full training sets and a tuned model; on the two largest current benchmarks "
-        "that run scores a 200,000-row test sample.",
-        "EMBER is scanned on leakcheck's own numeric view, not the official 2,381-dimension feature vector.",
-        "Two current benchmarks come from public copies: IDS2018's is byte-identical to the official bucket, "
-        "CIC-IoT2023's matches all 34 published label counts.",
+        "A copy is not always a bug: measured. On KDD Cup 99 and NSL-KDD the copied rows are easy (a model trained "
+        "without them still gets 97% right, E9); on CSE-CIC-IDS2018 and EMBER they are memorised (E13).",
+        "The cleaned test set is harder by construction: measured. A random removal of the same size is reported beside "
+        "every gap (up to 1.5 points, against 15–17 on KDD Cup 99, E10).",
+        "Near-copy thresholds: measured. Every gap is recomputed from eps 0.001 to 0.1 and Jaccard 0.6 to 0.95 (E6).",
+        "Untuned baselines: measured. Every gap is repeated with full training sets, a tuned model and a paired "
+        "bootstrap (E5/E6); the two largest current benchmarks are scored on a 200,000-row test sample.",
+        "EMBER's feature view: measured. The official 2,381-dimension vectors give the same copies and gaps within "
+        "0.4 points (E11).",
+        "Provenance: IDS2018 is byte-identical to the official bucket; CIC-IoT2023 matches all 34 published label counts.",
     ]
     lim = "".join(f"<li>{e(x)}</li>" for x in limitations)
 
@@ -693,7 +692,7 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
 </section>
 
 <section class="flex flex-col gap-space-md pt-space-md border-t border-surface-container-high">
-  {sec_head("10", "Scope", "Limitations", level="h2")}
+  {sec_head("10", "Scope", "Every caveat, measured", level="h2")}
   <ul class="grid grid-cols-1 md:grid-cols-2 gap-x-space-xl gap-y-space-xs font-body-sm text-body-sm text-on-surface-variant list-disc pl-4">{lim}</ul>
 </section>
 

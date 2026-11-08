@@ -521,7 +521,7 @@ published 2018 model scored ROC AUC 0.996429 on them, the figure EMBER reports.
 On the official 2,381-dimension vectors the exact-copy rate is the same 0.009%
 as on leakcheck's own view, and the E2 gaps (no_near) are LR 2.03 vs 2.39, RF
 1.54 vs 1.47, HGB 1.18 vs 1.30, MLP 1.19 vs 1.38 points: **H15 supported**, the
-largest difference 0.36 points. The limitation "EMBER was scanned on our own
+largest difference 0.36 points. The caveat "EMBER was scanned on our own
 view" is now a measurement.
 
 ## 29. H11 not supported, by 0.02 points

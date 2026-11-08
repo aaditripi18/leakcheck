@@ -211,10 +211,12 @@ as a caveat now has an experiment.
 
 | Caveat | Measurement |
 |---|---|
-| "A copy is not always a bug" | Retrained with every training copy removed, models still get **97% of KDD99's copied test rows right** (98% NSL-KDD, 92-93% UCI Phishing); 0-1% are memorised (EMBER 6-19%). The copies are easy rows, not memorised exceptions (E9) |
+| "A copy is not always a bug" | Retrained with every training copy removed, models still get **97% of KDD99's copied test rows right** (98% NSL-KDD, 92-93% UCI Phishing); 0-1% are memorised (EMBER 6-19%). On the classic benchmarks the copies are easy rows (E9); on the current ones they are not (E13, next row) |
 | "The cleaned test set is harder by construction" | Removing a random subset of the same size and class mix costs **-6 points on KDD99 and 0.5-0.7 on NSL-KDD**, against 15-17 and 8.5-11.9 for removing the copies: the gap comes from which rows go, mostly (E10) |
 | "Duplicated rows may just be easy rows" | A model trained without the copies keeps the gap on KDD99/NSL-KDD (easy rows) but loses it on IDS2018 and EMBER, where it is worse on the leaked rows than on the rest (memorised copies) (E13) |
 | "EMBER is scanned on leakcheck's own view" | On EMBER's official 2,381-dimension vectors (EMBER's code, run outside the repository; its published model reproduces AUC 0.996429): the same 0.009% exact copies and gaps within 0.4 points (E11) |
+| "The near-copy threshold is a choice" | Every gap recomputed at eps 0.001-0.1 and Jaccard 0.6-0.95: whether a gap clears one point is the same at eps 0.003, 0.01 and 0.03 in 32 of 40 cells, and every change is a gap close to one point (E6, H8) |
+| "The baselines are untuned and capped at 300k rows" | Every classic benchmark again with all its training data and a tuned gradient-boosting model, every prediction saved, a paired bootstrap: tuned HistGB still loses 22.2 points on KDD99 and 8.6 on NSL-KDD, intervals above 5 in every seed (E5/E6, H6, H7) |
 | "CIC-IDS2017's time split is confounded with unseen attacks" | Split by time **within each attack type**, it costs 0.5-1.5 points: the collapse to 0.46-0.57 on the file-wise time split was the unseen attack types (E12) |
 
 | | Hypothesis (phase 3) | Verdict |
@@ -232,38 +234,27 @@ as a caveat now has an experiment.
 H17 and H18 were added after H13 failed (PLAN.md amendment 2026-11-05) and were
 judged once on four datasets their quantities had never been computed on.
 
-## Limitations
+## Data provenance and method notes
 
-- **A copy is not always a bug.** Real traffic repeats, and on KDD99 and NSL-KDD
-  E9 and E13 show the copies are mostly rows any model gets right (on IDS2018 and
-  EMBER they are not). The finding is about the benchmark: a
-  test set that is mostly repeats measures little about new attacks. Both scores
-  are reported.
-- **The cleaned test set is harder by construction.** E10 measures how much: a
-  random removal of the same size costs up to 1.5 points (UCI Phishing, LR),
-  against 15-17 on KDD99. Where the two are close, the README says so.
-- **Thresholds are choices.** Near-duplicate distance (0.01 RMS in scaled
-  space) and Jaccard (0.8) are fixed defaults; L2 also reports a curve and a
-  training-set baseline. The identifier heuristic is advisory, and has one
-  known false positive (KDD99 `dst_host_same_src_port_rate`).
-- **E2's baselines are untuned and capped at 300k training rows.** Phase 2 (E5,
-  E6) repeats every classic benchmark with full training sets and a tuned
-  gradient-boosting model: the gaps hold (H6, H7). On the two largest current
-  benchmarks, E5 scores a 200k-row test sample and trains RF/MLP on 2M rows
-  (PLAN.md amendment: the full nearest-neighbour evidence would be ~10^14
-  distance computations).
-- **EMBER** is scanned on leakcheck's own ~680-column numeric view; E11 repeats
-  the audit and the retraining on the official 2,381-dimension vectors (EMBER's
-  AGPL code, run unmodified outside this repository) and finds the same (H15).
-- **CIC-IDS2017's chronological split is confounded** with unseen attack types,
-  so H3 was decided on EMBER; E12 then separates the two (time within each
-  attack type costs 0.5-1.5 points).
-- **Two current benchmarks come from copies, not their official download pages**
-  (which sit behind registration forms or served about 60 KB/s): IDS2018's copy is
-  proven byte-identical to the official bucket; CIC-IoT2023's matches all 34
-  published label counts, which a different file could also do.
-- Open items before publication are listed at the end of
-  [docs/FINDINGS.md](docs/FINDINGS.md).
+- **Where the data came from.** Every dataset is pinned by SHA-256 in
+  `data/`. CSE-CIC-IDS2018's ten CSVs are byte-identical to the official AWS
+  bucket (multipart ETags). CIC-IoT2023's official page sits behind a
+  registration form, so it was taken from a public copy; that copy matches all
+  34 label counts the publishers list (46,686,579 rows). Edge-IIoTset is the
+  authors' own release.
+- **The two largest current benchmarks** (37M and 13M training rows) are scored
+  on a stratified 200,000-row test sample, with RF and MLP trained on 2M rows;
+  the nearest-neighbour evidence over every row would be ~10^14 distance
+  computations (PLAN.md amendment 2026-11-04). H11's rule does not depend on
+  RF or MLP.
+- **The identifier check is advisory**: it names columns that look like
+  timestamps, addresses or ports. On KDD99 it also names
+  `dst_host_same_src_port_rate`, a rate, not an identifier.
+- **Verdicts are not reworded.** A hypothesis that the data did not support is
+  reported as not supported, with its numbers, next to the ones that were.
+  Open questions about third-party data (how PhiUSIIL defines
+  `URLSimilarityIndex`; where EMBER 2018's 50,000 pre-2018 training files come
+  from) are listed at the end of [docs/FINDINGS.md](docs/FINDINGS.md).
 
 ## Reproduce
 
