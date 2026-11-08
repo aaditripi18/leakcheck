@@ -385,3 +385,57 @@ Hypotheses (12 cells per dataset = 4 models x 3 seeds):
 
 A fresh dataset that does not meet a hypothesis's entry condition is reported, not
 counted. Both verdicts are reported as supported or not supported, as all others.
+
+## Amendment 2026-11-09: phase 4 (H19, H20, `leakcheck explain`), before any fresh data is fetched
+
+E13 split the datasets whose leakage gap is at least a point into two kinds. On KDD Cup 99,
+NSL-KDD and UNSW-NB15 the copy-free model keeps the gap: the duplicated rows are *easy*. On
+EMBER (both views), UCI Phishing, SMS Spam and CSE-CIC-IDS2018 without identifiers the gap
+disappears: the copies were *memorised*. Telling the two apart took 24 model fits per dataset.
+Phase 4 asks whether an audit can tell them apart without training anything (H19), turns
+that into a tool (`leakcheck explain`), and asks a new question about rare classes (H20).
+Every number below is fixed now; the fresh datasets have never been downloaded.
+
+**Fresh data (none of it fetched before this amendment).** TON_IoT's train/test files
+(network, and the seven IoT device files: fridge, garage door, GPS tracker, Modbus, motion
+light, thermostat, weather), BoT-IoT's 5% "10 best features" train/test split, and X-IIoTID
+(stratified random 80/20, seed 0, as E1 does where no official split exists). Each is used as
+published and, where leakcheck's identifier check flags columns, also without them (as for
+CSE-CIC-IDS2018 and Edge-IIoTset). A file is used only if it matches the authors' published
+row or class counts; the sourcing note listing what was used is written before any leakage
+number is computed on it. A *case* is one dataset in one view.
+
+**E14.** E13 exactly (same seeds 0-2, models, eps, copy removal, subsampling), plus per-class
+F1 of the full model on the whole test set and without the leaked rows, plus the statistic S.
+
+**The statistic S (no model is trained).** On seed 0's split: the training rows to keep are
+those E9/E13 keep (no leaked test row keeps an exact or near copy). L = the leaked test rows,
+R = the others, each a random sample of at most 20,000 (seed 0). A row's *neighbour vote* is
+the label of its nearest training row (leakcheck's `nearest`: scaled numeric space within
+categorical buckets; MinHash nearest neighbour for text; the training majority class when no
+neighbour is found), taken from the copy-free training set for L and from the full training
+set for R. S = vote accuracy on L minus vote accuracy on R. A positive S says the leaked rows
+are easy even without their copies.
+
+- **H19 (an audit can tell easy from memorised)** A case is *eligible* if its E13/E14
+  full-model gap (mean of 12 cells) is >= 1 point; it is *easy* if the copy-free gap is >= 80%
+  of the full gap, else *memorised*. The threshold s* is fixed on the eight eligible dev cases
+  (kdd99, nslkdd, unsw_nb15, ember2018, ember2018_official, uci_phishing, sms_spam,
+  cseids2018:no_identifiers): the midpoint between the classes if S separates them, otherwise
+  the value with the fewest dev errors (ties: the widest margin). Each fresh case's prediction
+  (easy if S > s*) is recorded in the ledger before E14 runs on it. H19 is supported if the
+  prediction is right on >= 90% of the eligible fresh cases, with at least 4 eligible; with
+  fewer than 4 eligible it is reported as not judged, with every case shown.
+- **H20 (leakage hides in rare classes of near-perfect benchmarks)** A fresh case is eligible
+  if its full model's macro-F1 on the whole test set is >= 0.98 (mean of 12 cells) and it has
+  at least one *rare* class (< 1% of test rows, >= 20 test rows, >= 1 leaked row) and one
+  common class. Per class, the gap is F1 on the whole test set minus F1 without the leaked
+  rows (a class with every row leaked is skipped). A cell supports H20 if the median gap of
+  the rare classes is larger than the median gap of the common classes. H20 is supported if
+  every eligible case has >= 10 of 12 supporting cells, with at least 2 eligible; with fewer
+  it is reported as not judged. Dev for inspection: ciciot2023, edgeiiot, cicids2017,
+  phiusiil.
+- **`leakcheck explain`** reports, for a given train/test pair, the leaked rows, S, the
+  neighbour-vote accuracy of each, and the verdict H19's frozen threshold gives ("leaked rows
+  look easy" or "look memorised"), stating that the threshold was fixed on the eight dev
+  cases and how it fared on the fresh ones.
