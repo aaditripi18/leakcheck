@@ -521,3 +521,22 @@ and `DATE` in YouTube Spam, and `id.orig_p` and `id.resp_p` (ports) in RT-IoT202
 of these three is also run without them. This gives **8 fresh cases**: uci_spambase,
 uci_website_phishing, uci_youtube_spam, uci_tuandromd and uci_rt_iot2022, plus the
 no_identifiers views of uci_spambase, uci_youtube_spam and uci_rt_iot2022.
+
+## Amendment 2026-11-12 (2): E15, EMBER 2018's pre-2018 training files (before the run)
+
+**Why.** An open question since phase 1 (FINDINGS, "Open items") is where EMBER 2018's
+pre-2018 training files come from; the repository is archived and the paper does not say.
+A count made for this amendment: 50,000 of the 600,000 labelled training files have an
+`appeared` date from 2006 to 2017, and **all 50,000 are benign**; every malicious training
+file and every test file is from 2018. Their origin stays unknown; their effect is measured.
+
+**E15.** EMBER's official time split, leakcheck's numeric view (as E1/E2), the four baselines
+and seeds 0-2. Per seed, two training sets of the same size (300,000, E2's cap, stratified
+by label): one drawn from all 600,000 training files (*as published*), one from the 550,000
+without the pre-2018 files (*2018 only*). Both are scored on the full official test set
+(200,000 files, Nov-Dec 2018); the effect is macro-F1 (as published) minus macro-F1 (2018
+only), per model and seed.
+
+- **H21** The pre-2018 benign files do not change EMBER's verdicts: for every model, the
+  mean effect over the three seeds is below 0.5 macro-F1 points in absolute value. Not
+  supported if any model's mean effect reaches 0.5 points; the direction is reported either way.
