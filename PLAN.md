@@ -605,3 +605,58 @@ recorded, committed and pushed before E14 trains any model on it. Every case run
   - how many cases were uncertain;
   - how many outcomes were borderline;
   - a strict tally that counts every uncertain prediction on an eligible case as wrong.
+
+**Sourcing note and extension (2026-11-13, before S or any leakage number on round 3).**
+
+*UCI candidates.*
+- **Used**, all with counts matching UCI's:
+  - *Burst Header Packet flooding* (ARFF, 1,075 rows);
+  - *Bitcoin Heist* (2,916,697 rows);
+  - *Internet Firewall Data* (65,532 rows).
+- **Not used**, by the rules above:
+  - *Detect Malware Types* (533) and *UAV Intrusion Detection* (564): UCI's download link
+    returns 404, so they cannot be fetched from UCI.
+  - *Turkish Spam* (530): the file holds 825 messages plus a footer row (",,496"), where
+    UCI states 826.
+  - *Malware static and dynamic features* (541): the 2,955-row table that matches UCI's
+    count has a single label value (every row is malware), so it is not a classification
+    task. The archive's benign rows are in a separate 595-row table, and UCI's count does
+    not describe combining them.
+
+That leaves three datasets, too few to give 4 judgeable cases. The round is therefore
+extended once, now, from OpenML. No row of these has been read.
+
+*Search.* Every active OpenML dataset (API list, 2026-11-13) whose name matches
+`phish|spam|malware|intrusion|fraud|botnet|android|ransom|ddos|cyber|attack|darknet|url|dns|
+virus|security|network traffic|firewall|anomal|hack|exploit|bot`.
+
+*Rule.* A candidate is kept if all of these hold:
+- it is a security or fraud benchmark whose OpenML description names its published
+  source or research group;
+- OpenML gives a default target;
+- it is not synthetic;
+- it has at most 1,000,000 rows and 500 features;
+- it is not a copy or subset of a dataset used before;
+- it is the first OpenML id of a series of near-identical recordings.
+
+*Kept*, in OpenML id order:
+
+| Order | OpenML id | Dataset | Target | Excluded |
+|--:|--:|---|---|---|
+| 8 | 1597 | creditcard (Dal Pozzolo et al., 2015) | `Class` | `Time` (OpenML's row id) |
+| 9 | 45449 | Bleichenbacher timing attack, 1 µs, 2022-09-01 (ITSC Wuppertal), first of its series | `label` | |
+| 10 | 45913 | Bleichenbacher padding attack, OpenSSL 1.1.1k (ITSC Wuppertal), first of its series | `label` | |
+| 11 | 46858 | IEEE-CIS Fraud Detection (Kaggle / IEEE CIS) | `isFraud` | |
+| 12 | 46868 | Phishing Dataset for Machine Learning (Tan, 2018, doi 10.17632/h3cgnj8hft.1) | `CLASS_LABEL` | `id` |
+
+*Dropped by the rule:*
+- re-uploads or subsets of datasets already used: spambase, KDD99, BoT-IoT, Bitcoin Heist,
+  the firewall logs, website phishing, YouTube spam, and the credit-card copies 4154,
+  42175, 42397, 43627, 44235, 46455 and 46568;
+- no default target: 43527, 43622, 45955, 46099 and 46637;
+- synthetic: 46724;
+- no named source: 46357, 46359, 46369 and 46504;
+- later members of the timing-attack and padding-attack series.
+
+Each OpenML dataset is used if its row count equals OpenML's stated count. Everything
+else is as above.
