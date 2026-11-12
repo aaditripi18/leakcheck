@@ -29,9 +29,10 @@ EMBER = "leakcheck-ember2018"
 SOURCES = {"cseids2018": ["solarmainframe/ids-intrusion-csv"],
            "cseids2018:no_identifiers": ["solarmainframe/ids-intrusion-csv"],
            "ciciot2023": ["madhavmalhotra/unb-cic-iot-dataset"],
-           "ember2018": [f"{k.USER}/{EMBER}"]}
+           "ember2018": [f"{k.USER}/{EMBER}"],
+           "botiot": [f"{k.USER}/{k.DATA}"]}  # phase 4's private copy of the fresh data (hash-checked)
 DATASET_OF = {"cseids2018": "cseids2018", "cseids2018:no_identifiers": "cseids2018", "ciciot2023": "ciciot2023",
-              "ember2018": "ember2018"}
+              "ember2018": "ember2018", "botiot": "botiot"}
 
 NOTEBOOK = r'''
 import json, os, pathlib, shutil, subprocess, sys
