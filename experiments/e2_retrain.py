@@ -47,8 +47,11 @@ RETRAIN_CSV = data.ROOT / "results" / "retrain.csv"
 def subsample(split: Split, seed: int, cap: int = MAX_TRAIN) -> Split:
     if len(split.train) <= cap:
         return split
-    idx, _ = train_test_split(np.arange(len(split.train)), train_size=cap, random_state=seed,
-                              stratify=split.train[split.label])
+    y = split.train[split.label]
+    counts = y.value_counts()
+    if (counts < 2).any():  # single-row classes pooled for stratification only (PLAN.md 2026-11-13)
+        y = y.where(~y.isin(counts[counts < 2].index), "__single_row_classes__")
+    idx, _ = train_test_split(np.arange(len(split.train)), train_size=cap, random_state=seed, stratify=y)
     return like(split, split.train.iloc[np.sort(idx)], split.test)
 
 

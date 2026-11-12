@@ -684,3 +684,8 @@ Phishing (Tan) has no `id` column in OpenML's version 2, so nothing was excluded
 openml_timing_attack, openml_padding_attack, openml_ieee_fraud and openml_phishing_tan,
 plus the no_identifiers views of uci_bhp, uci_firewall, openml_timing_attack and
 openml_ieee_fraud.
+
+*Deviation, continued (before S on uci_bitcoin_heist).* The same pooling applies where
+E2/E14 subsample a training set to 300,000 rows. Only uci_bitcoin_heist has both a
+single-row class and more than 300,000 training rows, so every other case's subsample
+is unchanged.
