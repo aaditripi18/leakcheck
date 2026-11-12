@@ -983,6 +983,13 @@ def h20(runs: dict) -> dict:
         rows.append((n, v["macro_f1"], sup))
     ev = ("; ".join(f"{n} (macro-F1 {f:.4f}): {k}/12 cells" for n, f, k in rows) or "no case") + \
          f". Eligible {len(rows)} of 19 (rare and common classes in every seed's split)"
+    perfect = [n for n, v in e.items() if v["macro_f1"] >= 0.98 and n not in {x[0] for x in rows}]
+    with_rare = [n for n, v in e.items() if all(_class_gaps(c)[0] for c in v["cells"]) and n not in {x[0] for x in rows}]
+    if perfect:
+        ev += ". Macro-F1 >= 0.98 but no rare class with a leaked row: " + ", ".join(perfect)
+    if with_rare:
+        ev += ". A rare class with leaked rows but macro-F1 below 0.98: " + ", ".join(
+            f"{n} ({e[n]['macro_f1']:.4f})" for n in with_rare)
     if len(rows) < 2:
         return {"id": "H20", "text": text, "verdict": "not judged", "evidence": ev}
     return {"id": "H20", "text": text, "verdict": _verdict(all(k >= 10 for _, _, k in rows)), "evidence": ev}
