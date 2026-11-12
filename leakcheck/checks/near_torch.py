@@ -22,7 +22,7 @@ K = 8  # shortlist per test row
 
 
 def nearest(split, test_idx: np.ndarray | None = None, device: str | None = None, k: int = K,
-            rows: int = 1024, block: int = 1_000_000) -> tuple[np.ndarray, np.ndarray]:
+            rows: int = 1024, block: int = 250_000) -> tuple[np.ndarray, np.ndarray]:
     import torch
 
     device = device or ("cuda" if torch.cuda.is_available() else "cpu")

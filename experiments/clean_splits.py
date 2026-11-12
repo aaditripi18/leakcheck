@@ -41,6 +41,8 @@ OFFICIAL = {"kdd99", "nslkdd", "unsw_nb15", "botiot", "ember2018"}
 
 def split_for(case: str):
     name, _, view = case.partition(":")
+    if name == "ember2018" and not view:
+        view = "numeric"  # the official time split, on leakcheck's numeric view (exact and near copies alike)
     prep = PREP[name]()
     views = {v: s for v, s, _ in prep.splits}
     s = views[view] if view else prep.splits[0][1]
@@ -61,10 +63,22 @@ def gaps(case: str) -> dict | None:
     return {"source": f"E2, 4 models x 5 seeds (ledger e2_retrain:{case})", "summary": d["results"].get("summary")}
 
 
+def use_gpu_search() -> bool:
+    """LEAKCHECK_NEAR=torch: near.nearest becomes leakcheck.checks.near_torch.nearest (same answers,
+    tests/test_near_torch.py), for clean_split and its re-check alike, so the giants get every row."""
+    import os
+    if os.environ.get("LEAKCHECK_NEAR") != "torch":
+        return False
+    from leakcheck.checks import near, near_torch
+    near.nearest = near_torch.nearest
+    return True
+
+
 def make(case: str) -> dict:
     t0 = time.time()
+    gpu = use_gpu_search()
     prep, s = split_for(case)
-    exact_only = case in EXACT_ONLY
+    exact_only = case in EXACT_ONLY and not gpu
     opts = CleanOptions(near_eps=None if exact_only else NEAR_EPS,
                         text_tau=None if exact_only else (TEXT_TAU if s.text else None), conflicts="keep")
     res = clean_split(s, opts)
@@ -78,7 +92,8 @@ def make(case: str) -> dict:
            "n_train": len(s.train), "n_test": len(s.test), "n_drop": len(drop),
            "n_clean_test": len(s.test) - len(drop),
            "by_reason": {k: len(v["test"]) for k, v in res.removed.items()},
-           "recheck": check, "measured_gap": gaps(case), "seconds": round(time.time() - t0)}
+           "recheck": check, "measured_gap": gaps(case), "seconds": round(time.time() - t0),
+           "search": "near_torch (GPU shortlist, exact float64 distances)" if gpu else "near.nearest (CPU)"}
     OUT.mkdir(exist_ok=True)
     slug = case.replace(":", "__")
     (OUT / f"{slug}.json").write_text(json.dumps(out, indent=1, default=str) + "\n", encoding="utf-8")
