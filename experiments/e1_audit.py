@@ -41,8 +41,22 @@ class Prepared:
     datasets: tuple[str, ...] = ()
 
 
+# The source position of each test row of the most recent random split (positions in the
+# loader's frame), for experiments/clean_splits.py; bookkeeping only, the split is unchanged.
+LAST_TEST_ROWS: np.ndarray | None = None
+LAST_STRATIFY: str | None = None
+
+
+def _remember(df: pd.DataFrame, te_index, stratify=None) -> None:
+    global LAST_TEST_ROWS, LAST_STRATIFY
+    LAST_STRATIFY = getattr(stratify, "name", None)
+    plain = isinstance(df.index, pd.RangeIndex) and df.index.start == 0 and df.index.step == 1
+    LAST_TEST_ROWS = np.asarray(te_index, dtype=np.int64) if plain else None
+
+
 def random_split(df: pd.DataFrame, stratify: pd.Series, seed: int = SEED) -> tuple[pd.DataFrame, pd.DataFrame]:
     tr, te = train_test_split(df, test_size=TEST_SIZE, random_state=seed, stratify=stratify)
+    _remember(df, te.index, stratify)
     return tr.reset_index(drop=True), te.reset_index(drop=True)
 
 
@@ -108,6 +122,7 @@ def big_split(df, label_col: str, target: str, seed: int, **kw) -> Split:
     tr_idx, te_idx = train_test_split(np.arange(len(df)), test_size=TEST_SIZE, random_state=seed,
                                       stratify=df[label_col])
     # same rows in the same order as random_split (train_test_split on the frame itself)
+    _remember(df, te_idx, df[label_col])
     tr, te = df.iloc[tr_idx].reset_index(drop=True), df.iloc[te_idx].reset_index(drop=True)
     for side in (tr, te):
         del side[label_col]

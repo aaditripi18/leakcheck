@@ -37,16 +37,41 @@ OUT = ROOT / "splits"
 EXACT_ONLY = {"cseids2018", "cseids2018:no_identifiers", "ciciot2023", "ember2018"}
 # random splits: which column the split was stratified on (the prep functions' choice)
 OFFICIAL = {"kdd99", "nslkdd", "unsw_nb15", "botiot", "ember2018"}
+# How each dataset's rows are numbered in `drop_source` (0-based), so the lists can be used
+# without leakcheck: official splits count rows of the test file; random splits count rows of
+# the whole dataset, read from the pinned files as described.
+SOURCE = {
+    "kdd99": "rows of the test set `corrected` (registry kdd99_test), in file order",
+    "nslkdd": "rows of KDDTest+.txt, in file order",
+    "unsw_nb15": "rows of the official testing set, in file order",
+    "botiot": "rows of UNSW_2018_IoT_Botnet_Final_10_best_Testing.csv, in file order",
+    "ember2018": "rows of EMBER 2018's test files (test_features.jsonl), in file order, unlabelled samples excluded",
+    "cicids2017": "rows of the eight MachineLearningCVE CSVs read in capture order, Monday to Friday "
+                  "(experiments/data.py, cic_members)",
+    "cseids2018": "rows of the ten CSVs read in capture order (02-14 ... 03-02-2018), with the header lines "
+                  "repeated inside some files skipped",
+    "ciciot2023": "rows of the 169 part-*.csv files read in registry order",
+    "uci_tuandromd": "rows of TUANDROMD.csv without its one entirely empty row (row 2,533)",
+}
+SINGLE_FILE = "rows of the pinned file, in file order"
+TEST_ROWS_MAX = 1_000_000  # above this, test_source is not written; rebuild it as the JSON says
 
 
 def split_for(case: str):
+    import experiments.e1_audit as e1
+    e1.LAST_TEST_ROWS = None
     name, _, view = case.partition(":")
     if name == "ember2018" and not view:
         view = "numeric"  # the official time split, on leakcheck's numeric view (exact and near copies alike)
     prep = PREP[name]()
     views = {v: s for v, s, _ in prep.splits}
     s = views[view] if view else prep.splits[0][1]
-    return prep, s
+    rows = e1.LAST_TEST_ROWS
+    if name in OFFICIAL:
+        rows = np.arange(len(s.test), dtype=np.int64)
+    if rows is not None and len(rows) != len(s.test):
+        rows = None
+    return prep, s, rows
 
 
 def gaps(case: str) -> dict | None:
@@ -77,7 +102,7 @@ def use_gpu_search() -> bool:
 def make(case: str) -> dict:
     t0 = time.time()
     gpu = use_gpu_search()
-    prep, s = split_for(case)
+    prep, s, src = split_for(case)
     exact_only = case in EXACT_ONLY and not gpu
     opts = CleanOptions(near_eps=None if exact_only else NEAR_EPS,
                         text_tau=None if exact_only else (TEXT_TAU if s.text else None), conflicts="keep")
@@ -93,12 +118,25 @@ def make(case: str) -> dict:
            "n_clean_test": len(s.test) - len(drop),
            "by_reason": {k: len(v["test"]) for k, v in res.removed.items()},
            "recheck": check, "measured_gap": gaps(case), "seconds": round(time.time() - t0),
-           "search": "near_torch (GPU shortlist, exact float64 distances)" if gpu else "near.nearest (CPU)"}
+           "search": "near_torch (GPU shortlist, exact float64 distances)" if gpu else "near.nearest (CPU)",
+           "source_numbering": SOURCE.get(case.partition(":")[0], SINGLE_FILE) if src is not None else None}
+    if case.partition(":")[0] not in OFFICIAL and src is not None:
+        import experiments.e1_audit as e1
+        out["split_rule"] = ("test rows = sklearn.model_selection.train_test_split(numpy.arange(n), test_size=0.2, "
+                             f"random_state=0, stratify=column {e1.LAST_STRATIFY!r})[1], n = rows of the whole "
+                             "dataset numbered as source_numbering says")
+        out["test_source_written"] = len(src) <= TEST_ROWS_MAX
     OUT.mkdir(exist_ok=True)
     slug = case.replace(":", "__")
     (OUT / f"{slug}.json").write_text(json.dumps(out, indent=1, default=str) + "\n", encoding="utf-8")
     with gzip.open(OUT / f"{slug}.drop.txt.gz", "wt", encoding="utf-8") as f:
         f.write("\n".join(map(str, drop)) + "\n")
+    if src is not None:
+        with gzip.open(OUT / f"{slug}.drop_source.txt.gz", "wt", encoding="utf-8") as f:
+            f.write("\n".join(map(str, sorted(src[drop].tolist()))) + "\n")
+        if case.partition(":")[0] not in OFFICIAL and len(src) <= TEST_ROWS_MAX:
+            with gzip.open(OUT / f"{slug}.test_source.txt.gz", "wt", encoding="utf-8") as f:
+                f.write("\n".join(map(str, sorted(src.tolist()))) + "\n")
     print(f"{case}: drop {len(drop)}/{len(s.test)} test rows, re-check "
           f"{'ok' if all(v['ok'] for v in check.values()) else check}, {out['seconds']} s", flush=True)
     return out
@@ -110,7 +148,7 @@ def Split_like(s, res):
 
 
 def write(case: str, out_dir: str) -> None:
-    prep, s = split_for(case)
+    prep, s, _ = split_for(case)
     slug = case.replace(":", "__")
     with gzip.open(OUT / f"{slug}.drop.txt.gz", "rt", encoding="utf-8") as f:
         drop = np.array([int(x) for x in f.read().split()], dtype=np.int64)
