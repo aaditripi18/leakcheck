@@ -73,7 +73,9 @@ def push_data(slug: str = DATA, names: tuple[str, ...] = FRESH_DATA) -> None:
         d = Path(d)
         for name in names:
             for p in verify_local(name):
-                os.link(p, d / p.name) if os.name != "nt" else shutil.copy2(p, d / p.name)
+                # Kaggle unpacks uploaded zips, so a zip goes up as <name>.zip.bin (same bytes)
+                out = d / (p.name + ".bin" if p.suffix == ".zip" else p.name)
+                os.link(p, out) if os.name != "nt" else shutil.copy2(p, out)
         _upload(slug, d, "fresh data")
     print(f"uploaded {USER}/{slug}")
 
@@ -121,7 +123,11 @@ reg = json.loads((work / "data" / "registry.json").read_text(encoding="utf-8"))
 for name in FRESH_DATA:
     for f in reg[name]["files"]:
         base = pathlib.PurePosixPath(f["path"]).name
-        hit = [p for p in inp.rglob(base) if work.name not in p.parts and src not in p.parents]
+        # Kaggle strips characters such as "+" from uploaded names: match letters, digits and dots
+        key = lambda n: "".join(ch for ch in n.lower() if ch.isalnum() or ch == ".")
+        want = {key(base), key(base + ".bin")}
+        hit = [p for p in inp.rglob("*") if p.is_file() and key(p.name) in want
+               and work.name not in p.parts and src not in p.parents]
         dst = work / "data" / "raw" / f["path"]
         dst.parent.mkdir(parents=True, exist_ok=True)
         os.symlink(hit[0], dst)   # the loaders check the SHA-256
