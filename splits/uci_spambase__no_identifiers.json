@@ -1,0 +1,42 @@
+{
+ "case": "uci_spambase:no_identifiers",
+ "split": "stratified random 80%/20% by Class, seed 0",
+ "files": {
+  "uci_spambase": {
+   "uci_spambase/data.csv": "d86711ceadadd177f09ca816fffa79d82edf5007b585a836c112462e2c217c0d"
+  }
+ },
+ "label": "Class",
+ "excluded_columns": [],
+ "near": {
+  "eps": 0.01,
+  "text_jaccard": null
+ },
+ "n_train": 3680,
+ "n_test": 921,
+ "n_drop": 132,
+ "n_clean_test": 789,
+ "by_reason": {
+  "cross_exact": 84,
+  "near_tabular": 48
+ },
+ "recheck": {
+  "L1.cross": {
+   "ok": true,
+   "value": 0
+  },
+  "L2.near": {
+   "ok": true,
+   "value": 0
+  }
+ },
+ "measured_gap": {
+  "full_gap_macro_f1": 0.010376671952117314,
+  "source": "E13/E14, 4 models x 3 seeds (ledger e14:/e13_difficulty:uci_spambase:no_identifiers)"
+ },
+ "seconds": 0,
+ "search": "near.nearest (CPU)",
+ "source_numbering": "rows of the pinned file, in file order",
+ "split_rule": "test rows = sklearn.model_selection.train_test_split(numpy.arange(n), test_size=0.2, random_state=0, stratify=column 'Class')[1], n = rows of the whole dataset numbered as source_numbering says",
+ "test_source_written": true
+}

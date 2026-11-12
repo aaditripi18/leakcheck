@@ -1,0 +1,190 @@
+{
+ "cicids2017": {
+  "cicids2017.drop.txt.gz": "411af29ca60e9b84e76a3079407e366612129b6d41e3f76d968507dc424672de",
+  "cicids2017.drop_source.txt.gz": "4d1e9a35e6a1489fe824c678e2d76d26f96911c754010e092a905fdd73ad8d29",
+  "cicids2017.test_source.txt.gz": "6c02f0705e7aad1c2cbdf888dcd0cf86dd8c4a057345a5c8fa708072066b0d82"
+ },
+ "ciciot2023": {
+  "ciciot2023.drop.txt.gz": "2df4c850e4f3a4fb40daa96b013aee3e55f9ed77a125ec4b6a4b9f8b6faa405b",
+  "ciciot2023.drop_source.txt.gz": "e755b190ed656d16fb45e732952ff958f9d1a10ed950fa8c3b46a33fd92e5cb9"
+ },
+ "cseids2018": {
+  "cseids2018.drop.txt.gz": "6a9513ab565663d6c30ca93d18b71f54933dcdee0a42b3fee4e15d8f675de6bd",
+  "cseids2018.drop_source.txt.gz": "5676aea016fce26fcf7d28d14e85ea0465267e42bbc3f241837657fdbcdeb83d"
+ },
+ "cseids2018:no_identifiers": {
+  "cseids2018__no_identifiers.drop.txt.gz": "4de3d99e3f72a167c52176101a6d45764da44cdd926f2855a9daaf3988aafd35",
+  "cseids2018__no_identifiers.drop_source.txt.gz": "aa23a607e3a4c7b5ca7f77d0bd1096f0f5f2a1d87a544c7be0cd4a22386f0bc3"
+ },
+ "edgeiiot": {
+  "edgeiiot.drop.txt.gz": "69c18e19ffa6f3d0b4d6e87fa51b89301de585b3b612d92f8c82391d7e63c925",
+  "edgeiiot.drop_source.txt.gz": "7c0243e655216cd52daa328567afd6bb47083f18917997aaa1f33fac33e6fa57",
+  "edgeiiot.test_source.txt.gz": "7c2b96336e51b590818a1e3ad7d94d8a5c523e538f13f39cc573fd9e580dbba5"
+ },
+ "edgeiiot:no_identifiers": {
+  "edgeiiot__no_identifiers.drop.txt.gz": "ae3132092d41fcb16a0ceef28deebb2a85f7efd3b63bd4d81ff9e4896d41fb13",
+  "edgeiiot__no_identifiers.drop_source.txt.gz": "ffe81d9aa78054a2d28a904d5e1019354e9052dab0f519eda5dc0667f0714410",
+  "edgeiiot__no_identifiers.test_source.txt.gz": "84ebcfd00ca44c39b6f5ce8a944007472e0090ea1c06fad41d9652482b383490"
+ },
+ "ember2018": {
+  "ember2018.drop.txt.gz": "4e6c4410238a13ea4b1432a2252451162353ea90ca630de5cc209e2bb0f85f19",
+  "ember2018.drop_source.txt.gz": "51061ccdb5d45adc72b1e0d8d967df56f6791b4068be57a7ebc22ad3929f5ba1"
+ },
+ "kdd99": {
+  "kdd99.drop.txt.gz": "3ab8cfa8c8c193a9380013272c848fe86931747da09d8a1961f71c368634bcb0",
+  "kdd99.drop_source.txt.gz": "0cdc07feb452dbc3dbba78c9b8b746277967c242e43b9aa334f72b14e39cf20d"
+ },
+ "nslkdd": {
+  "nslkdd.drop.txt.gz": "3bd4ff219636f280b2e9e85ff02b3c3bd0aa4fad11ae538625645e12c76e3f38",
+  "nslkdd.drop_source.txt.gz": "5bb855269f02eecfd4e2abad75e0e46fc4cc21dbfaeb2c10a7cec421fe3bd1db"
+ },
+ "phiusiil": {
+  "phiusiil.drop.txt.gz": "19be5b80f132586d8e0181e66558612fd23ddd0ce56a4bc936c85aac8c72127a",
+  "phiusiil.drop_source.txt.gz": "cccea8f138439b6de01c7c7c92af3939ec990d54534d4224ebcdb7cc26e558a1",
+  "phiusiil.test_source.txt.gz": "1c20789d9f2b2fea153ed033ea7ec8c3e3d7882263cd892872e91dc3c6685586"
+ },
+ "sms_spam": {
+  "sms_spam.drop.txt.gz": "502a56f3ea26f38a204d76895b97c8e7578d423894e02070e02be7b4eac1c87b",
+  "sms_spam.drop_source.txt.gz": "3c546ecf57bb8930b3f9c13559552086939c29ae34245c2245cbb82f70a9969d",
+  "sms_spam.test_source.txt.gz": "cb60be9e76f1005f772f4e17b8a0cf0724b739285a81fc7d23be782fe24d6368"
+ },
+ "ton_fridge": {
+  "ton_fridge.drop.txt.gz": "1c54563cdbb8a822da75de7adee35591642cc6bff2b7e447372e7f2eea6ec6ea",
+  "ton_fridge.drop_source.txt.gz": "d677d3871e2436a7d3d9bea45757c74a28cce676d498c21b3819d9211195a88d",
+  "ton_fridge.test_source.txt.gz": "6c331c6c02e8b4877a0a8d4de0118b500ae98b467283414d5052352722fe5c7a"
+ },
+ "ton_fridge:no_identifiers": {
+  "ton_fridge__no_identifiers.drop.txt.gz": "ea77ca4125d188acc300cb80a7b6a11c01698776e5bdfcb5ae71c7474f44d8f2",
+  "ton_fridge__no_identifiers.drop_source.txt.gz": "585f94be54c41ec813ede1ad2c46b3d2ab3095e7f19454867f7181ba17175a4f",
+  "ton_fridge__no_identifiers.test_source.txt.gz": "1baf12d5f8bfe2ad10ae09ff4a441fd1e302cf2518ea01c7f6caca770d9104d5"
+ },
+ "ton_garage_door": {
+  "ton_garage_door.drop.txt.gz": "4fd6e57d16791e6d68dae5bf258a839a1df49509e8da27b6d97089875671d993",
+  "ton_garage_door.drop_source.txt.gz": "7b7a730e51f1d2c7deb05db38b3abc1ade6e70357de7efe931460facb8cab360",
+  "ton_garage_door.test_source.txt.gz": "a2a2b138350aa6611c1d8710ab70c3cd2f15edba7bed75b4ec402b16b5ab6d07"
+ },
+ "ton_garage_door:no_identifiers": {
+  "ton_garage_door__no_identifiers.drop.txt.gz": "3f0ee1e15318394ea0902974e435939c034f94a2da4fda4f3708c4620f0720e5",
+  "ton_garage_door__no_identifiers.drop_source.txt.gz": "aee7df5fe5a2a4d10dee8fe2b564ab50286a7e7b6e1bf922900ba631b5b2fdd0",
+  "ton_garage_door__no_identifiers.test_source.txt.gz": "af1303aa1ff093f49113358753d27729f763bcb517ca63e3a331b72cbadeadea"
+ },
+ "ton_gps_tracker": {
+  "ton_gps_tracker.drop.txt.gz": "214c4ed3ee34818e97128a1e9b8fd4c4a06d87797ecca9ae55632ad6493ea3bc",
+  "ton_gps_tracker.drop_source.txt.gz": "bcb48954c96a158dfceaae879729a95804b1b46a86ca4f67edf754435fe08158",
+  "ton_gps_tracker.test_source.txt.gz": "a7ba5934e31247482fb2f04512648c20bb67bba68c6516fa77a3044479762408"
+ },
+ "ton_gps_tracker:no_identifiers": {
+  "ton_gps_tracker__no_identifiers.drop.txt.gz": "91b19d5d643b41d36f272c18293177157f6e071d61ab7519229c9c0e5f67564e",
+  "ton_gps_tracker__no_identifiers.drop_source.txt.gz": "2ce3c0da44dd119d1c909ec855a3754f4e2be39ef72f0cc658c184d5aef5889c",
+  "ton_gps_tracker__no_identifiers.test_source.txt.gz": "cd5679ed81fee5f99ce04c8c060a9d24337970061c630b48d05868314e7d40e8"
+ },
+ "ton_modbus": {
+  "ton_modbus.drop.txt.gz": "d95e2d2e558b8f32315585ca5163d14fe9419eda96f399c5661903435411250d",
+  "ton_modbus.drop_source.txt.gz": "97e463117a20f0060055c84c4bad0c56e9fe6a6ab81c50151605ba78025fd87b",
+  "ton_modbus.test_source.txt.gz": "ee813b23435e6d346e248fa4151e81607e553017047913a84e704e31dacb500c"
+ },
+ "ton_modbus:no_identifiers": {
+  "ton_modbus__no_identifiers.drop.txt.gz": "669d607d58f0136440866958c446024a1b9d97540bd6550958a67b8ca54e7450",
+  "ton_modbus__no_identifiers.drop_source.txt.gz": "18f073e07ed95c5e9d8d617e67752fd5b41f14068f291b42af92e1db6ac958b0",
+  "ton_modbus__no_identifiers.test_source.txt.gz": "99e480f9f012cd44d7615a10f340d66afbfa6e4ea1e591cf675003fafff7a457"
+ },
+ "ton_motion_light": {
+  "ton_motion_light.drop.txt.gz": "00759bc692b41dbab9d6da3133c8e77f2bd959b9124f68ef2dfd501becb83d22",
+  "ton_motion_light.drop_source.txt.gz": "d436bb010278ddcf8e492168db42cbbc6a860e66745589a8d67185d35307e422",
+  "ton_motion_light.test_source.txt.gz": "5adccc46a628039bbd82100a60d127693e1b1a65291aa0092bd62f19ada1987c"
+ },
+ "ton_motion_light:no_identifiers": {
+  "ton_motion_light__no_identifiers.drop.txt.gz": "9f00d011939d9fc577456ac6ea56daddb8b751de749b7f2328e0c6e8735f12ce",
+  "ton_motion_light__no_identifiers.drop_source.txt.gz": "80205e58ed10e56f4785633126665cd4fa905e4094b01c8f32bc7ddba7514e75",
+  "ton_motion_light__no_identifiers.test_source.txt.gz": "2e000bdf7c4c0068dd885e365c5d2cf8709f7ba2f923cdc47b9fc21d3bfe0a9f"
+ },
+ "ton_network": {
+  "ton_network.drop.txt.gz": "0f3cb5ea491087144ef8de4d906f8b881655883516f83b9e724d0bbf7e4d22b0",
+  "ton_network.drop_source.txt.gz": "08fd30285d3bd51bdede8292c9f63f20589b3073286fdb2537d0a6dae845819e",
+  "ton_network.test_source.txt.gz": "5dc7c03117aec403fb0ab8d87b36aa223308416eea44040b2a8eb007209f1f3c"
+ },
+ "ton_network:no_identifiers": {
+  "ton_network__no_identifiers.drop.txt.gz": "fdfcddfa34242f65bc58a1755b1452d0939412c9f97211dfbec55e1fb3bca951",
+  "ton_network__no_identifiers.drop_source.txt.gz": "a793efbfd2972997637946e633b518b10f87fc01d0ffe722465ef52affa3b2bf",
+  "ton_network__no_identifiers.test_source.txt.gz": "de96719e12e1d78e701c64e0d9a5cfa3e5d7128cbfbbdb2f90ef94cd620dbbed"
+ },
+ "ton_thermostat": {
+  "ton_thermostat.drop.txt.gz": "927725d3c97df5a9975f911ba71208ac94389abbb6d459fe5b7d1302972bb036",
+  "ton_thermostat.drop_source.txt.gz": "01ccf7944bd2c054e935a0c385b381030ec3c52fd8e9adeba0830f5c3bdada7f",
+  "ton_thermostat.test_source.txt.gz": "c0d23f8efa598be9059a1d4d9983834ab182f9e1a5064d5ecf8c8219d4af90fc"
+ },
+ "ton_thermostat:no_identifiers": {
+  "ton_thermostat__no_identifiers.drop.txt.gz": "8ff1a7df3aeff237274ecc94f78f12b27ff0e53e7517c1b0c2538f6caba036e5",
+  "ton_thermostat__no_identifiers.drop_source.txt.gz": "975de624969b35890a2cea1e62dbc28c414558e7fe5e989551ea0bb1b07267f2",
+  "ton_thermostat__no_identifiers.test_source.txt.gz": "a343635597bbc492a31acbb4f028b9194230dcde5a13bb55bb25a10fc0e9cfee"
+ },
+ "ton_weather": {
+  "ton_weather.drop.txt.gz": "7b7b8fa44cd65c1d1a1d0e005e0235793d2cc6dc1cecd1bb4d496aa40c85de26",
+  "ton_weather.drop_source.txt.gz": "bfdcb5910367aa50028f97a90c97f89af372b8b8c5356e415740bba1c9732b6b",
+  "ton_weather.test_source.txt.gz": "be28b2098b3a291c9e7b853f0039b0465e2835fdec02a12cce72494ab404cf77"
+ },
+ "ton_weather:no_identifiers": {
+  "ton_weather__no_identifiers.drop.txt.gz": "bc60121f2274abdbd6738d0f4496a4f6b59378ba679f73dc3d0e680263138c74",
+  "ton_weather__no_identifiers.drop_source.txt.gz": "ec065529cd900745192f3a4d71ce2bb5cc314a561b17724d82d51141748495d2",
+  "ton_weather__no_identifiers.test_source.txt.gz": "8abc09de8c49d980ba927087ba6da338e67e4043207f617cca13f02298246f49"
+ },
+ "uci_phishing": {
+  "uci_phishing.drop.txt.gz": "b89f8b2215275bf9a0106844b08a487fe6d1f719ff906167ed499089873755bd",
+  "uci_phishing.drop_source.txt.gz": "403f08ab87503f5cdc1b506b98d9c3015f8e550ce68f83e7ad22e5f0f3f3e376",
+  "uci_phishing.test_source.txt.gz": "5d565f5129ccc426cfc2d54053b7c5bb89bac54f50d9e23fab4a3a731d16d75a"
+ },
+ "uci_rt_iot2022": {
+  "uci_rt_iot2022.drop.txt.gz": "c84d5683c83f719c2a04773efda85d4fe3e771559b31afaae7ad9c1325d106f7",
+  "uci_rt_iot2022.drop_source.txt.gz": "dbe68b535dd0b48d429fd7e43d925a3ba85dbbfd01bb1bc52682ef4b08cce5f2",
+  "uci_rt_iot2022.test_source.txt.gz": "6d085dd94164fe4da714d694a7a434c7a9ffba9f76e762f2cf2a11f5c1897d82"
+ },
+ "uci_rt_iot2022:no_identifiers": {
+  "uci_rt_iot2022__no_identifiers.drop.txt.gz": "57bf6cd22119dea717c33dfa4d4691ba036fa89b04bbb0ce186da82661b50bb5",
+  "uci_rt_iot2022__no_identifiers.drop_source.txt.gz": "3102b1ecca263d1118f7959060d283d2075dfb9e3b9eafae6e2040d69213bb37",
+  "uci_rt_iot2022__no_identifiers.test_source.txt.gz": "61e550bc98f3b00d9785bcc25d934f04e9a22380ed6a37bc2a8cc90f708b1c75"
+ },
+ "uci_spambase": {
+  "uci_spambase.drop.txt.gz": "fedb1a857d87a62a5b7543fcd7648a239b80845040f621b2996abba50069108e",
+  "uci_spambase.drop_source.txt.gz": "a318ae4d69855c96f1a6fa5256bfad6e9d0105ce365c5f3a2e53d7ccc46e5984",
+  "uci_spambase.test_source.txt.gz": "102d6de0dc11a11fdb7c9e3b1696336bfaf4b3deabc031270de49a571931df62"
+ },
+ "uci_spambase:no_identifiers": {
+  "uci_spambase__no_identifiers.drop.txt.gz": "57e1564d2ad3d913ceae86f5cfa836833ba76bacfd6d1f5a201f3cd5c31ba568",
+  "uci_spambase__no_identifiers.drop_source.txt.gz": "e9f7adc911901c549cc7ea3e2ce58c0a03a8beefdd9567c678ef875c71bf88a8",
+  "uci_spambase__no_identifiers.test_source.txt.gz": "47e48dc4f7080d2c23509f3a63891a7760f5d139662ba98bc0f47fba3f46c69f"
+ },
+ "uci_tuandromd": {
+  "uci_tuandromd.drop.txt.gz": "fc2f3ab43bc2a318d61e058f45d978f021e7d3b9e828e5a40fca7f2aba834a93",
+  "uci_tuandromd.drop_source.txt.gz": "b64ed837fdc093d13ca3a9e3f4f9c26f0e3a498a54d44f2b256c1c2dd89850b4",
+  "uci_tuandromd.test_source.txt.gz": "dee5450495a9896b9cc268ea38af831e2db639962f320997b000623dd3aea22e"
+ },
+ "uci_website_phishing": {
+  "uci_website_phishing.drop.txt.gz": "c497fa337c53f5117b0267b61c995f439fbe6993a94484930705e84b9e37f63c",
+  "uci_website_phishing.drop_source.txt.gz": "f480037e09db2c149d8fde23d18bc0f09d94d886fcaf79005869aaee70f83de7",
+  "uci_website_phishing.test_source.txt.gz": "30bd6ce01aaa41b159ebcc1fed15aaf6d46d13a26b8680e8490f658f37772697"
+ },
+ "uci_youtube_spam": {
+  "uci_youtube_spam.drop.txt.gz": "ef4134bc3f91fcfa62e82b7c0fc0dab66bae373ab0ee2c34240f0606d1a4d217",
+  "uci_youtube_spam.drop_source.txt.gz": "60498ea37944f52d057e57b0ec876dc90c032eaf4508275db64e8c7ea3319935",
+  "uci_youtube_spam.test_source.txt.gz": "50bc2d62989ebebe0c9a12ac85f285e246469aeb59ac03f3d45ededdc1a63c7f"
+ },
+ "uci_youtube_spam:no_identifiers": {
+  "uci_youtube_spam__no_identifiers.drop.txt.gz": "3212c451d8f391882a2d4a62154d8dc6664e97e961cd1b1f7b0acc847f05da8c",
+  "uci_youtube_spam__no_identifiers.drop_source.txt.gz": "c8da44e1650d3cccdafc967add44da96e55aa434b94b11e10112237d7dbd2802",
+  "uci_youtube_spam__no_identifiers.test_source.txt.gz": "e69dbd3f1e3adfb2a99b58a2e28d0ecfa49712ebad6392aae57a9af52fdaf6b8"
+ },
+ "unsw_nb15": {
+  "unsw_nb15.drop.txt.gz": "3621a65e79582cc3f11f55fee76be104fc203b2cd4bb9a1676a8408477503a96",
+  "unsw_nb15.drop_source.txt.gz": "4b3c8803f69b18550eb0360bd4a6d3374a7ff63ac63b78c4f4245dd7cf349bba"
+ },
+ "xiiotid": {
+  "xiiotid.drop.txt.gz": "566110d1a5897f78ad2afc55ebf081d4883dc0cb26667fc73897ebbb8bc8aded",
+  "xiiotid.drop_source.txt.gz": "0a52a85cce712a34de7b0d6d5d6473be970b0da12a28b93abbd70443aa187e27",
+  "xiiotid.test_source.txt.gz": "bfe0b1d74f2ab054557d218f90debf727c5c77824ba66947f653775ceba2e7f2"
+ },
+ "xiiotid:no_identifiers": {
+  "xiiotid__no_identifiers.drop.txt.gz": "da4089b598e25a8d043d16438f913ea59e92c302ce277e9d39372ea923cf95b1",
+  "xiiotid__no_identifiers.drop_source.txt.gz": "529ee4c3cc321b0e1255e56eb8c6a526d660ead28fb33b421a2e91468a3d5ab2",
+  "xiiotid__no_identifiers.test_source.txt.gz": "78b525ac0d44ec74b558d42b3e045ca1dd89b36447a5e98d03b372b92ab27d65"
+ }
+}

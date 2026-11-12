@@ -1,0 +1,44 @@
+{
+ "case": "edgeiiot:no_identifiers",
+ "split": "stratified random 80%/20% by Attack_type, seed 0",
+ "files": {
+  "edgeiiot": {
+   "edgeiiot/DNN-EdgeIIoT-dataset.csv.zip": "40f2ecf8bd206ccd3e9a21543c501b6d875ea55348e250628b0da31157b60982"
+  }
+ },
+ "label": "Attack_label",
+ "excluded_columns": [
+  "Attack_type (attack name)"
+ ],
+ "near": {
+  "eps": 0.01,
+  "text_jaccard": null
+ },
+ "n_train": 1775360,
+ "n_test": 443841,
+ "n_drop": 243554,
+ "n_clean_test": 200287,
+ "by_reason": {
+  "cross_exact": 72073,
+  "near_tabular": 171481
+ },
+ "recheck": {
+  "L1.cross": {
+   "ok": true,
+   "value": 0
+  },
+  "L2.near": {
+   "ok": true,
+   "value": 0
+  }
+ },
+ "measured_gap": {
+  "full_gap_macro_f1": 0.0,
+  "source": "E13/E14, 4 models x 3 seeds (ledger e14:/e13_difficulty:edgeiiot:no_identifiers)"
+ },
+ "seconds": 471,
+ "search": "near.nearest (CPU)",
+ "source_numbering": "rows of the pinned file, in file order",
+ "split_rule": "test rows = sklearn.model_selection.train_test_split(numpy.arange(n), test_size=0.2, random_state=0, stratify=column 'Attack_type')[1], n = rows of the whole dataset numbered as source_numbering says",
+ "test_source_written": true
+}

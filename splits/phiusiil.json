@@ -1,0 +1,49 @@
+{
+ "case": "phiusiil",
+ "split": "stratified random 80%/20%, seed 0",
+ "files": {
+  "phiusiil": {
+   "phiusiil/phiusiil+phishing+url+dataset.zip": "0a639fd03aea6308c5b1c10c92aa23c2ce1505447a9137271865cd0badc9a59a"
+  }
+ },
+ "label": "label",
+ "excluded_columns": [
+  "FILENAME (row identifier)"
+ ],
+ "near": {
+  "eps": 0.01,
+  "text_jaccard": 0.8
+ },
+ "n_train": 188636,
+ "n_test": 47159,
+ "n_drop": 2090,
+ "n_clean_test": 45069,
+ "by_reason": {
+  "cross_exact": 0,
+  "near_tabular": 140,
+  "near_text": 1950
+ },
+ "recheck": {
+  "L1.cross": {
+   "ok": true,
+   "value": 0
+  },
+  "L2.near": {
+   "ok": true,
+   "value": 0
+  },
+  "L2.near_text": {
+   "ok": true,
+   "value": 0
+  }
+ },
+ "measured_gap": {
+  "full_gap_macro_f1": 3.7727482363932494e-06,
+  "source": "E13/E14, 4 models x 3 seeds (ledger e14:/e13_difficulty:phiusiil)"
+ },
+ "seconds": 63,
+ "search": "near.nearest (CPU)",
+ "source_numbering": "rows of the pinned file, in file order",
+ "split_rule": "test rows = sklearn.model_selection.train_test_split(numpy.arange(n), test_size=0.2, random_state=0, stratify=column 'label')[1], n = rows of the whole dataset numbered as source_numbering says",
+ "test_source_written": true
+}

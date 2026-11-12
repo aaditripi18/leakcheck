@@ -1,0 +1,32 @@
+{
+ "case": "ember2018",
+ "split": "official temporal (train Jan-Oct 2018, test Nov-Dec 2018); unlabelled samples dropped",
+ "files": {
+  "ember2018": {
+   "ember2018/ember_dataset_2018_2.tar.bz2": "b6052eb8d350a49a8d5a5396fbe7d16cf42848b86ff969b77464434cf2997812"
+  }
+ },
+ "label": "label",
+ "excluded_columns": [],
+ "near": "exact copies only: nearest-neighbour search over every row is out of reach at this size",
+ "n_train": 600000,
+ "n_test": 200000,
+ "n_drop": 18,
+ "n_clean_test": 199982,
+ "by_reason": {
+  "cross_exact": 18
+ },
+ "recheck": {
+  "L1.cross": {
+   "ok": true,
+   "value": 0
+  }
+ },
+ "measured_gap": {
+  "full_gap_macro_f1": 0.016396256939326382,
+  "source": "E13/E14, 4 models x 3 seeds (ledger e14:/e13_difficulty:ember2018)"
+ },
+ "seconds": 53,
+ "search": "near.nearest (CPU)",
+ "source_numbering": "rows of EMBER 2018's test files (test_features.jsonl), in file order, unlabelled samples excluded"
+}

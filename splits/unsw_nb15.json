@@ -1,0 +1,44 @@
+{
+ "case": "unsw_nb15",
+ "split": "official (training-set vs testing-set)",
+ "files": {
+  "unsw_nb15": {
+   "unsw_nb15/UNSW_NB15_training-set.csv": "bec7dd5ec88dc2a0ccc7a07879d338395ed7421750f675fd0339e07dfe0648fa",
+   "unsw_nb15/UNSW_NB15_testing-set.csv": "734fe6642edf758f7c94d7d9149426b49d202fe8e7bf0bef47392489c3c0a559"
+  }
+ },
+ "label": "label",
+ "excluded_columns": [
+  "id (row number)",
+  "attack_cat (attack name)"
+ ],
+ "near": {
+  "eps": 0.01,
+  "text_jaccard": null
+ },
+ "n_train": 175341,
+ "n_test": 82332,
+ "n_drop": 14727,
+ "n_clean_test": 67605,
+ "by_reason": {
+  "cross_exact": 8541,
+  "near_tabular": 6186
+ },
+ "recheck": {
+  "L1.cross": {
+   "ok": true,
+   "value": 0
+  },
+  "L2.near": {
+   "ok": true,
+   "value": 0
+  }
+ },
+ "measured_gap": {
+  "full_gap_macro_f1": 0.014032524321623413,
+  "source": "E13/E14, 4 models x 3 seeds (ledger e14:/e13_difficulty:unsw_nb15)"
+ },
+ "seconds": 8,
+ "search": "near.nearest (CPU)",
+ "source_numbering": "rows of the official testing set, in file order"
+}

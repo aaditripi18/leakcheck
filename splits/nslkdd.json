@@ -1,0 +1,43 @@
+{
+ "case": "nslkdd",
+ "split": "official (KDDTrain+ vs KDDTest+)",
+ "files": {
+  "nslkdd": {
+   "nslkdd/NSL-KDD-original.zip": "bfae9d0b76a745e566e8fcb55d37e1e9d730e9463a16c179cf5d6ef04aa4123b"
+  }
+ },
+ "label": "is_attack",
+ "excluded_columns": [
+  "label (attack name)",
+  "difficulty"
+ ],
+ "near": {
+  "eps": 0.01,
+  "text_jaccard": null
+ },
+ "n_train": 125973,
+ "n_test": 22544,
+ "n_drop": 7455,
+ "n_clean_test": 15089,
+ "by_reason": {
+  "cross_exact": 664,
+  "near_tabular": 6791
+ },
+ "recheck": {
+  "L1.cross": {
+   "ok": true,
+   "value": 0
+  },
+  "L2.near": {
+   "ok": true,
+   "value": 0
+  }
+ },
+ "measured_gap": {
+  "full_gap_macro_f1": 0.1004017446091473,
+  "source": "E13/E14, 4 models x 3 seeds (ledger e14:/e13_difficulty:nslkdd)"
+ },
+ "seconds": 4,
+ "search": "near.nearest (CPU)",
+ "source_numbering": "rows of KDDTest+.txt, in file order"
+}

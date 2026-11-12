@@ -1,0 +1,45 @@
+{
+ "case": "cseids2018:no_identifiers",
+ "split": "stratified random 80%/20% by Label, seed 0",
+ "files": {
+  "cseids2018": {
+   "cseids2018/02-14-2018.csv": "acff8bc61376ee031d80878ee6099e0b1a87a1bd711d8068298421418c9f8147",
+   "cseids2018/02-15-2018.csv": "fa2947a8256d81ee9103ae16139d62d0e17aa23e696ee80d9e76fb51c01c9c4b",
+   "cseids2018/02-16-2018.csv": "1a4919faa0c49c7af97230b0c2d076eba23ee6dd81103a3801d51ac316355d8b",
+   "cseids2018/02-20-2018.csv": "7287a4d7740a1dddbf330ceb2beb6a4889d33ba63674558a68b5eb50d16711df",
+   "cseids2018/02-21-2018.csv": "a5f4a1c2689e0aa6566c03a58466de9c407c0be0cbd3cc69306544026611be04",
+   "cseids2018/02-22-2018.csv": "da33c927018274f9d49b145baa00e4ce0526c25b3b890b34c489e247b5e24544",
+   "cseids2018/02-23-2018.csv": "d0a7f5059d9823b6e9b392b759e306481a3502d190dea7a1b5502ae079ea069b",
+   "cseids2018/02-28-2018.csv": "f15e2a12304446058a0186c8ad67de2bd15735a9ba5c70c9a1f4c4242ab06771",
+   "cseids2018/03-01-2018.csv": "b0534c5d7d8b41e03df71c6966c995d116a8ed28e61f377c8b14cdf5d28f4edf",
+   "cseids2018/03-02-2018.csv": "d96f38e7496aba83475031e6fb8c6fdf1abf6aa1b71325a917798f3c7de93de1"
+  }
+ },
+ "label": "is_attack",
+ "excluded_columns": [
+  "Label (attack name)"
+ ],
+ "near": "exact copies only: nearest-neighbour search over every row is out of reach at this size",
+ "n_train": 12986354,
+ "n_test": 3246589,
+ "n_drop": 1307051,
+ "n_clean_test": 1939538,
+ "by_reason": {
+  "cross_exact": 1307051
+ },
+ "recheck": {
+  "L1.cross": {
+   "ok": true,
+   "value": 0
+  }
+ },
+ "measured_gap": {
+  "full_gap_macro_f1": 0.11671744685730856,
+  "source": "E13/E14, 4 models x 3 seeds (ledger e14:/e13_difficulty:cseids2018:no_identifiers)"
+ },
+ "seconds": 906,
+ "search": "near.nearest (CPU)",
+ "source_numbering": "rows of the ten CSVs read in capture order (02-14 ... 03-02-2018), with the header lines repeated inside some files skipped",
+ "split_rule": "test rows = sklearn.model_selection.train_test_split(numpy.arange(n), test_size=0.2, random_state=0, stratify=column 'Label')[1], n = rows of the whole dataset numbered as source_numbering says",
+ "test_source_written": false
+}

@@ -1,0 +1,46 @@
+{
+ "case": "kdd99",
+ "split": "official (kddcup.data vs corrected)",
+ "files": {
+  "kdd99": {
+   "kdd99/kddcup.data.gz": "3b6c942aa0356c0ca35b7b595a26c89d343652c9db428893e7494f837b274292"
+  },
+  "kdd99_test": {
+   "kdd99_hf/test-00000-of-00002.parquet": "5bf467cb018e1fc34f0b710ed46da31f52059581cc522090b3e55f7a3da5b90b",
+   "kdd99_hf/test-00001-of-00002.parquet": "0d8a6980462dfdda8193a11ec5923f32b1314a99728c43cd83d23facc5a0e60e"
+  }
+ },
+ "label": "is_attack",
+ "excluded_columns": [
+  "label (attack name)"
+ ],
+ "near": {
+  "eps": 0.01,
+  "text_jaccard": null
+ },
+ "n_train": 4898431,
+ "n_test": 311029,
+ "n_drop": 258496,
+ "n_clean_test": 52533,
+ "by_reason": {
+  "cross_exact": 212612,
+  "near_tabular": 45884
+ },
+ "recheck": {
+  "L1.cross": {
+   "ok": true,
+   "value": 0
+  },
+  "L2.near": {
+   "ok": true,
+   "value": 0
+  }
+ },
+ "measured_gap": {
+  "full_gap_macro_f1": 0.1610847934825537,
+  "source": "E13/E14, 4 models x 3 seeds (ledger e14:/e13_difficulty:kdd99)"
+ },
+ "seconds": 520,
+ "search": "near.nearest (CPU)",
+ "source_numbering": "rows of the test set `corrected` (registry kdd99_test), in file order"
+}

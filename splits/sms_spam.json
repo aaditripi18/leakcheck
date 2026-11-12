@@ -1,0 +1,42 @@
+{
+ "case": "sms_spam",
+ "split": "stratified random 80%/20%, seed 0",
+ "files": {
+  "sms_spam": {
+   "sms_spam/sms+spam+collection.zip": "1587ea43e58e82b14ff1f5425c88e17f8496bfcdb67a583dbff9eefaf9963ce3"
+  }
+ },
+ "label": "label",
+ "excluded_columns": [],
+ "near": {
+  "eps": 0.01,
+  "text_jaccard": 0.8
+ },
+ "n_train": 4459,
+ "n_test": 1115,
+ "n_drop": 148,
+ "n_clean_test": 967,
+ "by_reason": {
+  "cross_exact": 123,
+  "near_text": 25
+ },
+ "recheck": {
+  "L1.cross": {
+   "ok": true,
+   "value": 0
+  },
+  "L2.near_text": {
+   "ok": true,
+   "value": 0
+  }
+ },
+ "measured_gap": {
+  "full_gap_macro_f1": 0.029982816779686432,
+  "source": "E13/E14, 4 models x 3 seeds (ledger e14:/e13_difficulty:sms_spam)"
+ },
+ "seconds": 1,
+ "search": "near.nearest (CPU)",
+ "source_numbering": "rows of the pinned file, in file order",
+ "split_rule": "test rows = sklearn.model_selection.train_test_split(numpy.arange(n), test_size=0.2, random_state=0, stratify=column 'label')[1], n = rows of the whole dataset numbered as source_numbering says",
+ "test_source_written": true
+}

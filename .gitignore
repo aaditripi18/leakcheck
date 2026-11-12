@@ -10,3 +10,6 @@ node_modules/
 .vercel/
 results/e5/*.npz
 results/e7/*.npz
+
+# clean-split row lists: published as assets of the clean-splits release (SHA-256 in splits/index.json)
+splits/*.gz

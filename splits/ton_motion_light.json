@@ -1,0 +1,51 @@
+{
+ "case": "ton_motion_light",
+ "split": "stratified random 80%/20% by type, seed 0",
+ "files": {
+  "ton_iot": {
+   "ton_iot/train_test_network.csv": "26ddc513552de36de6428b2e578efaed2b57504c716dfba847cc0109a64e1974",
+   "ton_iot/Train_Test_IoT_Fridge.csv": "56377a00b97204ea65f8912eadea9e626fe05d091f975f5be64c94c85efe3149",
+   "ton_iot/Train_Test_IoT_Garage_Door.csv": "44b2d63f233ed239d604815f53e2b2ba6ec2b9bc604a9f6fbed6b98d55e53188",
+   "ton_iot/Train_Test_IoT_GPS_Tracker.csv": "71c6cc302b14822aea699cf41a02dad36089ea59b87a28000b38a44b2d23cb9b",
+   "ton_iot/Train_Test_IoT_Modbus.csv": "78345a857244e671b0c255ca65aac619049632448fc5aa736f1cea255f308cbb",
+   "ton_iot/Train_Test_IoT_Motion_Light.csv": "e0e145ff3d8145d4ad713380a291248dba74e75a70bd75525719ffaaaf2f5242",
+   "ton_iot/Train_Test_IoT_Thermostat.csv": "b475654a43ec885fd8c3409d9e85b7902ecc3ad47440948466f4fe3559fd1f6d",
+   "ton_iot/Train_Test_IoT_Weather.csv": "10c49fe8a6eae98db688e277e96218c9a9bf587cc5aee5962833470366dafdba"
+  }
+ },
+ "label": "type",
+ "excluded_columns": [
+  "label (binary)"
+ ],
+ "near": {
+  "eps": 0.01,
+  "text_jaccard": null
+ },
+ "n_train": 31590,
+ "n_test": 7898,
+ "n_drop": 3196,
+ "n_clean_test": 4702,
+ "by_reason": {
+  "cross_exact": 3196,
+  "near_tabular": 0
+ },
+ "recheck": {
+  "L1.cross": {
+   "ok": true,
+   "value": 0
+  },
+  "L2.near": {
+   "ok": true,
+   "value": 0
+  }
+ },
+ "measured_gap": {
+  "full_gap_macro_f1": 0.007192772861029123,
+  "source": "E13/E14, 4 models x 3 seeds (ledger e14:/e13_difficulty:ton_motion_light)"
+ },
+ "seconds": 5,
+ "search": "near.nearest (CPU)",
+ "source_numbering": "rows of the pinned file, in file order",
+ "split_rule": "test rows = sklearn.model_selection.train_test_split(numpy.arange(n), test_size=0.2, random_state=0, stratify=column 'type')[1], n = rows of the whole dataset numbered as source_numbering says",
+ "test_source_written": true
+}
