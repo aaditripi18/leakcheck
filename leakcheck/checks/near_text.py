@@ -102,7 +102,9 @@ def nearest_text(train_text, test_text, test_idx=None, tau: float = TAU):
     if cand.empty:
         return sim, best
 
-    cand = cand.sort_values("est", ascending=False).groupby("i").head(5)
+    # a stable order with a tie-break on the training row: each test row's candidates then depend on that
+    # row and the training set only, never on which other test rows are present (clean's re-check relies on it)
+    cand = cand.sort_values(["i", "est", "j"], ascending=[True, False, True], kind="mergesort").groupby("i").head(5)
     for ii, jj in zip(cand["i"].to_numpy(), cand["j"].to_numpy()):
         s = jaccard(te_sh[ii], tr_sh[jj])
         if s > sim[ii]:

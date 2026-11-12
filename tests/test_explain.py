@@ -98,3 +98,15 @@ def test_explain_cli_when_every_training_row_is_a_copy(tmp_path, capsys):
                  "--label", "y"])
     out = capsys.readouterr().out
     assert code == 0 and "S undefined" in out and "every training row is a copy" in out
+
+
+def test_text_neighbours_do_not_depend_on_the_other_test_rows():
+    from leakcheck.checks import near_text
+    rng = np.random.default_rng(3)
+    words = ["login", "secure", "bank", "verify", "account", "update", "paypal", "mail", "home", "page"]
+    train = pd.Series([" ".join(rng.choice(words, 6)) for _ in range(400)])
+    test = pd.Series([" ".join(rng.choice(words, 6)) for _ in range(200)])
+    sim_all, nn_all = near_text.nearest_text(train, test, tau=0.8)
+    keep = np.arange(0, 200, 3)
+    sim_sub, nn_sub = near_text.nearest_text(train, test.iloc[keep], tau=0.8)
+    assert np.array_equal(sim_all[keep], sim_sub) and np.array_equal(nn_all[keep], nn_sub)
