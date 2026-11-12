@@ -1,0 +1,106 @@
+name: leakcheck
+description: >-
+  Audit a train/test split for leakage (exact and near copies, contradictory labels, future
+  data, one-column shortcuts, group overlap) before results are reported.
+author: Aaditya Tripathi
+branding:
+  icon: shield
+  color: orange
+
+inputs:
+  train:
+    description: Path to the training CSV (Parquet needs pyarrow installed).
+    required: true
+  test:
+    description: Path to the test CSV (Parquet needs pyarrow installed).
+    required: true
+  label:
+    description: Name of the label column.
+    required: true
+  args:
+    description: >-
+      Extra `leakcheck scan` arguments, e.g. "--time ts --group host --text url --ignore id".
+    required: false
+    default: ""
+  fail-on:
+    description: >-
+      Fail the step at this severity or above: "high", "medium", or "never" (report only).
+    required: false
+    default: high
+  explain:
+    description: Also run `leakcheck explain` (easy or memorised copies) when rows leak. "true" or "false".
+    required: false
+    default: "true"
+  python-version:
+    description: Python used to run leakcheck.
+    required: false
+    default: "3.12"
+
+outputs:
+  exit-code:
+    description: "leakcheck scan's exit code: 0 clean or minor, 1 medium, 2 high, 3 bad input."
+    value: ${{ steps.scan.outputs.code }}
+  report:
+    description: Path of the JSON report.
+    value: ${{ steps.scan.outputs.report }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+    - name: Install leakcheck
+      shell: bash
+      run: python -m pip install --quiet "${{ github.action_path }}"
+    - name: Scan
+      id: scan
+      shell: bash
+      env:
+        LC_TRAIN: ${{ inputs.train }}
+        LC_TEST: ${{ inputs.test }}
+        LC_LABEL: ${{ inputs.label }}
+        LC_ARGS: ${{ inputs.args }}
+      run: |
+        report="${RUNNER_TEMP}/leakcheck-report.json"
+        set +e
+        # LC_ARGS is split on spaces on purpose: it carries several flags
+        python -m leakcheck scan --train "$LC_TRAIN" --test "$LC_TEST" --label "$LC_LABEL" $LC_ARGS \
+          --json "$report" | tee "${RUNNER_TEMP}/leakcheck-report.txt"
+        code=${PIPESTATUS[0]}
+        set -e
+        echo "code=$code" >> "$GITHUB_OUTPUT"
+        echo "report=$report" >> "$GITHUB_OUTPUT"
+        {
+          echo "## leakcheck"
+          echo
+          echo "\`$LC_TRAIN\` vs \`$LC_TEST\`, label \`$LC_LABEL\`: exit code $code (0 clean or minor, 1 medium, 2 high, 3 bad input)"
+          echo
+          echo '```'
+          cat "${RUNNER_TEMP}/leakcheck-report.txt"
+          echo '```'
+        } >> "$GITHUB_STEP_SUMMARY"
+    - name: Explain
+      if: inputs.explain == 'true' && (steps.scan.outputs.code == '1' || steps.scan.outputs.code == '2')
+      shell: bash
+      env:
+        LC_TRAIN: ${{ inputs.train }}
+        LC_TEST: ${{ inputs.test }}
+        LC_LABEL: ${{ inputs.label }}
+      run: |
+        python -m leakcheck explain --train "$LC_TRAIN" --test "$LC_TEST" --label "$LC_LABEL" \
+          | tee "${RUNNER_TEMP}/leakcheck-explain.txt"
+        { echo; echo "### Easy or memorised?"; echo; echo '```'; cat "${RUNNER_TEMP}/leakcheck-explain.txt"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+    - name: Decide
+      shell: bash
+      env:
+        CODE: ${{ steps.scan.outputs.code }}
+        FAIL_ON: ${{ inputs.fail-on }}
+      run: |
+        case "$FAIL_ON" in
+          never) exit 0 ;;
+          medium) [ "$CODE" -ge 1 ] && { echo "::error::leakcheck found medium or high leakage (exit $CODE)"; exit 1; } ;;
+          high) [ "$CODE" -ge 2 ] && { echo "::error::leakcheck found high leakage or bad input (exit $CODE)"; exit 1; } ;;
+          *) echo "::error::fail-on must be high, medium or never"; exit 1 ;;
+        esac
+        exit 0

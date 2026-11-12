@@ -54,3 +54,34 @@ jobs:
           status=$?
           echo "exit $status"
           test $status -le 2
+
+  action:
+    # the composite action in action.yml, as another repository would use it
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: A leaky split and a clean one
+        run: |
+          python3 - <<'PY'
+          import csv, random
+          random.seed(0)
+          cols = [f"f{j}" for j in range(10)]  # ten features: in two, random points sit within eps by chance
+          rows = [{**{c: random.random() for c in cols}, "y": random.randint(0, 1)} for i in range(400)]
+          def write(name, part):
+              with open(name, "w", newline="") as f:
+                  w = csv.DictWriter(f, fieldnames=cols + ["y"]); w.writeheader(); w.writerows(part)
+          write("train.csv", rows[:300]); write("leaky_test.csv", rows[200:300]); write("clean_test.csv", rows[300:])
+          PY
+      - id: leaky
+        uses: ./
+        with: { train: train.csv, test: leaky_test.csv, label: y, fail-on: never }
+      - id: clean
+        uses: ./
+        with: { train: train.csv, test: clean_test.csv, label: y }
+      - name: The action catches the planted copies and passes the clean split
+        env:
+          LEAKY: ${{ steps.leaky.outputs.exit-code }}
+          CLEAN: ${{ steps.clean.outputs.exit-code }}
+        run: |
+          echo "leaky exit $LEAKY, clean exit $CLEAN"
+          test "$LEAKY" = 2 && test "$CLEAN" = 0
