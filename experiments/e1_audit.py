@@ -260,7 +260,11 @@ def prep_uci5(name: str, label: str, excluded: tuple[str, ...] = (), text: str |
     def prep(seed: int = SEED) -> Prepared:
         df = (loader or (lambda: data.load_uci_csv(name)))()
         df = df.drop(columns=list(excluded))
-        tr, te = random_split(df, df[label], seed)
+        # a class with a single row cannot be stratified; such classes are pooled for the split
+        # only (labels unchanged; no effect where every class has 2+ rows; PLAN.md 2026-11-13)
+        counts = df[label].value_counts()
+        strat = df[label].where(~df[label].isin(counts[counts < 2].index), "__single_row_classes__")             if (counts < 2).any() else df[label]
+        tr, te = random_split(df, strat.rename(label), seed)
         s = Split(tr, te, label, text=text)
         notes = {"excluded": list(excluded)} if excluded else {}
         if text:
@@ -282,6 +286,21 @@ PREP = {
     "uci_youtube_spam": prep_uci5("uci_youtube_spam", "CLASS", ("VIDEO", "COMMENT_ID"), text="CONTENT"),
     "uci_tuandromd": prep_uci5("uci_tuandromd", "Label", loader=data.load_tuandromd),
     "uci_rt_iot2022": prep_uci5("uci_rt_iot2022", "Attack_type", ("id",)),
+    # round 3 of H22 (PLAN.md amendment 2026-11-13): same split rule as phase 5
+    "uci_bhp": prep_uci5("uci_bhp", "Class", loader=data.load_uci_bhp),
+    "uci_bitcoin_heist": prep_uci5("uci_bitcoin_heist", "label", ("address",),
+                                   loader=lambda: data.load_uci_zip_csv("uci_bitcoin_heist", "BitcoinHeistData.csv")),
+    "uci_firewall": prep_uci5("uci_firewall", "Action",
+                              loader=lambda: data.load_uci_zip_csv("uci_firewall", "log2.csv")),
+    "openml_creditcard": prep_uci5("openml_creditcard", "Class", ("Time",),
+                                   loader=lambda: data.load_openml("openml_creditcard")),
+    "openml_timing_attack": prep_uci5("openml_timing_attack", "label",
+                                      loader=lambda: data.load_openml("openml_timing_attack")),
+    "openml_padding_attack": prep_uci5("openml_padding_attack", "label",
+                                       loader=lambda: data.load_openml("openml_padding_attack")),
+    "openml_ieee_fraud": prep_uci5("openml_ieee_fraud", "isFraud", loader=lambda: data.load_openml("openml_ieee_fraud")),
+    "openml_phishing_tan": prep_uci5("openml_phishing_tan", "CLASS_LABEL",
+                                     loader=lambda: data.load_openml("openml_phishing_tan")),
 }
 
 

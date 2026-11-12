@@ -1546,5 +1546,117 @@
         "sha256": "289632f1b01a317e86a3cce5e276246ad64e1e6ac03ffd3b16202b9d016d7d90"
       }
     ]
+  },
+  "uci_bhp": {
+    "description": "Burst Header Packet flooding attack on OBS networks: 1,075 node records, 21 features, Class label (4 classes)",
+    "source": "UCI Machine Learning Repository dataset 404 (official), downloaded from archive.ics.uci.edu on 2026-11-13",
+    "provenance": "UCI's zip (one ARFF file); 1,075 rows, as UCI publishes (PLAN.md amendment 2026-11-13, sourcing note).",
+    "licence": "CC BY 4.0",
+    "citation": "Rajab. Burst Header Packet (BHP) flooding attack on Optical Burst Switching (OBS) Network. UCI ML Repository, https://archive.ics.uci.edu/dataset/404",
+    "files": [
+      {
+        "path": "uci_bhp/burst+header+packet+bhp+flooding+attack+on+optical+burst+switching+obs+network.zip",
+        "url": "https://archive.ics.uci.edu/static/public/404/burst+header+packet+bhp+flooding+attack+on+optical+burst+switching+obs+network.zip",
+        "sha256": "b154f2018d24c0caff4b08daaea27784831529ecfbbc7e491bff7a2be9e4532e"
+      }
+    ]
+  },
+  "uci_bitcoin_heist": {
+    "description": "BitcoinHeist: 2,916,697 Bitcoin addresses, 8 graph features, label (ransomware family or white); address excluded",
+    "source": "UCI Machine Learning Repository dataset 526 (official), downloaded from archive.ics.uci.edu on 2026-11-13",
+    "provenance": "UCI's zip (BitcoinHeistData.csv); 2,916,697 rows, as UCI publishes (PLAN.md amendment 2026-11-13, sourcing note).",
+    "licence": "CC BY 4.0",
+    "citation": "BitcoinHeist Ransomware Address. UCI ML Repository, https://archive.ics.uci.edu/dataset/526",
+    "files": [
+      {
+        "path": "uci_bitcoin_heist/bitcoinheistransomwareaddressdataset.zip",
+        "url": "https://archive.ics.uci.edu/static/public/526/bitcoinheistransomwareaddressdataset.zip",
+        "sha256": "cdf3bb34199367b08285cf7f9c1db06c4a262d353aa596055e97db77f4514e5b"
+      }
+    ]
+  },
+  "uci_firewall": {
+    "description": "Internet Firewall Data: 65,532 firewall log records, 11 features, Action label (4 classes)",
+    "source": "UCI Machine Learning Repository dataset 542 (official), downloaded from archive.ics.uci.edu on 2026-11-13",
+    "provenance": "UCI's zip (log2.csv); 65,532 rows, as UCI publishes (PLAN.md amendment 2026-11-13, sourcing note).",
+    "licence": "CC BY 4.0",
+    "citation": "Internet Firewall Data. UCI ML Repository, https://archive.ics.uci.edu/dataset/542",
+    "files": [
+      {
+        "path": "uci_firewall/internet+firewall+data.zip",
+        "url": "https://archive.ics.uci.edu/static/public/542/internet+firewall+data.zip",
+        "sha256": "9865aa2f47a269b4d76c48ea33f30c3a050da855b9ab7a5d218fe560eff9470a"
+      }
+    ]
+  },
+  "openml_creditcard": {
+    "description": "Credit card fraud (ULB): 284,807 transactions, 28 PCA features and Amount, Class label; Time (OpenML's row id) excluded",
+    "source": "OpenML dataset 1597, parquet file, downloaded from data.openml.org on 2026-11-13",
+    "provenance": "OpenML's parquet; row count equals OpenML's NumberOfInstances (PLAN.md amendment 2026-11-13, sourcing note).",
+    "licence": "Public",
+    "citation": "Dal Pozzolo, Caelen, Johnson, Bontempi. Calibrating probability with undersampling for unbalanced classification. IEEE SSCI 2015",
+    "files": [
+      {
+        "path": "openml_creditcard/dataset_1597.pq",
+        "url": "https://data.openml.org/datasets/0000/1597/dataset_1597.pq",
+        "sha256": "b7efcb35a428bbe22347a05d2437d9177bab07ce61e51214a17bec584ad9496d"
+      }
+    ]
+  },
+  "openml_timing_attack": {
+    "description": "Bleichenbacher timing attack, 1 microsecond delay, 2022-09-01: 9,995 TLS handshakes, 124 packet features, label (11 classes)",
+    "source": "OpenML dataset 45449, parquet file, downloaded from data.openml.org on 2026-11-13",
+    "provenance": "OpenML's parquet; row count equals OpenML's NumberOfInstances (PLAN.md amendment 2026-11-13, sourcing note).",
+    "licence": "see OpenML 45449",
+    "citation": "IT-Security research group ITSC, University of Wuppertal; uploaded by SICP, University of Paderborn (OpenML 45449)",
+    "files": [
+      {
+        "path": "openml_timing_attack/dataset_45449.pq",
+        "url": "https://data.openml.org/datasets/0004/45449/dataset_45449.pq",
+        "sha256": "fab429d749fefef057c3ef8e6f2cd80673fe9a9c488a3eda6cc948bb21e6534f"
+      }
+    ]
+  },
+  "openml_padding_attack": {
+    "description": "Bleichenbacher padding attack, OpenSSL 1.1.1k, 2021-07-23: 49,977 TLS handshakes, 116 packet features, label (11 classes)",
+    "source": "OpenML dataset 45913, parquet file, downloaded from data.openml.org on 2026-11-13",
+    "provenance": "OpenML's parquet; row count equals OpenML's NumberOfInstances (PLAN.md amendment 2026-11-13, sourcing note).",
+    "licence": "ODbL",
+    "citation": "IT-Security research group ITSC, University of Wuppertal; uploaded by SICP, University of Paderborn (OpenML 45913)",
+    "files": [
+      {
+        "path": "openml_padding_attack/dataset_45913.pq",
+        "url": "https://data.openml.org/datasets/0004/45913/dataset_45913.pq",
+        "sha256": "7f6deb2b7c42be2a3fd4ff2f221cd1292ec9ae53e581f1076c3f902f73fe8f5c"
+      }
+    ]
+  },
+  "openml_ieee_fraud": {
+    "description": "IEEE-CIS Fraud Detection: 590,540 transactions, 455 features, isFraud label",
+    "source": "OpenML dataset 46858, parquet file, downloaded from data.openml.org on 2026-11-13",
+    "provenance": "OpenML's parquet; row count equals OpenML's NumberOfInstances (PLAN.md amendment 2026-11-13, sourcing note).",
+    "licence": "Kaggle and IEEE CIS",
+    "citation": "Howard, Bouchon-Meunier, IEEE CIS, et al. IEEE-CIS Fraud Detection. Kaggle (OpenML 46858)",
+    "files": [
+      {
+        "path": "openml_ieee_fraud/dataset_46858.pq",
+        "url": "https://data.openml.org/datasets/0004/46858/dataset_46858.pq",
+        "sha256": "c313ad335223589693e26d5808267ed6ff03d871be5d9bb63deb3b847fa4b891"
+      }
+    ]
+  },
+  "openml_phishing_tan": {
+    "description": "Phishing Dataset for Machine Learning: 10,000 web pages, 48 features, CLASS_LABEL",
+    "source": "OpenML dataset 46868, parquet file, downloaded from data.openml.org on 2026-11-13",
+    "provenance": "OpenML's parquet; row count equals OpenML's NumberOfInstances (PLAN.md amendment 2026-11-13, sourcing note).",
+    "licence": "CC BY 4.0",
+    "citation": "Tan. Phishing Dataset for Machine Learning: Feature Evaluation. Mendeley Data, 2018, doi:10.17632/h3cgnj8hft.1",
+    "files": [
+      {
+        "path": "openml_phishing_tan/dataset_46868.pq",
+        "url": "https://data.openml.org/datasets/0004/46868/dataset_46868.pq",
+        "sha256": "e0ce4a8469b5543a720b5488516c5306086cc85844035f4af1980d287804ecaf"
+      }
+    ]
   }
 }

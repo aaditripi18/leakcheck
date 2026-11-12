@@ -18,6 +18,7 @@ import hashlib
 import http.client
 import json
 import os
+import re
 import time
 import urllib.error
 import urllib.request
@@ -438,4 +439,44 @@ def load_ciciot2023() -> pd.DataFrame:
         frames.append(d)
     df = pd.concat(frames, ignore_index=True)
     df["label"] = df["label"].astype("string")
+    return df
+
+
+# --- Round 3 of H22: UCI and OpenML security benchmarks (PLAN.md amendment 2026-11-13) ---
+
+
+def load_uci_bhp() -> pd.DataFrame:
+    """Burst Header Packet flooding: the zip's single ARFF file, parsed (quoted nominal values)."""
+    import csv
+    import io
+    (path,) = verify_local("uci_bhp")
+    with zipfile.ZipFile(path) as zf:
+        txt = zf.read(_zip_member(zf, "OBS-Network-DataSet_2_Aug27.arff")).decode("latin-1")
+    head, body = re.split(r"^@data\s*$", txt, maxsplit=1, flags=re.I | re.M)
+    names = [m.group(1) or m.group(2) for m in
+             re.finditer(r"^@attribute\s+(?:'([^']+)'|(\S+))\s+", head, flags=re.I | re.M)]
+    rows = [r for r in csv.reader(io.StringIO(body), quotechar="'", skipinitialspace=True)
+            if r and not r[0].startswith("%")]
+    df = pd.DataFrame(rows, columns=names)
+    for c in df.columns:
+        num = pd.to_numeric(df[c], errors="coerce")
+        if num.notna().all():
+            df[c] = num
+    return df
+
+
+def load_uci_zip_csv(name: str, member: str) -> pd.DataFrame:
+    """A UCI zip holding one CSV (Bitcoin Heist, Internet Firewall Data)."""
+    (path,) = verify_local(name)
+    with zipfile.ZipFile(path) as zf, zf.open(_zip_member(zf, member)) as f:
+        return pd.read_csv(f, low_memory=False)
+
+
+def load_openml(name: str) -> pd.DataFrame:
+    """An OpenML parquet file; categorical columns become plain values (as a CSV would give)."""
+    (path,) = verify_local(name)
+    df = pd.read_parquet(path)
+    for c in df.columns:
+        if isinstance(df[c].dtype, pd.CategoricalDtype):
+            df[c] = df[c].astype(object).where(df[c].notna(), None)
     return df

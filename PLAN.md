@@ -660,3 +660,27 @@ virus|security|network traffic|firewall|anomal|hack|exploit|bot`.
 
 Each OpenML dataset is used if its row count equals OpenML's stated count. Everything
 else is as above.
+
+**Deviation and views (2026-11-13, before S on any round-3 case).**
+
+*Deviation.* Bitcoin Heist has three ransomware families with a single row each, and a
+stratified split cannot place a class that has one row. For the split only, classes
+with fewer than 2 rows are pooled into one stratum. The labels do not change. Every
+other dataset of any round has at least 2 rows per class, so its split is byte for byte
+the same as before.
+
+*Views.* By the L5 identifier check:
+
+| Dataset | Columns dropped in the no_identifiers view |
+|---|---|
+| BHP | `Average_Delay_Time_Per_Sec` |
+| Firewall | the four port columns and `Elapsed Time (sec)` |
+| Timing attack | the eight TCP timestamp and time-delta columns |
+| IEEE-CIS | 18 of the `id_*` columns |
+
+Phishing (Tan) has no `id` column in OpenML's version 2, so nothing was excluded there.
+
+*Cases.* **12 cases**: uci_bhp, uci_bitcoin_heist, uci_firewall, openml_creditcard,
+openml_timing_attack, openml_padding_attack, openml_ieee_fraud and openml_phishing_tan,
+plus the no_identifiers views of uci_bhp, uci_firewall, openml_timing_attack and
+openml_ieee_fraud.

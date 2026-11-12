@@ -27,7 +27,8 @@ from experiments.ledger import LEDGER, record
 from leakcheck.explain import NEAR_EPS, ROUNDS, TEXT_TAU, copies_in_train, leak_masks, statistic, with_train
 
 FRESH_PREFIXES = ("ton_", "botiot", "xiiotid", "uci_spambase", "uci_website_phishing", "uci_youtube_spam",
-                  "uci_tuandromd", "uci_rt_iot2022")  # phases 4 and 5
+                  "uci_tuandromd", "uci_rt_iot2022",  # phases 4 and 5
+                  "uci_bhp", "uci_bitcoin_heist", "uci_firewall", "openml_")  # round 3 (H22)
 
 
 def _hashes(name: str) -> dict:
