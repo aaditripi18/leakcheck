@@ -26,7 +26,8 @@ from experiments.e9_controls import SEEDS
 from experiments.ledger import LEDGER, record
 from leakcheck.explain import NEAR_EPS, ROUNDS, TEXT_TAU, copies_in_train, leak_masks, statistic, with_train
 
-FRESH_PREFIXES = ("ton_", "botiot", "xiiotid")
+FRESH_PREFIXES = ("ton_", "botiot", "xiiotid", "uci_spambase", "uci_website_phishing", "uci_youtube_spam",
+                  "uci_tuandromd", "uci_rt_iot2022")  # phases 4 and 5
 
 
 def _hashes(name: str) -> dict:
