@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import os
 import platform
 import subprocess
 from importlib.metadata import version
@@ -27,6 +28,9 @@ def git_state() -> dict:
             return ""
 
     commit = run("rev-parse", "--short", "HEAD")
+    if not commit and os.environ.get("LEAKCHECK_COMMIT"):
+        # a Kaggle notebook: no git, code unpacked from `git archive` of that clean commit
+        return {"commit": os.environ["LEAKCHECK_COMMIT"], "dirty": False, "where": "kaggle"}
     return {"commit": commit or "unknown", "dirty": bool(run("status", "--porcelain", "--", "leakcheck", "experiments"))}
 
 
