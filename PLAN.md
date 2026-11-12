@@ -504,3 +504,20 @@ model on it.
   it as a description only.
 - H20 is not re-tested: none of these benchmarks is both near-perfect and multi-class with
   rare classes by design, so it stays as phase 4 left it (not judged).
+
+**Sourcing note (2026-11-12, before any leakage number on these files).** Downloaded from
+UCI and pinned in data/registry.json; each count checked against UCI's published one:
+
+- *Spambase* (4,601), *Website Phishing* (1,353), *YouTube Spam Collection* (1,956) and
+  *RT-IoT2022* (123,117): UCI's data.csv, row counts equal to UCI's.
+- *TUANDROMD*: the zip's TUANDROMD.csv has 4,465 rows, one of them entirely empty (no value
+  in any of its 242 columns). Without it, 4,464 rows, UCI's count; the empty row is dropped.
+- *NATICUSdroid*: UCI's data.csv has 29,332 rows where UCI states 29,333, and the dataset
+  paper gives no exact count. By the rule above it is **not used**.
+
+Views, by the rule above: the L5 identifier check flags `word_freq_address` in Spambase (a
+word frequency, not an identifier, as with KDD99's `dst_host_same_src_port_rate`), `AUTHOR`
+and `DATE` in YouTube Spam, and `id.orig_p` and `id.resp_p` (ports) in RT-IoT2022, so each
+of these three is also run without them. This gives **8 fresh cases**: uci_spambase,
+uci_website_phishing, uci_youtube_spam, uci_tuandromd and uci_rt_iot2022, plus the
+no_identifiers views of uci_spambase, uci_youtube_spam and uci_rt_iot2022.

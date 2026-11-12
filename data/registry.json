@@ -1476,5 +1476,75 @@
         "url": "https://www.kaggle.com/datasets/munaalhawawreh/xiiotid-iiot-intrusion-dataset"
       }
     ]
+  },
+  "uci_spambase": {
+    "description": "Spambase: 4,601 e-mails, 57 word/character-frequency features, Class label (1 = spam)",
+    "source": "UCI Machine Learning Repository dataset 94 (official), downloaded from archive.ics.uci.edu on 2026-11-12",
+    "provenance": "UCI's data.csv; 4,601 rows, as UCI publishes (PLAN.md amendment 2026-11-12, sourcing note).",
+    "licence": "CC BY 4.0",
+    "citation": "Hopkins, Reeber, Forman, Suermondt. Spambase. UCI ML Repository, https://doi.org/10.24432/C53G6X",
+    "files": [
+      {
+        "path": "uci_spambase/data.csv",
+        "url": "https://archive.ics.uci.edu/static/public/94/data.csv",
+        "sha256": "d86711ceadadd177f09ca816fffa79d82edf5007b585a836c112462e2c217c0d"
+      }
+    ]
+  },
+  "uci_website_phishing": {
+    "description": "Website Phishing: 1,353 sites, 9 ternary features, Result label (-1 phishing, 0 suspicious, 1 legitimate)",
+    "source": "UCI Machine Learning Repository dataset 379 (official), downloaded from archive.ics.uci.edu on 2026-11-12",
+    "provenance": "UCI's data.csv; 1,353 rows, as UCI publishes (PLAN.md amendment 2026-11-12, sourcing note).",
+    "licence": "CC BY 4.0",
+    "citation": "Abdelhamid. Website Phishing. UCI ML Repository, https://doi.org/10.24432/C5B301",
+    "files": [
+      {
+        "path": "uci_website_phishing/data.csv",
+        "url": "https://archive.ics.uci.edu/static/public/379/data.csv",
+        "sha256": "1c9970fb1eb7f4efa3621c18646c2f5e96cab5d82688794356d5bea4b6626e2d"
+      }
+    ]
+  },
+  "uci_youtube_spam": {
+    "description": "YouTube Spam Collection: 1,956 comments on five videos, CONTENT text, CLASS label (1 = spam)",
+    "source": "UCI Machine Learning Repository dataset 380 (official), downloaded from archive.ics.uci.edu on 2026-11-12",
+    "provenance": "UCI's data.csv; 1,956 rows, as UCI publishes (PLAN.md amendment 2026-11-12, sourcing note).",
+    "licence": "CC BY 4.0",
+    "citation": "Alberto, Lochter, Almeida. YouTube Spam Collection. UCI ML Repository, https://doi.org/10.24432/C58885",
+    "files": [
+      {
+        "path": "uci_youtube_spam/data.csv",
+        "url": "https://archive.ics.uci.edu/static/public/380/data.csv",
+        "sha256": "d643fa90a884918890c8e444842bd89ca31bdca7df6565fc35de5271b2291d1b"
+      }
+    ]
+  },
+  "uci_tuandromd": {
+    "description": "TUANDROMD: 4,464 Android apps, 241 binary permission/API features, Label (malware/goodware)",
+    "source": "UCI Machine Learning Repository dataset 855 (official), downloaded from archive.ics.uci.edu on 2026-11-12",
+    "provenance": "UCI's zip; TUANDROMD.csv holds 4,465 rows of which one is entirely empty (no value in any of its 242 columns, row 2,533); without it, 4,464 rows, as UCI publishes. The empty row is dropped (PLAN.md amendment 2026-11-12, sourcing note).",
+    "licence": "CC BY 4.0",
+    "citation": "Borah, Bhattacharyya, Kalita. TUANDROMD. UCI ML Repository, https://doi.org/10.24432/C5560H",
+    "files": [
+      {
+        "path": "uci_tuandromd/tuandromd.zip",
+        "url": "https://archive.ics.uci.edu/static/public/855/tuandromd+%28tezpur+university+android+malware+dataset%29.zip",
+        "sha256": "441d2005b97f3816e8b64e692c5e5a0b629685091638aad9e67fd81f40a5cf5f"
+      }
+    ]
+  },
+  "uci_rt_iot2022": {
+    "description": "RT-IoT2022: 123,117 network flows from an IoT testbed, 83 flow features, Attack_type label (12 classes)",
+    "source": "UCI Machine Learning Repository dataset 942 (official), downloaded from archive.ics.uci.edu on 2026-11-12",
+    "provenance": "UCI's data.csv; 123,117 rows, as UCI publishes (PLAN.md amendment 2026-11-12, sourcing note).",
+    "licence": "CC BY 4.0",
+    "citation": "B. S. and Nagapadma. RT-IoT2022. UCI ML Repository, https://doi.org/10.24432/C5P338",
+    "files": [
+      {
+        "path": "uci_rt_iot2022/data.csv",
+        "url": "https://archive.ics.uci.edu/static/public/942/data.csv",
+        "sha256": "289632f1b01a317e86a3cce5e276246ad64e1e6ac03ffd3b16202b9d016d7d90"
+      }
+    ]
   }
 }

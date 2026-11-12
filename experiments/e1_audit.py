@@ -239,6 +239,22 @@ def prep_xiiotid(seed: int = SEED) -> Prepared:
     return Prepared(views(s), f"stratified random {1 - TEST_SIZE:.0%}/{TEST_SIZE:.0%} by class1, seed {seed}",
                     {"excluded": ["class2 (attack stage)", "class3 (binary)"]}, ("xiiotid",))
 
+def prep_uci5(name: str, label: str, excluded: tuple[str, ...] = (), text: str | None = None, loader=None):
+    """Phase 5 (PLAN.md amendment 2026-11-12): stratified random 80/20 by the label; UCI-declared
+    ID columns excluded; both views."""
+    def prep(seed: int = SEED) -> Prepared:
+        df = (loader or (lambda: data.load_uci_csv(name)))()
+        df = df.drop(columns=list(excluded))
+        tr, te = random_split(df, df[label], seed)
+        s = Split(tr, te, label, text=text)
+        notes = {"excluded": list(excluded)} if excluded else {}
+        if text:
+            notes["text"] = text
+        return Prepared(views(s), f"stratified random {1 - TEST_SIZE:.0%}/{TEST_SIZE:.0%} by {label}, seed {seed}",
+                        notes, (name,))
+    return prep
+
+
 PREP = {
     "kdd99": prep_kdd99, "nslkdd": prep_nslkdd, "unsw_nb15": prep_unsw, "cicids2017": prep_cic,
     "ember2018": prep_ember, "uci_phishing": prep_uci_phishing, "phiusiil": prep_phiusiil, "sms_spam": prep_sms,
@@ -246,6 +262,11 @@ PREP = {
     "ember2018_official": prep_ember_official,
     "ton_network": prep_ton("network"), **{f"ton_{d}": prep_ton(d) for d in data.TON_DEVICES},
     "botiot": prep_botiot, "xiiotid": prep_xiiotid,
+    "uci_spambase": prep_uci5("uci_spambase", "Class"),
+    "uci_website_phishing": prep_uci5("uci_website_phishing", "Result"),
+    "uci_youtube_spam": prep_uci5("uci_youtube_spam", "CLASS", ("VIDEO", "COMMENT_ID"), text="CONTENT"),
+    "uci_tuandromd": prep_uci5("uci_tuandromd", "Label", loader=data.load_tuandromd),
+    "uci_rt_iot2022": prep_uci5("uci_rt_iot2022", "Attack_type", ("id",)),
 }
 
 

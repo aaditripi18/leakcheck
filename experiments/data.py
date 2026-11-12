@@ -379,6 +379,23 @@ def load_xiiotid() -> pd.DataFrame:
     return _numeric_where_possible(pd.read_csv(path, low_memory=False), keep=("class1", "class2", "class3"))
 
 
+# --- Phase 5: UCI security benchmarks (PLAN.md amendment 2026-11-12) ---------------------
+
+
+def load_uci_csv(name: str) -> pd.DataFrame:
+    """Spambase, Website Phishing, YouTube Spam, RT-IoT2022: UCI's data.csv as distributed."""
+    (path,) = verify_local(name)
+    return pd.read_csv(path, low_memory=False)
+
+
+def load_tuandromd() -> pd.DataFrame:
+    """TUANDROMD without its one entirely empty row (registry provenance)."""
+    (path,) = verify_local("uci_tuandromd")
+    with zipfile.ZipFile(path) as zf, zf.open(_zip_member(zf, "TUANDROMD.csv")) as f:
+        df = pd.read_csv(f)
+    return df.dropna(how="all").reset_index(drop=True)
+
+
 def run_file(name: str) -> str:
     """A run name as a file-name stem: "dataset:view" would make Windows write an
     alternate data stream of a file called "dataset" instead of a file."""
