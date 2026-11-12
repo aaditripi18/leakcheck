@@ -7,7 +7,7 @@
 `stat` records `e14_stat:<case>`. `full` records `e14:<case>`: per seed and model, the
 E13 quantities plus the full model's per-class F1 on the whole test set and without the
 leaked rows. A fresh case's H19 prediction must be in the ledger (`h19_prediction:<case>`,
-scripts/h19_predict.py) before `full` runs on it; `full` refuses otherwise.
+python -m experiments.e14_explain predict) before `full` runs on it; `full` refuses otherwise.
 """
 from __future__ import annotations
 
@@ -115,7 +115,7 @@ def main(mode: str, names: list[str]) -> None:
                    run_stat(name), _hashes(name))
         else:
             if name.startswith(FRESH_PREFIXES) and not _predicted(name):
-                sys.exit(f"{name}: no H19 prediction in the ledger yet (scripts/h19_predict.py first)")
+                sys.exit(f"{name}: no H19 prediction in the ledger yet (python -m experiments.e14_explain predict first)")
             per_seed = [run_full_seed(name, s) for s in SEEDS]
             record("e14:" + name, {"seeds": list(SEEDS), "near_eps": NEAR_EPS, "text_tau": TEXT_TAU,
                                    "rounds": ROUNDS, "models": list(MODELS)},
