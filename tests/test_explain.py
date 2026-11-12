@@ -110,3 +110,21 @@ def test_text_neighbours_do_not_depend_on_the_other_test_rows():
     keep = np.arange(0, 200, 3)
     sim_sub, nn_sub = near_text.nearest_text(train, test.iloc[keep], tau=0.8)
     assert np.array_equal(sim_all[keep], sim_sub) and np.array_equal(nn_all[keep], nn_sub)
+
+
+def test_predict_uses_the_band(monkeypatch):
+    from leakcheck import explain as ex
+    monkeypatch.setattr(ex, "S_THRESHOLD", 0.06)
+    monkeypatch.setattr(ex, "S_BAND", (0.05, 0.13))
+    assert ex.predict(0.2) == "easy"
+    assert ex.predict(-0.1) == "memorised"
+    assert ex.predict(0.05) == ex.predict(0.09) == ex.predict(0.13) == "uncertain"
+    assert ex.predict(None) is None
+    monkeypatch.setattr(ex, "S_BAND", None)
+    assert ex.predict(0.09) == "easy" and ex.predict(0.055) == "memorised"
+
+
+def test_band_is_inside_its_own_interval():
+    from leakcheck import explain as ex
+    lo, hi = ex.S_BAND
+    assert lo <= ex.S_THRESHOLD <= hi

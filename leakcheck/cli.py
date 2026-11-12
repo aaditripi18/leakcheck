@@ -100,7 +100,9 @@ def _explain(args, split: Split) -> int:
             print(f"nearest-neighbour vote accuracy: leaked rows without their copies {r['vote_acc_leaked']:.4f} "
                   f"({r['sampled_leaked']} rows), other rows {r['vote_acc_rest']:.4f} ({r['sampled_rest']} rows)")
             print(f"S = {r['S']:+.4f}" + ("" if r["threshold"] is None else
-                                          f", threshold {r['threshold']:+.4f} (S - threshold {r['S'] - r['threshold']:+.4f})"))
+                                          f", threshold {r['threshold']:+.4f} (S - threshold {r['S'] - r['threshold']:+.4f})"
+                                          + ("" if not r.get("band") else
+                                             f", uncertain from {r['band'][0]:+.4f} to {r['band'][1]:+.4f}")))
     print(f"verdict: {r['verdict']}")
     if r["threshold"] is not None and r["S"] is not None:
         print("  easy: a model can get these rows right without their copies, so removing the copies will not "

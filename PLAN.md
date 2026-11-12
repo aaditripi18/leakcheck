@@ -540,3 +540,68 @@ only), per model and seed.
 - **H21** The pre-2018 benign files do not change EMBER's verdicts: for every model, the
   mean effect over the three seeds is below 0.5 macro-F1 points in absolute value. Not
   supported if any model's mean effect reaches 0.5 points; the direction is reported either way.
+
+## Amendment 2026-11-13: an "uncertain" band for explain, tested on a third fresh round (H22)
+
+Written before any file of the third round is fetched.
+
+**Why.** Over rounds 1 and 2, S with s* = +0.0721 was right on 7 of the 10 eligible fresh
+cases. A check made for this amendment (from data already in the ledger) shows that each
+miss sits at a cut-off:
+- *uci_website_phishing*: S was 0.005 below s*.
+- *The two uci_youtube_spam views*: their outcome is within noise of the 0.8 line. Over
+  their 12 cells, the 90% bootstrap interval of the copy-free / full ratio contains 0.8.
+
+A verdict should say when it cannot tell. This amendment adds that to both sides and
+tests the result on benchmarks no step has read.
+
+**Rule** (scripts/h22_band.py, ledger `h22_band`):
+
+1. **Outcome clarity.** A case's outcome is *clear* when 0.8 lies outside the 90% bootstrap
+   interval of its copy-free / full ratio: 12 cells, 4,000 resamples, seed 0. Otherwise it
+   is *borderline*.
+2. **Threshold.** s* is refit with H19's rule on every labelled case with a clear outcome:
+   the eight dev cases plus the clear eligible cases of rounds 1 and 2. That is 13 cases.
+   S separates them, and s* = +0.0645.
+3. **Band.** The 90% bootstrap interval of s* (10,000 resamples of those cases, seed 0)
+   is [+0.0580, +0.1303]. `leakcheck explain` says *uncertain* for S inside it, *easy*
+   above it and *memorised* below it.
+
+Rounds 1 and 2 helped fix this rule, so they are no longer evidence for it. Every clear
+case is on the right side by construction. H19's first threshold and its predictions
+stay in the ledger as they were.
+
+**Third round: candidates, in a frozen order** (UCI id ascending; no row of any of them
+has been read). These are UCI security benchmarks not used before. They are downloaded
+from UCI, and each is used only if one table's row count equals UCI's published count.
+- **Skipped from UCI's list:**
+  - URL Reputation (187), N-BaIoT (442) and Kitsune (516): sparse or split across many
+    files, with millions of rows.
+  - LT-FS-ID (715): a regression task.
+  - Shell Commands (869): no class label.
+
+| Order | UCI id | Dataset | Rows | Label | Excluded | Text |
+|--:|--:|---|--:|---|---|---|
+| 1 | 404 | Burst Header Packet flooding | 1,075 | `Class` | | |
+| 2 | 526 | Bitcoin Heist Ransomware Address | 2,916,697 | `label` | `address` (UCI: the Bitcoin address) | |
+| 3 | 530 | Turkish Spam V01 | 826 | `classification` | | `text` |
+| 4 | 533 | Detect Malware Types | 7,107 | see below | | |
+| 5 | 541 | Malware static and dynamic features | 2,955 | see below | | |
+| 6 | 542 | Internet Firewall Data | 65,532 | `Action` | | |
+| 7 | 564 | UAV Intrusion Detection | 17,256 | see below | | |
+
+Where UCI names no class column (533, 541, 564), the dataset is used only if its table
+has exactly one column named class, label, target or type (any case), and that column is
+the label. Otherwise it is not used. Splits, views (the L5 identifier check), E14's
+protocol and the eligibility rule (full gap of at least 1 point) are as in phase 5.
+
+**Procedure.** For every case, S and its prediction (easy, memorised or uncertain) are
+recorded, committed and pushed before E14 trains any model on it. Every case runs.
+
+- **H22** Supported if, among the third-round cases that are eligible, have a clear
+  outcome and get a decided prediction (not uncertain), the prediction is right on at
+  least 90%, with at least 4 such cases. With fewer than 4, it is reported as not judged.
+  Reported beside it either way:
+  - how many cases were uncertain;
+  - how many outcomes were borderline;
+  - a strict tally that counts every uncertain prediction on an eligible case as wrong.

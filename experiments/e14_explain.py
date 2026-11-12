@@ -109,8 +109,9 @@ def main(mode: str, names: list[str]) -> None:
                 print(f"   {name}: prediction already recorded, not repeated", flush=True)
                 continue
             st = run_stat(name)
-            pred = None if st["S"] is None else ("easy" if st["S"] > ex.S_THRESHOLD else "memorised")
-            record("h19_prediction:" + name, {"seed": 0, "s_star": ex.S_THRESHOLD, "near_eps": NEAR_EPS},
+            pred = ex.predict(st["S"])
+            record("h19_prediction:" + name, {"seed": 0, "s_star": ex.S_THRESHOLD, "band": ex.S_BAND,
+                                              "near_eps": NEAR_EPS},
                    {**st, "prediction": pred}, _hashes(name))
             print(f"   {name}: predicted {pred}", flush=True)
         elif mode == "stat":

@@ -24,12 +24,24 @@ TEXT_TAU = 0.8
 ROUNDS = 20
 SAMPLE = 20_000
 
-# H19's threshold on S, fixed on the eight eligible dev datasets (PLAN.md amendment
-# 2026-11-09) by scripts/h19_threshold.py; None until that has run.
-S_THRESHOLD: float | None = 0.07211209852651596
-THRESHOLD_NOTE = ("The threshold was fixed on eight datasets whose answer is known (E13, 24 model fits each). On "
-                  "27 fresh cases it was right on 7 of the 10 with a gap to explain, every miss near a cut-off "
-                  "(H19, H19b; docs/RESULTS.md): treat it as a first look, and retrain where the answer matters.")
+# The threshold on S and its "uncertain" band (PLAN.md amendment 2026-11-13, H22), refit by
+# scripts/h22_band.py on every labelled case with a clear outcome: H19's eight dev datasets and
+# the eligible fresh cases of rounds 1 and 2. H19's first threshold, +0.0721 from the eight dev
+# cases alone, stays in the ledger (`h19_threshold`) with the predictions it made.
+S_THRESHOLD: float | None = 0.0645156837652115
+S_BAND: tuple[float, float] | None = (0.05801112172141587, 0.13030456204379565)
+THRESHOLD_NOTE = ("The threshold and its uncertain band were fitted on the 13 known cases whose outcome is clear "
+                  "(eight dev datasets and two fresh rounds; H19, H19b). Inside the band S cannot tell; H22 tests "
+                  "the band on a third fresh round (docs/RESULTS.md).")
+
+
+def predict(s: float | None) -> str | None:
+    """easy, memorised or uncertain (S inside the band), from S alone; None if S is undefined."""
+    if s is None or S_THRESHOLD is None:
+        return None
+    if S_BAND is not None and S_BAND[0] <= s <= S_BAND[1]:
+        return "uncertain"
+    return "easy" if s > S_THRESHOLD else "memorised"
 
 
 def with_train(split: Split, train: pd.DataFrame, test: pd.DataFrame | None = None) -> Split:
@@ -158,11 +170,14 @@ def explain(split: Split, sample: int = SAMPLE, seed: int = 0) -> dict:
         return {**out, "verdict": "no leaked rows"}
     keep, left = copies_in_train(split, leaked)
     st = statistic(split, leaked, keep, sample, seed)
-    out.update(st, train_rows_removed=int((~keep).sum()), copies_left=left, threshold=S_THRESHOLD)
+    out.update(st, train_rows_removed=int((~keep).sum()), copies_left=left, threshold=S_THRESHOLD,
+               band=list(S_BAND) if S_BAND else None)
     if not keep.any():
         out["verdict"] = "no verdict (every training row is a copy of a leaked test row)"
     elif S_THRESHOLD is None or st["S"] is None:
         out["verdict"] = "no verdict (threshold not fixed)"
     else:
-        out["verdict"] = "leaked rows look easy" if st["S"] > S_THRESHOLD else "leaked rows look memorised"
+        p = predict(st["S"])
+        out["verdict"] = ("uncertain: S is inside the threshold's band" if p == "uncertain"
+                          else f"leaked rows look {p}")
     return out
