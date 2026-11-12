@@ -689,3 +689,10 @@ openml_ieee_fraud.
 E2/E14 subsample a training set to 300,000 rows. Only uci_bitcoin_heist has both a
 single-row class and more than 300,000 training rows, so every other case's subsample
 is unchanged.
+
+*Deviation, continued (E14 on uci_bitcoin_heist, after its prediction was recorded and
+before any of its results).* The MLP early-stops on a stratified hold-out, and so does
+HGB above 10,000 rows; that hold-out fails on a class with a single training row (a
+ransomware family seen once). In those fits only, such rows are left out of training.
+Any earlier fit with such a row would have crashed, so no earlier result changes. The
+first Kaggle run of this case failed on it and recorded nothing.

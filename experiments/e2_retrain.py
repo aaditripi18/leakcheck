@@ -65,8 +65,17 @@ def scores(y: np.ndarray, pred: np.ndarray) -> dict:
 
 def fit_predict(split: Split, model: str, seed: int) -> tuple[np.ndarray, float]:
     Xtr, Xte = split.train[split.features], split.test[split.features]
+    ytr = split.y_train
+    if model == "mlp" or (model == "hgb" and len(Xtr) > 10_000):
+        # the MLP, and HGB above 10,000 rows, early-stop on a stratified hold-out, which fails on a
+        # class with one training row; such rows are left out of this fit only (a fit that had
+        # them would have crashed, so every earlier fit is unchanged; PLAN.md 2026-11-13)
+        counts = pd.Series(ytr).value_counts()
+        single = np.asarray(pd.Series(ytr).isin(counts[counts < 2].index))
+        if single.any():
+            Xtr, ytr = Xtr[~single], np.asarray(ytr)[~single]
     t0 = time.time()
-    pipe = build(model, Xtr, split.text, seed).fit(Xtr, split.y_train)
+    pipe = build(model, Xtr, split.text, seed).fit(Xtr, ytr)
     return pipe.predict(Xte), time.time() - t0
 
 
