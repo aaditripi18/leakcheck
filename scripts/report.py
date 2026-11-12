@@ -621,7 +621,7 @@ def site_data(runs: dict) -> dict:
                     "datasets_with_5pct_exact_copies": sum((a["exact_copies"] or 0) >= 0.05 for a in audit),
                     "models": list(MODELS), "seeds": 5},
         "checks": CHECKS, "hypotheses": hypotheses(runs) + phase2_hypotheses(runs), "audit": audit, "retrain": retrain,
-        "ablation": ablation, "validation": validation, "phase3": phase3,
+        "ablation": ablation, "validation": validation, "phase3": phase3, "phase4": phase4_data(runs),
     }
 
 
@@ -885,6 +885,179 @@ def e11(runs: dict) -> list[str]:
             f"**H15 {h['verdict']}.** {h['evidence']}.", ""]
 
 
+TON_PARTS = ["ton_network", "ton_fridge", "ton_garage_door", "ton_gps_tracker", "ton_modbus", "ton_motion_light",
+             "ton_thermostat", "ton_weather"]
+E14_FRESH = [c for p in TON_PARTS for c in (p, p + ":no_identifiers")] + ["botiot", "xiiotid",
+                                                                           "xiiotid:no_identifiers"]
+H19_DEV = ["kdd99", "nslkdd", "unsw_nb15", "ember2018", "ember2018_official", "uci_phishing", "sms_spam",
+           "cseids2018:no_identifiers"]
+
+
+def _e14(runs: dict, name: str) -> dict | None:
+    """E14's full runs summarised like E13 (12 cells: 4 models x 3 seeds), plus the full model's
+    whole-test macro-F1 and per-class F1 per cell."""
+    d = runs.get(f"e14:{name}")
+    if d is None:
+        return None
+    ps = d["results"]["per_seed"]
+    cells = [{**v, "n_test": s["n_test"]} for s in ps for v in s["models"].values()]
+    full = [c["full"]["gap"] for c in cells if c["full"]["gap"] is not None]
+    cf = [c["copy_free"]["gap"] for c in cells if c.get("copy_free", {}).get("gap") is not None]
+    return {"cells": cells, "leaked_share": sum(s["leaked_share"] for s in ps) / len(ps),
+            "full_gap": sum(full) / len(full) if full else 0.0,
+            "copy_free_gap": sum(cf) / len(cf) if cf else None,
+            "macro_f1": sum(c["full"]["whole"] for c in cells) / len(cells), "commit": d["git"]["commit"]}
+
+
+def _h19_outcome(e: dict) -> str | None:
+    if e["full_gap"] < 0.01 or e["copy_free_gap"] is None:
+        return None
+    return "easy" if e["copy_free_gap"] >= 0.8 * e["full_gap"] else "memorised"
+
+
+def h19(runs: dict) -> dict:
+    text = ("An audit can tell easy from memorised leaks: S (no model trained), with a threshold fixed on eight dev "
+            "cases, predicts each eligible fresh case's E14 outcome right on >= 90% of them (>= 4 eligible)")
+    thr = runs.get("h19_threshold")
+    if thr is None:
+        return {"id": "H19", "text": text, "verdict": "pending", "evidence": "needs the threshold (E14 on dev)"}
+    s = thr["results"]["s_star"]
+    preds = {n: runs.get(f"h19_prediction:{n}") for n in E14_FRESH}
+    e = {n: _e14(runs, n) for n in E14_FRESH}
+    if any(v is None for v in preds.values()) or any(v is None for v in e.values()):
+        done = sum(v is not None for v in e.values())
+        return {"id": "H19", "text": text, "verdict": "pending",
+                "evidence": f"s* = {s:+.4f}; predictions recorded for {sum(v is not None for v in preds.values())}"
+                            f"/19 fresh cases, E14 complete on {done}/19"}
+    rows = []
+    for n in E14_FRESH:
+        out = _h19_outcome(e[n])
+        if out is not None:
+            p = preds[n]["results"]["prediction"]
+            rows.append((n, p, out, preds[n]["results"]["S"]))
+    right = sum(p == o for _, p, o, _ in rows)
+    ev = (f"s* = {s:+.4f}; right on {right}/{len(rows)} eligible fresh cases: "
+          + "; ".join(f"{n} S {sv:+.3f} predicted {p}, was {o}" for n, p, o, sv in rows)
+          + f". Not eligible (full gap below 1 point): {19 - len(rows)}")
+    if len(rows) < 4:
+        return {"id": "H19", "text": text, "verdict": "not judged", "evidence": ev}
+    return {"id": "H19", "text": text, "verdict": _verdict(right >= 0.9 * len(rows)), "evidence": ev}
+
+
+def _class_gaps(cell: dict) -> tuple[list[float], list[float]]:
+    """(rare gaps, common gaps) in one cell. Rare: < 1% of the test rows, >= 20 rows, >= 1 leaked.
+    Common: >= 1% of the test rows. A class with every row leaked has no gap and is skipped."""
+    n = cell["n_test"]
+    rare, common = [], []
+    for c in cell["per_class"].values():
+        if c["f1_without_leaked"] is None:
+            continue
+        gap = c["f1_whole"] - c["f1_without_leaked"]
+        if c["n_test"] < 0.01 * n and c["n_test"] >= 20 and c["n_leaked"] >= 1:
+            rare.append(gap)
+        elif c["n_test"] >= 0.01 * n:
+            common.append(gap)
+    return rare, common
+
+
+def _median(xs: list[float]) -> float:
+    xs = sorted(xs)
+    k = len(xs) // 2
+    return xs[k] if len(xs) % 2 else (xs[k - 1] + xs[k]) / 2
+
+
+def h20(runs: dict) -> dict:
+    text = ("Leakage hides in the rare classes of near-perfect benchmarks: on every fresh case with macro-F1 >= 0.98 "
+            "and a rare and a common class, the rare classes' median per-class gap exceeds the common classes' in "
+            ">= 10 of 12 cells (>= 2 eligible)")
+    e = {n: _e14(runs, n) for n in E14_FRESH}
+    if any(v is None for v in e.values()):
+        return {"id": "H20", "text": text, "verdict": "pending",
+                "evidence": f"E14 complete on {sum(v is not None for v in e.values())}/19 fresh cases"}
+    rows = []
+    for n, v in e.items():
+        gaps = [_class_gaps(c) for c in v["cells"]]
+        if v["macro_f1"] < 0.98 or not all(r and c for r, c in gaps):
+            continue
+        sup = sum(_median(r) > _median(c) for r, c in gaps)
+        rows.append((n, v["macro_f1"], sup))
+    ev = ("; ".join(f"{n} (macro-F1 {f:.4f}): {k}/12 cells" for n, f, k in rows) or "no case") + \
+         f". Eligible {len(rows)} of 19 (rare and common classes in every seed's split)"
+    if len(rows) < 2:
+        return {"id": "H20", "text": text, "verdict": "not judged", "evidence": ev}
+    return {"id": "H20", "text": text, "verdict": _verdict(all(k >= 10 for _, _, k in rows)), "evidence": ev}
+
+
+def phase4_hypotheses(runs: dict) -> list[dict]:
+    return [h19(runs), h20(runs)]
+
+
+def e14(runs: dict) -> list[str]:
+    stat = [n for n in H19_DEV + E9_ORDER + E13_FRESH if f"e14_stat:{n}" in runs]
+    stat = list(dict.fromkeys(stat))
+    if not stat and "h19_threshold" not in runs:
+        return []
+    out = ["## E14: telling easy leaks from memorised ones without training a model", "",
+           "*S* = neighbour-vote accuracy on the leaked rows (their training copies removed) minus on the other test "
+           "rows (seed 0, samples of at most 20,000; PLAN.md amendment 2026-11-09). A case is *easy* if its "
+           "copy-free model keeps >= 80% of the full model's gap (E13/E14, 12 cells), else *memorised*; cases with a "
+           "full gap below 1 point are not eligible.", "",
+           "| Case | Set | Leaked rows | S | Vote acc. leaked / rest | Outcome (E13/E14) |", "|---|---|--:|--:|--:|---|"]
+    for n in stat:
+        r = runs[f"e14_stat:{n}"]["results"]
+        e = _e13(runs, n) or _e14(runs, n)
+        o = (_h19_outcome(e) or "not eligible") if e else "no E13"
+        al, ar = r.get("vote_acc_leaked"), r.get("vote_acc_rest")
+        out.append(f"| {n} | {'H19 dev' if n in H19_DEV else 'inspected'} | {pct(r['leaked_share'])} | "
+                   f"{'' if r['S'] is None else format(r['S'], '+.4f')} | "
+                   f"{'' if al is None else f'{al:.4f} / {ar:.4f}'} | {o} |")
+    thr = runs.get("h19_threshold")
+    if thr:
+        out += ["", f"**s\\* = {thr['results']['s_star']:+.4f}** ({thr['results']['how']}), "
+                    f"ledger `h19_threshold` @ `{thr['git']['commit']}`."]
+    fresh = [n for n in E14_FRESH if f"h19_prediction:{n}" in runs]
+    if fresh:
+        out += ["", "| Fresh case | S | Prediction (recorded before E14 ran) | Full gap | Copy-free gap | Outcome | "
+                    "Macro-F1 |", "|---|--:|---|--:|--:|---|--:|"]
+        for n in fresh:
+            p = runs[f"h19_prediction:{n}"]["results"]
+            e = _e14(runs, n)
+            cells = (f"{pt(e['full_gap'])} | {pt(e['copy_free_gap']) if e['copy_free_gap'] is not None else ''} | "
+                     f"{_h19_outcome(e) or 'not eligible'} | {e['macro_f1']:.4f}") if e else "| | running |"
+            s = "" if p["S"] is None else format(p["S"], "+.4f")
+            out.append(f"| {n} | {s} | {p['prediction']} | {cells} |")
+    hs = phase4_hypotheses(runs)
+    out += [""] + [f"**{h['id']} {h['verdict']}.** {h['evidence']}." for h in hs] + [""]
+    return out
+
+
+def phase4_data(runs: dict) -> dict:
+    stat = {n: {"S": _num(runs[f"e14_stat:{n}"]["results"]["S"]),
+                "outcome": (_h19_outcome(_e13(runs, n)) if _e13(runs, n) else None)}
+            for n in H19_DEV if f"e14_stat:{n}" in runs}
+    thr = runs.get("h19_threshold")
+    fresh = {}
+    for n in E14_FRESH:
+        p, e = runs.get(f"h19_prediction:{n}"), _e14(runs, n)
+        if p is None:
+            continue
+        fresh[n] = {"S": _num(p["results"]["S"]), "prediction": p["results"]["prediction"],
+                    "outcome": _h19_outcome(e) if e else None,
+                    "full_gap": _num(e["full_gap"]) if e else None,
+                    "copy_free_gap": _num(e["copy_free_gap"]) if e and e["copy_free_gap"] is not None else None,
+                    "macro_f1": _num(e["macro_f1"]) if e else None}
+    return {"hypotheses": phase4_hypotheses(runs), "dev": stat,
+            "s_star": _num(thr["results"]["s_star"]) if thr else None, "fresh": fresh}
+
+
+def phase4_hypotheses_md(runs: dict) -> list[str]:
+    hs = phase4_hypotheses(runs)
+    out = ["## Phase 4 hypotheses (PLAN.md amendment 2026-11-09)", "", "| | Hypothesis | Verdict | Evidence |",
+           "|---|---|---|---|"]
+    out += [f"| {h['id']} | {h['text']} | **{h['verdict']}** | {h['evidence']} |" for h in hs]
+    return out + [""]
+
+
 def phase3_hypotheses_md(runs: dict) -> list[str]:
     hs = phase3_hypotheses(runs)
     out = ["## Phase 3 hypotheses (PLAN.md)", "", "| | Hypothesis | Verdict | Evidence |", "|---|---|---|---|"]
@@ -900,6 +1073,7 @@ def main() -> None:
     for name, fn in (("e0_sources", e0_sources), ("e0_synthetic", e0_synthetic), ("e0_kdd", e0_kdd)):
         if name in runs:
             lines += fn(runs[name])
+    lines += phase4_hypotheses_md(runs)
     lines += phase3_hypotheses_md(runs)
     lines += e0_phase3(runs)
     lines += e1(runs)
@@ -911,6 +1085,7 @@ def main() -> None:
     lines += e12(runs)
     lines += e11(runs)
     lines += e13(runs)
+    lines += e14(runs)
     lines += e2_stats(runs)
     lines += e6(runs)
     lines += e7(runs)
