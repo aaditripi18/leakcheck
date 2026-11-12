@@ -462,3 +462,45 @@ others stratified random 80/20 by that label, seed 0 (seeds 0-2 in E14, as E13).
 distributed, and without identifiers where the L5 identifier check flags columns. This gives
 19 fresh cases: ton_network and the seven ton_<device> files in both views, botiot (no column
 flagged, one view), xiiotid in both views.
+
+## Amendment 2026-11-12: phase 5, a second fresh round for H19 (before any of its data is fetched)
+
+**Why.** H19 was not judged: of the 19 phase-4 fresh cases only two had a full-model gap of
+at least one point (S was right on both), and the rule needs four. The IoT benchmarks leak
+many rows that do not move the score. Phase 5 tests the same, unchanged method on a second
+set of fresh benchmarks, chosen before any of their rows is read.
+
+**Nothing from phase 4 changes.** The statistic S, the threshold s* = +0.0721 (fixed on the
+eight dev cases, `h19_threshold`), the eligibility rule (E14 full-model gap >= 1 point, mean
+of 12 cells), the outcome rule (easy if the copy-free gap is >= 80% of the full gap, else
+memorised) and the E14 protocol (seeds 0-2, the four models, eps, copy removal, the training
+cap) are used exactly as committed.
+
+**Candidates, in a frozen order** (UCI id ascending; no row of any of them has been read).
+Each is a security benchmark from the UCI repository, downloaded from UCI itself, and used
+only if its row count equals UCI's published count:
+
+| Order | UCI id | Dataset | Rows | Label | Excluded (UCI-declared IDs) | Text column |
+|--:|--:|---|--:|---|---|---|
+| 1 | 94 | Spambase | 4,601 | `Class` | | |
+| 2 | 379 | Website Phishing | 1,353 | `Result` | | |
+| 3 | 380 | YouTube Spam Collection | 1,956 | `CLASS` | `VIDEO`, `COMMENT_ID` | `CONTENT` |
+| 4 | 722 | NATICUSdroid (Android permissions) | 29,333 | `Result` | | |
+| 5 | 855 | TUANDROMD (Android malware) | 4,464 | `Label` | | |
+| 6 | 942 | RT-IoT2022 | 123,117 | `Attack_type` | `id` | |
+
+Splits: stratified random 80/20 by the label, seed 0 (seeds 0-2 in E14, as before). Views: as
+distributed, and without identifiers where the L5 identifier check flags columns (as in
+phases 3-4). A *case* is one dataset in one view.
+
+**Procedure.** Every case runs; there is no early stop. For each case, S and its prediction
+(easy if S > s*) are recorded in the ledger, committed and pushed before E14 trains any
+model on it.
+
+- **H19b** Supported if the prediction is right on >= 90% of the eligible phase-5 cases, with
+  at least 4 eligible; with fewer than 4 eligible it is reported as not judged, with every
+  case shown. The two eligible phase-4 cases are not counted (their outcomes were known when
+  this round was planned); a tally over every fresh case of both rounds is reported beside
+  it as a description only.
+- H20 is not re-tested: none of these benchmarks is both near-perfect and multi-class with
+  rare classes by design, so it stays as phase 4 left it (not judged).
