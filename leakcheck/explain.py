@@ -140,7 +140,8 @@ def statistic(split: Split, leaked: np.ndarray, keep: np.ndarray, sample: int = 
         return np.sort(rng.choice(idx, sample, replace=False)) if len(idx) > sample else idx
 
     li, ri = pick(leaked), pick(~leaked)
-    acc_l = float((neighbour_votes(split, li, keep) == y[li]).mean()) if len(li) else None
+    # with every training row a copy of some leaked row, nothing is left to vote: S is undefined
+    acc_l = float((neighbour_votes(split, li, keep) == y[li]).mean()) if len(li) and keep.any() else None
     acc_r = float((neighbour_votes(split, ri) == y[ri]).mean()) if len(ri) else None
     s = acc_l - acc_r if acc_l is not None and acc_r is not None else None
     return {"n_leaked": int(leaked.sum()), "n_rest": int((~leaked).sum()), "sampled_leaked": int(len(li)),
@@ -157,7 +158,9 @@ def explain(split: Split, sample: int = SAMPLE, seed: int = 0) -> dict:
     keep, left = copies_in_train(split, leaked)
     st = statistic(split, leaked, keep, sample, seed)
     out.update(st, train_rows_removed=int((~keep).sum()), copies_left=left, threshold=S_THRESHOLD)
-    if S_THRESHOLD is None or st["S"] is None:
+    if not keep.any():
+        out["verdict"] = "no verdict (every training row is a copy of a leaked test row)"
+    elif S_THRESHOLD is None or st["S"] is None:
         out["verdict"] = "no verdict (threshold not fixed)"
     else:
         out["verdict"] = "leaked rows look easy" if st["S"] > S_THRESHOLD else "leaked rows look memorised"

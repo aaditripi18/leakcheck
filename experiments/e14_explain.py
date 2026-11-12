@@ -40,6 +40,8 @@ def run_stat(name: str) -> dict:
     leaked = leak_masks(split)["near"]
     keep, left = copies_in_train(split, leaked) if leaked.any() else (np.ones(len(split.train), bool), 0)
     st = statistic(split, leaked, keep, seed=0) if leaked.any() else {"S": None}
+    if leaked.any() and not keep.any():
+        st["note"] = "every training row is a copy of a leaked test row: S undefined"
     st.update(leaked_share=float(leaked.mean()), train_rows_removed=int((~keep).sum()), copies_left=left,
               seconds=round(time.time() - t0))
     print(f"   {name}: S {st['S']}, leaked {st['leaked_share']:.4f}, {st['seconds']} s", flush=True)
@@ -72,8 +74,8 @@ def run_full_seed(name: str, seed: int) -> dict:
     for m in MODELS:
         r = {}
         for tag, s in (("full", split), ("copy_free", dedup)):
-            if tag == "copy_free" and not leaked.any():
-                continue
+            if tag == "copy_free" and (not leaked.any() or not keep.any()):
+                continue  # no leak, or every training row is a copy of a leaked row: nothing to train on
             pred, _ = fit_predict(s, m, seed)
             r[tag] = {"whole": scores(y, pred)["macro_f1"],
                       "without_leaked": scores(y[~leaked], pred[~leaked])["macro_f1"] if (~leaked).any() else None,

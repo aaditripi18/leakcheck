@@ -79,3 +79,11 @@ def test_no_leak():
     tr = _frame(rng.normal(size=(200, 2)), rng.integers(0, 2, 200))
     te = _frame(rng.normal(size=(50, 2)) + 50, rng.integers(0, 2, 50))
     assert ex.explain(Split(tr, te, "y"))["verdict"] == "no leaked rows"
+
+
+def test_every_training_row_a_copy_leaves_s_undefined():
+    tr = _frame(np.zeros((20, 2)), np.array([0, 1] * 10))
+    te = _frame(np.zeros((5, 2)), np.array([0, 1, 0, 1, 0]))
+    r = ex.explain(Split(tr, te, "y"))
+    assert r["leaked"] == 5 and r["S"] is None
+    assert r["verdict"] == "no verdict (every training row is a copy of a leaked test row)"
