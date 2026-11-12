@@ -83,6 +83,7 @@ KDD99 L1.cross by class: normal 12.69% of 60,593, attack 81.83% of 250,436
 |---|---|---|---|
 | H19 | An audit can tell easy from memorised leaks: S (no model trained), with a threshold fixed on eight dev cases, predicts each eligible fresh case's E14 outcome right on >= 90% of them (>= 4 eligible) | **not judged** | s* = +0.0721; right on 2/2 eligible fresh cases: ton_network S +0.015 predicted memorised, was memorised; ton_network:no_identifiers S -0.403 predicted memorised, was memorised. Not eligible (full gap below 1 point): 17 |
 | H20 | Leakage hides in the rare classes of near-perfect benchmarks: on every fresh case with macro-F1 >= 0.98 and a rare and a common class, the rare classes' median per-class gap exceeds the common classes' in >= 10 of 12 cells (>= 2 eligible) | **not judged** | no case. Eligible 0 of 19 (rare and common classes in every seed's split). Macro-F1 >= 0.98 but no rare class with a leaked row: ton_modbus, ton_modbus:no_identifiers. A rare class with leaked rows but macro-F1 below 0.98: ton_network (0.9782), ton_network:no_identifiers (0.8327), xiiotid (0.9145), xiiotid:no_identifiers (0.9229) |
+| H19b | H19 on a second fresh round (five UCI security benchmarks, 8 cases): the same S and s* predict each eligible case's E14 outcome right on >= 90% of them (>= 4 eligible) | **not supported** | s* = +0.0721; right on 5/8 eligible: uci_spambase S +0.024 predicted memorised, was memorised (copy-free keeps 78% of the gap); uci_spambase:no_identifiers S +0.017 predicted memorised, was memorised (copy-free keeps 79% of the gap); uci_website_phishing S +0.067 predicted memorised, was easy (copy-free keeps 121% of the gap); uci_youtube_spam S +0.302 predicted easy, was memorised (copy-free keeps 75% of the gap); uci_youtube_spam:no_identifiers S +0.302 predicted easy, was memorised (copy-free keeps 78% of the gap); uci_tuandromd S -0.027 predicted memorised, was memorised (copy-free keeps -26% of the gap); uci_rt_iot2022 S +0.055 predicted memorised, was memorised (copy-free keeps -190% of the gap); uci_rt_iot2022:no_identifiers S +0.062 predicted memorised, was memorised (copy-free keeps -51% of the gap). Both rounds together (description only): 7/10 |
 
 ## Phase 3 hypotheses (PLAN.md)
 
@@ -429,30 +430,39 @@ Ledger lines: `e13_difficulty:kdd99` @ `be9ffcb`, `e13_difficulty:nslkdd` @ `be9
 
 **s\* = +0.0721** (separates: midpoint between lowest easy and highest memorised S), ledger `h19_threshold` @ `8e3b6b5`.
 
-| Fresh case | S | Prediction (recorded before E14 ran) | Full gap | Copy-free gap | Outcome | Macro-F1 |
-|---|--:|---|--:|--:|---|--:|
-| ton_network | +0.0145 | memorised | +1.51 | +0.66 | memorised | 0.9782 |
-| ton_network:no_identifiers | -0.4030 | memorised | +7.01 | -36.95 | memorised | 0.8327 |
-| ton_fridge | +0.4946 | easy | -0.02 | -0.03 | not eligible | 0.6930 |
-| ton_fridge:no_identifiers | -0.6809 | memorised | -30.82 | -64.70 | not eligible | 0.6918 |
-| ton_garage_door | -0.0077 | memorised | +0.13 | -1.05 | not eligible | 0.6936 |
-| ton_garage_door:no_identifiers |  | None | +0.00 |  | not eligible | 0.6919 |
-| ton_gps_tracker | +0.4772 | easy | +0.10 | +0.10 | not eligible | 0.9683 |
-| ton_gps_tracker:no_identifiers | -0.2719 | memorised | -3.18 | -56.31 | not eligible | 0.9682 |
-| ton_modbus | +0.7307 | easy | +0.00 | +0.00 | not eligible | 1.0000 |
-| ton_modbus:no_identifiers | +0.0000 | memorised | +0.00 | -0.08 | not eligible | 1.0000 |
-| ton_motion_light | -0.0970 | memorised | +0.72 | +0.24 | not eligible | 0.5402 |
-| ton_motion_light:no_identifiers |  | None | +0.00 |  | not eligible | 0.5428 |
-| ton_thermostat | +0.4346 | easy | -0.02 | -0.02 | not eligible | 0.8381 |
-| ton_thermostat:no_identifiers | -0.0387 | memorised | +0.82 | -16.58 | not eligible | 0.8337 |
-| ton_weather | +0.3079 | easy | +0.00 | +0.00 | not eligible | 0.9627 |
-| ton_weather:no_identifiers | -0.0015 | memorised | +0.14 | -0.15 | not eligible | 0.9626 |
-| botiot |  | None | +0.00 |  | not eligible | 0.8074 |
-| xiiotid | +0.0246 | memorised | +0.07 | +0.01 | not eligible | 0.9145 |
-| xiiotid:no_identifiers | -0.4732 | memorised | +0.11 | -0.73 | not eligible | 0.9229 |
+| Fresh case | Round | S | Prediction (recorded before E14 ran) | Full gap | Copy-free gap | Outcome | Macro-F1 |
+|---|---|--:|---|--:|--:|---|--:|
+| ton_network | phase 4 | +0.0145 | memorised | +1.51 | +0.66 | memorised | 0.9782 |
+| ton_network:no_identifiers | phase 4 | -0.4030 | memorised | +7.01 | -36.95 | memorised | 0.8327 |
+| ton_fridge | phase 4 | +0.4946 | easy | -0.02 | -0.03 | not eligible | 0.6930 |
+| ton_fridge:no_identifiers | phase 4 | -0.6809 | memorised | -30.82 | -64.70 | not eligible | 0.6918 |
+| ton_garage_door | phase 4 | -0.0077 | memorised | +0.13 | -1.05 | not eligible | 0.6936 |
+| ton_garage_door:no_identifiers | phase 4 |  | None | +0.00 |  | not eligible | 0.6919 |
+| ton_gps_tracker | phase 4 | +0.4772 | easy | +0.10 | +0.10 | not eligible | 0.9683 |
+| ton_gps_tracker:no_identifiers | phase 4 | -0.2719 | memorised | -3.18 | -56.31 | not eligible | 0.9682 |
+| ton_modbus | phase 4 | +0.7307 | easy | +0.00 | +0.00 | not eligible | 1.0000 |
+| ton_modbus:no_identifiers | phase 4 | +0.0000 | memorised | +0.00 | -0.08 | not eligible | 1.0000 |
+| ton_motion_light | phase 4 | -0.0970 | memorised | +0.72 | +0.24 | not eligible | 0.5402 |
+| ton_motion_light:no_identifiers | phase 4 |  | None | +0.00 |  | not eligible | 0.5428 |
+| ton_thermostat | phase 4 | +0.4346 | easy | -0.02 | -0.02 | not eligible | 0.8381 |
+| ton_thermostat:no_identifiers | phase 4 | -0.0387 | memorised | +0.82 | -16.58 | not eligible | 0.8337 |
+| ton_weather | phase 4 | +0.3079 | easy | +0.00 | +0.00 | not eligible | 0.9627 |
+| ton_weather:no_identifiers | phase 4 | -0.0015 | memorised | +0.14 | -0.15 | not eligible | 0.9626 |
+| botiot | phase 4 |  | None | +0.00 |  | not eligible | 0.8074 |
+| xiiotid | phase 4 | +0.0246 | memorised | +0.07 | +0.01 | not eligible | 0.9145 |
+| xiiotid:no_identifiers | phase 4 | -0.4732 | memorised | +0.11 | -0.73 | not eligible | 0.9229 |
+| uci_spambase | phase 5 | +0.0235 | memorised | +1.02 | +0.80 | memorised | 0.9462 |
+| uci_spambase:no_identifiers | phase 5 | +0.0167 | memorised | +1.04 | +0.82 | memorised | 0.9462 |
+| uci_website_phishing | phase 5 | +0.0670 | memorised | +3.42 | +4.13 | easy | 0.7401 |
+| uci_youtube_spam | phase 5 | +0.3023 | easy | +1.47 | +1.10 | memorised | 0.8040 |
+| uci_youtube_spam:no_identifiers | phase 5 | +0.3023 | easy | +1.19 | +0.93 | memorised | 0.9354 |
+| uci_tuandromd | phase 5 | -0.0271 | memorised | +21.24 | -5.55 | memorised | 0.9830 |
+| uci_rt_iot2022 | phase 5 | +0.0546 | memorised | +3.15 | -6.00 | memorised | 0.9134 |
+| uci_rt_iot2022:no_identifiers | phase 5 | +0.0621 | memorised | +14.62 | -7.47 | memorised | 0.9124 |
 
 **H19 not judged.** s* = +0.0721; right on 2/2 eligible fresh cases: ton_network S +0.015 predicted memorised, was memorised; ton_network:no_identifiers S -0.403 predicted memorised, was memorised. Not eligible (full gap below 1 point): 17.
 **H20 not judged.** no case. Eligible 0 of 19 (rare and common classes in every seed's split). Macro-F1 >= 0.98 but no rare class with a leaked row: ton_modbus, ton_modbus:no_identifiers. A rare class with leaked rows but macro-F1 below 0.98: ton_network (0.9782), ton_network:no_identifiers (0.8327), xiiotid (0.9145), xiiotid:no_identifiers (0.9229).
+**H19b not supported.** s* = +0.0721; right on 5/8 eligible: uci_spambase S +0.024 predicted memorised, was memorised (copy-free keeps 78% of the gap); uci_spambase:no_identifiers S +0.017 predicted memorised, was memorised (copy-free keeps 79% of the gap); uci_website_phishing S +0.067 predicted memorised, was easy (copy-free keeps 121% of the gap); uci_youtube_spam S +0.302 predicted easy, was memorised (copy-free keeps 75% of the gap); uci_youtube_spam:no_identifiers S +0.302 predicted easy, was memorised (copy-free keeps 78% of the gap); uci_tuandromd S -0.027 predicted memorised, was memorised (copy-free keeps -26% of the gap); uci_rt_iot2022 S +0.055 predicted memorised, was memorised (copy-free keeps -190% of the gap); uci_rt_iot2022:no_identifiers S +0.062 predicted memorised, was memorised (copy-free keeps -51% of the gap). Both rounds together (description only): 7/10.
 
 ## E2 uncertainty (post hoc)
 

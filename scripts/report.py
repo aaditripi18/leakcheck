@@ -995,8 +995,41 @@ def h20(runs: dict) -> dict:
     return {"id": "H20", "text": text, "verdict": _verdict(all(k >= 10 for _, _, k in rows)), "evidence": ev}
 
 
+P5_FRESH = ["uci_spambase", "uci_spambase:no_identifiers", "uci_website_phishing", "uci_youtube_spam",
+            "uci_youtube_spam:no_identifiers", "uci_tuandromd", "uci_rt_iot2022", "uci_rt_iot2022:no_identifiers"]
+
+
+def h19b(runs: dict) -> dict:
+    """PLAN.md amendment 2026-11-12: the unchanged method on a second fresh round."""
+    text = ("H19 on a second fresh round (five UCI security benchmarks, 8 cases): the same S and s* predict each "
+            "eligible case's E14 outcome right on >= 90% of them (>= 4 eligible)")
+    thr = runs.get("h19_threshold")
+    preds = {n: runs.get(f"h19_prediction:{n}") for n in P5_FRESH}
+    e = {n: _e14(runs, n) for n in P5_FRESH}
+    if thr is None or any(v is None for v in preds.values()) or any(v is None for v in e.values()):
+        return {"id": "H19b", "text": text, "verdict": "pending",
+                "evidence": f"E14 complete on {sum(v is not None for v in e.values())}/8 phase-5 cases"}
+    rows = []
+    for n in P5_FRESH:
+        out = _h19_outcome(e[n])
+        if out is not None:
+            p = preds[n]["results"]
+            keep = e[n]["copy_free_gap"] / e[n]["full_gap"]
+            rows.append((n, p["prediction"], out, p["S"], keep))
+    right = sum(p == o for _, p, o, _, _ in rows)
+    ev = (f"s* = {thr['results']['s_star']:+.4f}; right on {right}/{len(rows)} eligible: "
+          + "; ".join(f"{n} S {s:+.3f} predicted {p}, was {o} (copy-free keeps {k:.0%} of the gap)"
+                      for n, p, o, s, k in rows))
+    p4 = [n for n in E14_FRESH if _e14(runs, n) and _h19_outcome(_e14(runs, n))]
+    p4_right = sum(runs[f"h19_prediction:{n}"]["results"]["prediction"] == _h19_outcome(_e14(runs, n)) for n in p4)
+    ev += f". Both rounds together (description only): {right + p4_right}/{len(rows) + len(p4)}"
+    if len(rows) < 4:
+        return {"id": "H19b", "text": text, "verdict": "not judged", "evidence": ev}
+    return {"id": "H19b", "text": text, "verdict": _verdict(right >= 0.9 * len(rows)), "evidence": ev}
+
+
 def phase4_hypotheses(runs: dict) -> list[dict]:
-    return [h19(runs), h20(runs)]
+    return [h19(runs), h20(runs), h19b(runs)]
 
 
 def e14(runs: dict) -> list[str]:
@@ -1022,17 +1055,17 @@ def e14(runs: dict) -> list[str]:
     if thr:
         out += ["", f"**s\\* = {thr['results']['s_star']:+.4f}** ({thr['results']['how']}), "
                     f"ledger `h19_threshold` @ `{thr['git']['commit']}`."]
-    fresh = [n for n in E14_FRESH if f"h19_prediction:{n}" in runs]
+    fresh = [n for n in E14_FRESH + P5_FRESH if f"h19_prediction:{n}" in runs]
     if fresh:
-        out += ["", "| Fresh case | S | Prediction (recorded before E14 ran) | Full gap | Copy-free gap | Outcome | "
-                    "Macro-F1 |", "|---|--:|---|--:|--:|---|--:|"]
+        out += ["", "| Fresh case | Round | S | Prediction (recorded before E14 ran) | Full gap | Copy-free gap | "
+                    "Outcome | Macro-F1 |", "|---|---|--:|---|--:|--:|---|--:|"]
         for n in fresh:
             p = runs[f"h19_prediction:{n}"]["results"]
             e = _e14(runs, n)
             cells = (f"{pt(e['full_gap'])} | {pt(e['copy_free_gap']) if e['copy_free_gap'] is not None else ''} | "
                      f"{_h19_outcome(e) or 'not eligible'} | {e['macro_f1']:.4f}") if e else "| | running |"
             s = "" if p["S"] is None else format(p["S"], "+.4f")
-            out.append(f"| {n} | {s} | {p['prediction']} | {cells} |")
+            out.append(f"| {n} | {'phase 5' if n in P5_FRESH else 'phase 4'} | {s} | {p['prediction']} | {cells} |")
     hs = phase4_hypotheses(runs)
     out += [""] + [f"**{h['id']} {h['verdict']}.** {h['evidence']}." for h in hs] + [""]
     return out
@@ -1044,12 +1077,12 @@ def phase4_data(runs: dict) -> dict:
             for n in H19_DEV if f"e14_stat:{n}" in runs}
     thr = runs.get("h19_threshold")
     fresh = {}
-    for n in E14_FRESH:
+    for n in E14_FRESH + P5_FRESH:
         p, e = runs.get(f"h19_prediction:{n}"), _e14(runs, n)
         if p is None:
             continue
         fresh[n] = {"S": _num(p["results"]["S"]), "prediction": p["results"]["prediction"],
-                    "leaked_share": _num(p["results"]["leaked_share"]),
+                    "leaked_share": _num(p["results"]["leaked_share"]), "round": 5 if n in P5_FRESH else 4,
                     "outcome": _h19_outcome(e) if e else None,
                     "full_gap": _num(e["full_gap"]) if e else None,
                     "copy_free_gap": _num(e["copy_free_gap"]) if e and e["copy_free_gap"] is not None else None,

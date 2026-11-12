@@ -1,4 +1,4 @@
-# Findings (phases 1-4)
+# Findings (phases 1-5)
 
 Every number here is in [RESULTS.md](RESULTS.md), which is generated from
 `results/ledger.jsonl`. E0 ran at commit `0f452ad`, E1 at `6780929`. This file
@@ -608,6 +608,43 @@ score is 31 and 3 points higher without them. On these IoT benchmarks a
 duplicate count says nothing about whether a reported score is inflated; the
 retrain does, and on the two cases where there was a gap to explain, S said
 which kind it was before any model was trained.
+
+## 32. Phase 5: the same diagnosis on a second fresh round (H19b not supported)
+
+H19 was not judged because the IoT benchmarks gave only two cases with a gap to
+explain. Phase 5 (PLAN.md amendment 2026-11-12, committed and pushed before any
+of its data was fetched) ran the unchanged method, with the same s* = +0.0721,
+on five UCI security benchmarks in a frozen order. NATICUSdroid was dropped
+before any number was computed: its file has one row fewer than UCI states,
+and the rule allowed no exceptions. TUANDROMD's one entirely empty row was
+removed, which gives UCI's count exactly. Every prediction was committed and
+pushed before E14 trained a model on its case.
+
+| Case | S | Predicted | Gap, full | Gap, copy-free | Kept | Outcome |
+|---|--:|---|--:|--:|--:|---|
+| Spambase | +0.024 | memorised | +1.02 | +0.80 | 78% | memorised ✓ |
+| Spambase, no identifiers | +0.017 | memorised | +1.04 | +0.82 | 79% | memorised ✓ |
+| Website Phishing | +0.067 | memorised | +3.42 | +4.13 | 121% | **easy ✗** |
+| YouTube Spam | +0.302 | easy | +1.47 | +1.10 | 75% | **memorised ✗** |
+| YouTube Spam, no identifiers | +0.302 | easy | +1.19 | +0.93 | 78% | **memorised ✗** |
+| TUANDROMD | -0.027 | memorised | +21.24 | -5.55 | -26% | memorised ✓ |
+| RT-IoT2022 | +0.055 | memorised | +3.15 | -6.00 | -190% | memorised ✓ |
+| RT-IoT2022, no identifiers | +0.062 | memorised | +14.62 | -7.47 | -51% | memorised ✓ |
+
+**H19b not supported**: right on 5 of 8 eligible cases, against the 90% the
+rule asks. Across both rounds the predictions were right on 7 of 10 judgeable
+fresh cases (a description, not a test).
+
+Where it fails is measured, not guessed. Every case with a large gap was
+called right: TUANDROMD's 21-point gap and RT-IoT2022's 3 and 15 points are
+memorised copies (the copy-free model loses all of the gap and more), and S
+said so before any model was trained. The three misses sit at a cut-off:
+Website Phishing's S (+0.067) is 0.005 below s*, and YouTube Spam's copy-free
+models keep 75-78% of the gap against the 80% that separates easy from
+memorised. Spambase, called right, keeps 78-79%: these cases are partly easy
+and partly memorised, and a two-way verdict cannot describe them. `leakcheck
+explain` now prints S's distance from s* and states the fresh record, so a
+user can see a close call and retrain.
 
 ## Open items before any of this is published
 

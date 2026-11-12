@@ -87,3 +87,14 @@ def test_every_training_row_a_copy_leaves_s_undefined():
     r = ex.explain(Split(tr, te, "y"))
     assert r["leaked"] == 5 and r["S"] is None
     assert r["verdict"] == "no verdict (every training row is a copy of a leaked test row)"
+
+
+def test_explain_cli_when_every_training_row_is_a_copy(tmp_path, capsys):
+    tr = _frame(np.zeros((20, 2)), np.array([0, 1] * 10))
+    te = _frame(np.zeros((5, 2)), np.array([0, 1, 0, 1, 0]))
+    tr.to_csv(tmp_path / "train.csv", index=False)
+    te.to_csv(tmp_path / "test.csv", index=False)
+    code = main(["explain", "--train", str(tmp_path / "train.csv"), "--test", str(tmp_path / "test.csv"),
+                 "--label", "y"])
+    out = capsys.readouterr().out
+    assert code == 0 and "S undefined" in out and "every training row is a copy" in out

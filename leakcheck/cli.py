@@ -94,11 +94,15 @@ def _explain(args, split: Split) -> int:
     print(f"test rows {r['n_test']}, leaked (exact or near copy in train) {r['leaked']}, exact {r['exact']}")
     if r["leaked"]:
         print(f"training rows that copy a leaked row: {r['train_rows_removed']} (left after removal: {r['copies_left']})")
-        print(f"nearest-neighbour vote accuracy: leaked rows without their copies {r['vote_acc_leaked']:.4f} "
-              f"({r['sampled_leaked']} rows), other rows {r['vote_acc_rest']:.4f} ({r['sampled_rest']} rows)")
-        print(f"S = {r['S']:+.4f}" + ("" if r["threshold"] is None else f", threshold {r['threshold']:+.4f}"))
+        if r["S"] is None:
+            print("S undefined: no training row is left once the copies are removed")
+        else:
+            print(f"nearest-neighbour vote accuracy: leaked rows without their copies {r['vote_acc_leaked']:.4f} "
+                  f"({r['sampled_leaked']} rows), other rows {r['vote_acc_rest']:.4f} ({r['sampled_rest']} rows)")
+            print(f"S = {r['S']:+.4f}" + ("" if r["threshold"] is None else
+                                          f", threshold {r['threshold']:+.4f} (S - threshold {r['S'] - r['threshold']:+.4f})"))
     print(f"verdict: {r['verdict']}")
-    if r["threshold"] is not None and r["leaked"]:
+    if r["threshold"] is not None and r["S"] is not None:
         print("  easy: a model can get these rows right without their copies, so removing the copies will not "
               "close the leakage gap; memorised: the gap comes from the copies themselves.")
         print(f"  {ex.THRESHOLD_NOTE}")

@@ -27,8 +27,9 @@ SAMPLE = 20_000
 # H19's threshold on S, fixed on the eight eligible dev datasets (PLAN.md amendment
 # 2026-11-09) by scripts/h19_threshold.py; None until that has run.
 S_THRESHOLD: float | None = 0.07211209852651596
-THRESHOLD_NOTE = ("The threshold was fixed on eight datasets whose answer is known (E13, 24 model fits each); "
-                  "how often it is right on new data is H19 (PLAN.md, docs/RESULTS.md).")
+THRESHOLD_NOTE = ("The threshold was fixed on eight datasets whose answer is known (E13, 24 model fits each). On "
+                  "27 fresh cases it was right on 7 of the 10 with a gap to explain, every miss near a cut-off "
+                  "(H19, H19b; docs/RESULTS.md): treat it as a first look, and retrain where the answer matters.")
 
 
 def with_train(split: Split, train: pd.DataFrame, test: pd.DataFrame | None = None) -> Split:

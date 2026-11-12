@@ -64,9 +64,11 @@ def test_numbers_come_from_data(built):
     idx = html["index.html"]
     for a in d["audit"]:
         assert mod.fpct(a["exact_copies"]) in idx, a["id"]
-    verdicts = [h["verdict"] for h in d["hypotheses"] + d.get("phase3", {}).get("hypotheses", [])]
+    verdicts = [h["verdict"] for h in d["hypotheses"] + d.get("phase3", {}).get("hypotheses", [])
+                + d.get("phase4", {}).get("hypotheses", [])]
     assert idx.count(">SUPPORTED<") == verdicts.count("supported")
     assert idx.count(">NOT SUPPORTED<") == verdicts.count("not supported")
+    assert idx.count(">NOT JUDGED<") == verdicts.count("not judged")
     assert idx.count(">PENDING<") == verdicts.count("pending")
     kdd = next(r for r in d["retrain"] if r["id"] == "kdd99")
     assert f"{kdd['models']['lr']['gap_no_near'] * 100:.1f}" in idx

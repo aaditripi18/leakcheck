@@ -380,7 +380,7 @@
       </div>
     </div>
     <div class="lg:col-span-7 flex flex-col gap-space-xs">
-      <p class="font-body-sm text-body-sm text-on-surface-variant">On 19 fresh cases, each prediction was committed before any model was trained on them. A case is judged only if its leakage gap is at least one point.</p>
+      <p class="font-body-sm text-body-sm text-on-surface-variant">On 27 fresh cases in two rounds (19 IoT cases, then 8 from five UCI security benchmarks), each prediction was committed before any model was trained on them. A case is judged only if its leakage gap is at least one point.</p>
       <div class="border border-surface-container-high bg-surface overflow-x-auto" tabindex="0" role="region" aria-label="Fresh cases, scrolls sideways">
         <table class="w-full text-left border-collapse font-mono-data-sm text-mono-data-sm text-on-surface min-w-[620px]">
           <thead><tr class="bg-surface-container-low border-b border-on-surface sec-label text-secondary"><th scope="col" class="py-2 px-3">Fresh case</th><th scope="col" class="py-2 px-3 text-right">Leaked</th><th scope="col" class="py-2 px-3 text-right">S</th><th scope="col" class="py-2 px-3">Predicted</th><th scope="col" class="py-2 px-3 text-right">Gap (pts)</th><th scope="col" class="py-2 px-3">Retraining found</th></tr></thead>
@@ -517,18 +517,74 @@
   <td class="py-2 px-3">memorised</td>
   <td class="py-2 px-3 text-right tabular">0.1</td>
   <td class="py-2 px-3">not judged</td>
+</tr><tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">uci_spambase</th>
+  <td class="py-2 px-3 text-right tabular">14.4%</td>
+  <td class="py-2 px-3 text-right tabular">+0.024</td>
+  <td class="py-2 px-3">memorised</td>
+  <td class="py-2 px-3 text-right tabular">1.0</td>
+  <td class="py-2 px-3">memorised</td>
+</tr><tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">uci_spambase:no_identifiers</th>
+  <td class="py-2 px-3 text-right tabular">14.3%</td>
+  <td class="py-2 px-3 text-right tabular">+0.017</td>
+  <td class="py-2 px-3">memorised</td>
+  <td class="py-2 px-3 text-right tabular">1.0</td>
+  <td class="py-2 px-3">memorised</td>
+</tr><tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">uci_website_phishing</th>
+  <td class="py-2 px-3 text-right tabular">69.0%</td>
+  <td class="py-2 px-3 text-right tabular">+0.067</td>
+  <td class="py-2 px-3">memorised</td>
+  <td class="py-2 px-3 text-right tabular">3.4</td>
+  <td class="py-2 px-3">easy ✗</td>
+</tr><tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">uci_youtube_spam</th>
+  <td class="py-2 px-3 text-right tabular">16.1%</td>
+  <td class="py-2 px-3 text-right tabular">+0.302</td>
+  <td class="py-2 px-3">easy</td>
+  <td class="py-2 px-3 text-right tabular">1.5</td>
+  <td class="py-2 px-3">memorised ✗</td>
+</tr><tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">uci_youtube_spam:no_identifiers</th>
+  <td class="py-2 px-3 text-right tabular">16.1%</td>
+  <td class="py-2 px-3 text-right tabular">+0.302</td>
+  <td class="py-2 px-3">easy</td>
+  <td class="py-2 px-3 text-right tabular">1.2</td>
+  <td class="py-2 px-3">memorised ✗</td>
+</tr><tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">uci_tuandromd</th>
+  <td class="py-2 px-3 text-right tabular">90.8%</td>
+  <td class="py-2 px-3 text-right tabular">-0.027</td>
+  <td class="py-2 px-3">memorised</td>
+  <td class="py-2 px-3 text-right tabular">21.2</td>
+  <td class="py-2 px-3">memorised</td>
+</tr><tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">uci_rt_iot2022</th>
+  <td class="py-2 px-3 text-right tabular">84.9%</td>
+  <td class="py-2 px-3 text-right tabular">+0.055</td>
+  <td class="py-2 px-3">memorised</td>
+  <td class="py-2 px-3 text-right tabular">3.2</td>
+  <td class="py-2 px-3">memorised</td>
+</tr><tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">uci_rt_iot2022:no_identifiers</th>
+  <td class="py-2 px-3 text-right tabular">86.1%</td>
+  <td class="py-2 px-3 text-right tabular">+0.062</td>
+  <td class="py-2 px-3">memorised</td>
+  <td class="py-2 px-3 text-right tabular">14.6</td>
+  <td class="py-2 px-3">memorised</td>
 </tr></tbody>
         </table>
       </div>
     </div>
   </div>
-  <p class="font-body-sm text-body-sm text-on-surface-variant">Right on 2 of 2 judgeable fresh cases; the pre-registered rule needs four, so H19 is <strong>not judged</strong>. Run it on your own split: <code>leakcheck explain --train train.csv --test test.csv --label y</code>.</p>
+  <p class="font-body-sm text-body-sm text-on-surface-variant">First round: right on 2 of 2 judgeable cases; the rule needs four, so H19 is <strong>not judged</strong>. Second round, pre-registered after it: right on 5 of 8, below the 90% the rule asks, so H19b is <strong>not supported</strong>. Every large gap was called right (TUANDROMD, RT-IoT2022); the three misses sit at a cut-off: an S of +0.067 against s* = +0.072, and copy-free models keeping 75–78% of the gap against the 80% that separates easy from memorised. Use <code>leakcheck explain</code> as a first look, and retrain where the verdict matters: <code>leakcheck explain --train train.csv --test test.csv --label y</code>.</p>
 </section>
 
 <section class="flex flex-col gap-space-md">
   <div id="hypotheses" class="scroll-mt-20">
   <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">07</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">Pre-registered</span></div>
-  <h2 class="font-headline-md text-headline-md text-on-surface mt-1">20 hypotheses, decided by rules fixed before the runs</h2>
+  <h2 class="font-headline-md text-headline-md text-on-surface mt-1">21 hypotheses, decided by rules fixed before the runs</h2>
 </div>
   <div class="flex flex-col border border-surface-container-high divide-y divide-surface-container-high bg-surface"><div class="p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-sm hover:bg-surface-container-low transition-colors">
   <div class="flex items-start gap-space-md max-w-3xl">
@@ -710,6 +766,15 @@
     </div>
   </div>
   <div class="self-start md:self-center shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 font-mono-data-sm text-mono-data-sm font-semibold bg-surface-container-high text-secondary border border-outline-variant">NOT JUDGED</span></div>
+</div><div class="p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-sm hover:bg-surface-container-low transition-colors">
+  <div class="flex items-start gap-space-md max-w-3xl">
+    <span class="font-mono-data-md text-mono-data-md font-bold text-on-surface bg-surface-container px-2 py-0.5">H19b</span>
+    <div class="flex flex-col">
+      <span class="font-body-md text-body-md font-medium text-on-surface">The same diagnosis, unchanged, on a second fresh round of five benchmarks.</span>
+      <span class="font-mono-data-sm text-mono-data-sm text-secondary mt-0.5">s* = +0.0721; right on 5/8 eligible: uci_spambase S +0.024 predicted memorised, was memorised (copy-free keeps 78% of the gap); uci_spambase:no_identifiers S +0.017 predicted memorised, was memorised (copy-free keeps 79% of the gap); uci_website_phishing S +0.067 predicted memorised, was easy (copy-free keeps 121% of the gap); uci_youtube_spam S +0.302 predicted easy, was memorised (copy-free keeps 75% of the gap); uci_youtube_spam:no_identifiers S +0.302 predicted easy, was memorised (copy-free keeps 78% of the gap); uci_tuandromd S -0.027 predicted memorised, was memorised (copy-free keeps -26% of the gap); uci_rt_iot2022 S +0.055 predicted memorised, was memorised (copy-free keeps -190% of the gap); uci_rt_iot2022:no_identifiers S +0.062 predicted memorised, was memorised (copy-free keeps -51% of the gap). Both rounds together (description only): 7/10</span>
+    </div>
+  </div>
+  <div class="self-start md:self-center shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 font-mono-data-sm text-mono-data-sm font-semibold bg-surface-container-high text-secondary border border-outline-variant">NOT SUPPORTED</span></div>
 </div></div>
   <p class="font-mono-data-sm text-mono-data-sm text-secondary">Each decision rule was committed to <a class="underline underline-offset-2 hover:text-on-surface" href="https://github.com/aaditripi18/leakcheck/blob/main/PLAN.md" rel="noopener noreferrer">PLAN.md</a> before the experiment it judges was run.</p>
 </section>
@@ -858,7 +923,7 @@ python scripts/report.py</pre>
   <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">11</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">Scope</span></div>
   <h2 class="font-headline-md text-headline-md text-on-surface mt-1">Every caveat, measured</h2>
 </div>
-  <ul class="grid grid-cols-1 md:grid-cols-2 gap-x-space-xl gap-y-space-xs font-body-sm text-body-sm text-on-surface-variant list-disc pl-4"><li>A copy is not always a bug: measured. On KDD Cup 99 and NSL-KDD the copied rows are easy (a model trained without them still gets 97% right, E9); on CSE-CIC-IDS2018 and EMBER they are memorised (E13).</li><li>The cleaned test set is harder by construction: measured. A random removal of the same size is reported beside every gap (up to 1.5 points, against 15–17 on KDD Cup 99, E10).</li><li>Near-copy thresholds: measured. Every gap is recomputed from eps 0.001 to 0.1 and Jaccard 0.6 to 0.95 (E6).</li><li>Untuned baselines: measured. Every gap is repeated with full training sets, a tuned model and a paired bootstrap (E5/E6); the two largest current benchmarks are scored on a 200,000-row test sample.</li><li>EMBER&#x27;s feature view: measured. The official 2,381-dimension vectors give the same copies and gaps within 0.4 points (E11).</li><li>Provenance: IDS2018 is byte-identical to the official bucket; CIC-IoT2023 matches all 34 published label counts.</li><li>The cheap diagnosis (H19): measured on eight dev cases (separated; s* fixed between them) and on 19 fresh ones whose predictions were committed before any fresh model was trained. Only two fresh cases had a gap large enough to judge, so H19 is reported as not judged, with both predictions right.</li></ul>
+  <ul class="grid grid-cols-1 md:grid-cols-2 gap-x-space-xl gap-y-space-xs font-body-sm text-body-sm text-on-surface-variant list-disc pl-4"><li>A copy is not always a bug: measured. On KDD Cup 99 and NSL-KDD the copied rows are easy (a model trained without them still gets 97% right, E9); on CSE-CIC-IDS2018 and EMBER they are memorised (E13).</li><li>The cleaned test set is harder by construction: measured. A random removal of the same size is reported beside every gap (up to 1.5 points, against 15–17 on KDD Cup 99, E10).</li><li>Near-copy thresholds: measured. Every gap is recomputed from eps 0.001 to 0.1 and Jaccard 0.6 to 0.95 (E6).</li><li>Untuned baselines: measured. Every gap is repeated with full training sets, a tuned model and a paired bootstrap (E5/E6); the two largest current benchmarks are scored on a 200,000-row test sample.</li><li>EMBER&#x27;s feature view: measured. The official 2,381-dimension vectors give the same copies and gaps within 0.4 points (E11).</li><li>Provenance: IDS2018 is byte-identical to the official bucket; CIC-IoT2023 matches all 34 published label counts.</li><li>The cheap diagnosis (H19, H19b): measured on eight dev cases and on 27 fresh ones in two rounds, every prediction committed before any fresh model was trained. Right on 7 of 10 judgeable fresh cases; H19b is not supported (5 of 8 against the 90% asked). Every miss sat at a cut-off, so explain reports S beside s* and the retrain decides close cases.</li></ul>
 </section>
 
 </article>

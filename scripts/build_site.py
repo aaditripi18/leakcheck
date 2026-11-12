@@ -252,6 +252,7 @@ SHORT_H = {
     "H9": "On network traffic, a time split costs more than removing copies.",
     "H19": "Without training a model, an audit can tell easy leaks from memorised ones.",
     "H20": "On near-perfect benchmarks, leakage hides in the rare classes.",
+    "H19b": "The same diagnosis, unchanged, on a second fresh round of five benchmarks.",
 }
 
 
@@ -312,14 +313,17 @@ def phase4_section(p4: dict) -> str:
   <td class="py-2 px-3">{e(v['outcome'])}</td>
 </tr>""" for n, v in dev)
     fr = p4["fresh"]
-    elig = {n: v for n, v in fr.items() if v["outcome"] is not None}
+    elig = {n: v for n, v in fr.items() if v["outcome"] is not None and v.get("round", 4) == 4}
+    elig5 = {n: v for n, v in fr.items() if v["outcome"] is not None and v.get("round") == 5}
+    right5 = sum(v["prediction"] == v["outcome"] for v in elig5.values())
+    h19b = next((h for h in p4["hypotheses"] if h["id"] == "H19b"), None)
     fresh_rows = "".join(f"""<tr>
   <th scope="row" class="py-2 px-3 font-medium text-left">{e(n)}</th>
   <td class="py-2 px-3 text-right tabular">{fpct(v['leaked_share'])}</td>
   <td class="py-2 px-3 text-right tabular">{'' if v['S'] is None else format(v['S'], '+.3f')}</td>
   <td class="py-2 px-3">{e(v['prediction'] or 'undefined')}</td>
   <td class="py-2 px-3 text-right tabular">{'' if v['full_gap'] is None else fpt(v['full_gap'])}</td>
-  <td class="py-2 px-3">{e(v['outcome'] or 'not judged')}</td>
+  <td class="py-2 px-3">{e(v['outcome'] or 'not judged')}{'' if v['outcome'] is None or v['prediction'] == v['outcome'] else ' ✗'}</td>
 </tr>""" for n, v in fr.items())
     right = sum(v["prediction"] == v["outcome"] for v in elig.values())
     h19 = next(h for h in p4["hypotheses"] if h["id"] == "H19")
@@ -339,7 +343,7 @@ def phase4_section(p4: dict) -> str:
       </div>
     </div>
     <div class="lg:col-span-7 flex flex-col gap-space-xs">
-      <p class="font-body-sm text-body-sm text-on-surface-variant">On 19 fresh cases, each prediction was committed before any model was trained on them. A case is judged only if its leakage gap is at least one point.</p>
+      <p class="font-body-sm text-body-sm text-on-surface-variant">On 27 fresh cases in two rounds (19 IoT cases, then 8 from five UCI security benchmarks), each prediction was committed before any model was trained on them. A case is judged only if its leakage gap is at least one point.</p>
       <div class="border border-surface-container-high bg-surface overflow-x-auto" tabindex="0" role="region" aria-label="Fresh cases, scrolls sideways">
         <table class="w-full text-left border-collapse font-mono-data-sm text-mono-data-sm text-on-surface min-w-[620px]">
           <thead><tr class="bg-surface-container-low border-b border-on-surface sec-label text-secondary"><th scope="col" class="py-2 px-3">Fresh case</th><th scope="col" class="py-2 px-3 text-right">Leaked</th><th scope="col" class="py-2 px-3 text-right">S</th><th scope="col" class="py-2 px-3">Predicted</th><th scope="col" class="py-2 px-3 text-right">Gap (pts)</th><th scope="col" class="py-2 px-3">Retraining found</th></tr></thead>
@@ -348,7 +352,7 @@ def phase4_section(p4: dict) -> str:
       </div>
     </div>
   </div>
-  <p class="font-body-sm text-body-sm text-on-surface-variant">Right on {right} of {len(elig)} judgeable fresh cases; the pre-registered rule needs four, so H19 is <strong>{e(h19['verdict'])}</strong>. Run it on your own split: <code>leakcheck explain --train train.csv --test test.csv --label y</code>.</p>
+  <p class="font-body-sm text-body-sm text-on-surface-variant">First round: right on {right} of {len(elig)} judgeable cases; the rule needs four, so H19 is <strong>{e(h19['verdict'])}</strong>. Second round, pre-registered after it: right on {right5} of {len(elig5)}, below the 90% the rule asks, so H19b is <strong>{e(h19b['verdict'] if h19b else 'pending')}</strong>. Every large gap was called right (TUANDROMD, RT-IoT2022); the three misses sit at a cut-off: an S of +0.067 against s* = {s_star:+.3f}, and copy-free models keeping 75–78% of the gap against the 80% that separates easy from memorised. Use <code>leakcheck explain</code> as a first look, and retrain where the verdict matters: <code>leakcheck explain --train train.csv --test test.csv --label y</code>.</p>
 </section>
 """
 
@@ -497,7 +501,7 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
     ]
     p4 = d.get("phase4", {})
     p4_section = phase4_section(p4) if p4.get("s_star") is not None else ""
-    fr = p4.get("fresh", {})
+    fr = {n: v for n, v in p4.get("fresh", {}).items() if v.get("round", 4) == 4}
     if fr and all(v["full_gap"] is not None for v in fr.values()):
         leaky = [v for v in fr.values() if (v["leaked_share"] or 0) >= 0.10]
         small = [v for v in leaky if v["full_gap"] < 0.01]
@@ -563,6 +567,12 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
 </tr>""")
 
     recall = min(v for v in syn["minhash_recall"].values() if v is not None)
+    all_fr = p4.get("fresh", {})
+    all_judged = [v for v in all_fr.values() if v["outcome"] is not None]
+    all_right = sum(v["prediction"] == v["outcome"] for v in all_judged)
+    r5 = [v for v in all_judged if v.get("round") == 5]
+    r5_right = sum(v["prediction"] == v["outcome"] for v in r5)
+    h19b_v = next((h["verdict"] for h in p4.get("hypotheses", []) if h["id"] == "H19b"), "pending")
     limitations = [
         "A copy is not always a bug: measured. On KDD Cup 99 and NSL-KDD the copied rows are easy (a model trained "
         "without them still gets 97% right, E9); on CSE-CIC-IDS2018 and EMBER they are memorised (E13).",
@@ -574,9 +584,10 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
         "EMBER's feature view: measured. The official 2,381-dimension vectors give the same copies and gaps within "
         "0.4 points (E11).",
         "Provenance: IDS2018 is byte-identical to the official bucket; CIC-IoT2023 matches all 34 published label counts.",
-        "The cheap diagnosis (H19): measured on eight dev cases (separated; s* fixed between them) and on 19 fresh "
-        "ones whose predictions were committed before any fresh model was trained. Only two fresh cases had a gap "
-        "large enough to judge, so H19 is reported as not judged, with both predictions right.",
+        f"The cheap diagnosis (H19, H19b): measured on eight dev cases and on {len(all_fr)} fresh ones in two "
+        f"rounds, every prediction committed before any fresh model was trained. Right on {all_right} of "
+        f"{len(all_judged)} judgeable fresh cases; H19b is {h19b_v} ({r5_right} of {len(r5)} against the 90% "
+        "asked). Every miss sat at a cut-off, so explain reports S beside s* and the retrain decides close cases.",
     ]
     lim = "".join(f"<li>{e(x)}</li>" for x in limitations)
 
