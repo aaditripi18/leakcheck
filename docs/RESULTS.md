@@ -77,6 +77,13 @@ leakcheck findings on the binary attack/normal task (features only, label column
 
 KDD99 L1.cross by class: normal 12.69% of 60,593, attack 81.83% of 250,436
 
+## Phase 4 hypotheses (PLAN.md amendment 2026-11-09)
+
+| | Hypothesis | Verdict | Evidence |
+|---|---|---|---|
+| H19 | An audit can tell easy from memorised leaks: S (no model trained), with a threshold fixed on eight dev cases, predicts each eligible fresh case's E14 outcome right on >= 90% of them (>= 4 eligible) | **not judged** | s* = +0.0721; right on 2/2 eligible fresh cases: ton_network S +0.015 predicted memorised, was memorised; ton_network:no_identifiers S -0.403 predicted memorised, was memorised. Not eligible (full gap below 1 point): 17 |
+| H20 | Leakage hides in the rare classes of near-perfect benchmarks: on every fresh case with macro-F1 >= 0.98 and a rare and a common class, the rare classes' median per-class gap exceeds the common classes' in >= 10 of 12 cells (>= 2 eligible) | **not judged** | no case. Eligible 0 of 19 (rare and common classes in every seed's split). Macro-F1 >= 0.98 but no rare class with a leaked row: ton_modbus, ton_modbus:no_identifiers. A rare class with leaked rows but macro-F1 below 0.98: ton_network (0.9782), ton_network:no_identifiers (0.8327), xiiotid (0.9145), xiiotid:no_identifiers (0.9229) |
+
 ## Phase 3 hypotheses (PLAN.md)
 
 | | Hypothesis | Verdict | Evidence |
@@ -398,6 +405,54 @@ Same splits, seeds (0-2), models and copy removal as E9. *Gap* = macro-F1 on the
 | ember2018_official | fresh | 26.90% | +1.48 | -0.18 | 0.9282 / 0.9428 | 0/12 | 6/12 |
 
 Ledger lines: `e13_difficulty:kdd99` @ `be9ffcb`, `e13_difficulty:nslkdd` @ `be9ffcb`, `e13_difficulty:unsw_nb15` @ `be9ffcb`, `e13_difficulty:cicids2017` @ `be9ffcb`, `e13_difficulty:ember2018` @ `be9ffcb`, `e13_difficulty:uci_phishing` @ `68eb06d`, `e13_difficulty:phiusiil` @ `be9ffcb`, `e13_difficulty:sms_spam` @ `be9ffcb`, `e13_difficulty:edgeiiot` @ `be9ffcb`, `e13_difficulty:edgeiiot:no_identifiers` @ `be9ffcb`, `e13_difficulty:cseids2018` @ `be9ffcb`, `e13_difficulty:cseids2018:no_identifiers` @ `be9ffcb`, `e13_difficulty:ciciot2023` @ `be9ffcb`, `e13_difficulty:ember2018_official` @ `be9ffcb`
+
+## E14: telling easy leaks from memorised ones without training a model
+
+*S* = neighbour-vote accuracy on the leaked rows (their training copies removed) minus on the other test rows (seed 0, samples of at most 20,000; PLAN.md amendment 2026-11-09). A case is *easy* if its copy-free model keeps >= 80% of the full model's gap (E13/E14, 12 cells), else *memorised*; cases with a full gap below 1 point are not eligible.
+
+| Case | Set | Leaked rows | S | Vote acc. leaked / rest | Outcome (E13/E14) |
+|---|---|--:|--:|--:|---|
+| kdd99 | H19 dev | 77.96% | +0.1986 | 0.9690 / 0.7705 | easy |
+| nslkdd | H19 dev | 33.07% | +0.2587 | 0.9819 / 0.7232 | easy |
+| unsw_nb15 | H19 dev | 17.89% | +0.0952 | 0.9400 / 0.8448 | easy |
+| ember2018 | H19 dev | 23.61% | +0.0233 | 0.9135 / 0.8902 | memorised |
+| ember2018_official | H19 dev | 26.87% | +0.0491 | 0.9406 / 0.8915 | memorised |
+| uci_phishing | H19 dev | 64.41% | -0.0487 | 0.8827 / 0.9314 | memorised |
+| sms_spam | H19 dev | 13.27% | -0.1147 | 0.8243 / 0.9390 | memorised |
+| cseids2018:no_identifiers | H19 dev | 87.25% | -0.1079 | 0.8707 / 0.9785 | memorised |
+| cicids2017 | inspected | 66.88% | -0.0101 | 0.9893 / 0.9994 | not eligible |
+| phiusiil | inspected | 4.43% | -0.1034 | 0.8240 / 0.9274 | not eligible |
+| edgeiiot | inspected | 0.04% | -0.6864 | 0.0407 / 0.7270 | not eligible |
+| edgeiiot:no_identifiers | inspected | 44.24% | +0.3160 | 0.9909 / 0.6750 | not eligible |
+| cseids2018 | inspected | 8.28% | -0.4095 | 0.5029 / 0.9124 | not eligible |
+| ciciot2023 | inspected | 64.78% | +0.0296 | 1.0000 / 0.9704 | not eligible |
+
+**s\* = +0.0721** (separates: midpoint between lowest easy and highest memorised S), ledger `h19_threshold` @ `8e3b6b5`.
+
+| Fresh case | S | Prediction (recorded before E14 ran) | Full gap | Copy-free gap | Outcome | Macro-F1 |
+|---|--:|---|--:|--:|---|--:|
+| ton_network | +0.0145 | memorised | +1.51 | +0.66 | memorised | 0.9782 |
+| ton_network:no_identifiers | -0.4030 | memorised | +7.01 | -36.95 | memorised | 0.8327 |
+| ton_fridge | +0.4946 | easy | -0.02 | -0.03 | not eligible | 0.6930 |
+| ton_fridge:no_identifiers | -0.6809 | memorised | -30.82 | -64.70 | not eligible | 0.6918 |
+| ton_garage_door | -0.0077 | memorised | +0.13 | -1.05 | not eligible | 0.6936 |
+| ton_garage_door:no_identifiers |  | None | +0.00 |  | not eligible | 0.6919 |
+| ton_gps_tracker | +0.4772 | easy | +0.10 | +0.10 | not eligible | 0.9683 |
+| ton_gps_tracker:no_identifiers | -0.2719 | memorised | -3.18 | -56.31 | not eligible | 0.9682 |
+| ton_modbus | +0.7307 | easy | +0.00 | +0.00 | not eligible | 1.0000 |
+| ton_modbus:no_identifiers | +0.0000 | memorised | +0.00 | -0.08 | not eligible | 1.0000 |
+| ton_motion_light | -0.0970 | memorised | +0.72 | +0.24 | not eligible | 0.5402 |
+| ton_motion_light:no_identifiers |  | None | +0.00 |  | not eligible | 0.5428 |
+| ton_thermostat | +0.4346 | easy | -0.02 | -0.02 | not eligible | 0.8381 |
+| ton_thermostat:no_identifiers | -0.0387 | memorised | +0.82 | -16.58 | not eligible | 0.8337 |
+| ton_weather | +0.3079 | easy | +0.00 | +0.00 | not eligible | 0.9627 |
+| ton_weather:no_identifiers | -0.0015 | memorised | +0.14 | -0.15 | not eligible | 0.9626 |
+| botiot |  | None | +0.00 |  | not eligible | 0.8074 |
+| xiiotid | +0.0246 | memorised | +0.07 | +0.01 | not eligible | 0.9145 |
+| xiiotid:no_identifiers | -0.4732 | memorised | +0.11 | -0.73 | not eligible | 0.9229 |
+
+**H19 not judged.** s* = +0.0721; right on 2/2 eligible fresh cases: ton_network S +0.015 predicted memorised, was memorised; ton_network:no_identifiers S -0.403 predicted memorised, was memorised. Not eligible (full gap below 1 point): 17.
+**H20 not judged.** no case. Eligible 0 of 19 (rare and common classes in every seed's split). Macro-F1 >= 0.98 but no rare class with a leaked row: ton_modbus, ton_modbus:no_identifiers. A rare class with leaked rows but macro-F1 below 0.98: ton_network (0.9782), ton_network:no_identifiers (0.8327), xiiotid (0.9145), xiiotid:no_identifiers (0.9229).
 
 ## E2 uncertainty (post hoc)
 

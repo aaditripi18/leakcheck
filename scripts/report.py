@@ -1049,6 +1049,7 @@ def phase4_data(runs: dict) -> dict:
         if p is None:
             continue
         fresh[n] = {"S": _num(p["results"]["S"]), "prediction": p["results"]["prediction"],
+                    "leaked_share": _num(p["results"]["leaked_share"]),
                     "outcome": _h19_outcome(e) if e else None,
                     "full_gap": _num(e["full_gap"]) if e else None,
                     "copy_free_gap": _num(e["copy_free_gap"]) if e and e["copy_free_gap"] is not None else None,

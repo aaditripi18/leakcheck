@@ -33,6 +33,17 @@ for each hypothesis were committed before the runs they govern.
   and +1.5 → -0.2 points): the copy-free model is *worse* on the leaked rows than
   on the rest, so the score was coming from the copies themselves. Nearly three
   quarters of KDD99's gap (72%) comes from *near*-copies.
+- **`leakcheck explain` tells easy copies from memorised ones without training a
+  model.** It removes each leaked row's training copies and asks whether the
+  nearest remaining row still has the right label. On the eight dev benchmarks
+  that statistic separates E13's easy cases (KDD99, NSL-KDD, UNSW-NB15) from the
+  memorised ones (EMBER, UCI Phishing, SMS Spam, IDS2018) completely. On 19
+  fresh IoT cases, predictions committed before any model was trained were
+  right on both cases with a gap to explain (H19 not judged: the rule needs
+  four).
+- **Leaked is not the same as inflated.** On TON_IoT, BoT-IoT and X-IIoTID, 16
+  cases leak 10-100% of their test rows, yet in 14 of them the leaked rows
+  inflate macro-F1 by less than a point, and in two they are the hard rows (E14).
 - **Today's benchmarks hide their copies behind identifiers.** A timestamp or a
   flow ID makes every row unique, so an exact-duplicate check sees nothing;
   without those columns, 40% of IDS2018's test set and 16% of Edge-IIoTset's
@@ -104,6 +115,16 @@ python -m leakcheck clean --train train.csv --test test.csv --label label --out 
 
 `scan` exits 0 when clean or minor, 1 on medium findings, 2 on high findings, 3
 on bad input.
+
+```
+python -m leakcheck explain --train train.csv --test test.csv --label label [--json explain.json]
+```
+
+`explain` answers whether the leaked rows are easy or memorised, without
+training a model: it removes their training copies, takes each row's nearest
+remaining neighbour as a vote, and compares the vote accuracy on the leaked
+rows with the rest (S). Above the threshold fixed on eight benchmarks whose
+answer is known (s\* = +0.072), the leaked rows look easy; below it, memorised.
 
 | Check | What it reports |
 |---|---|
@@ -234,6 +255,14 @@ as a caveat now has an experiment.
 H17 and H18 were added after H13 failed (PLAN.md amendment 2026-11-05) and were
 judged once on four datasets their quantities had never been computed on.
 
+| | Hypothesis (phase 4, amendment 2026-11-09) | Verdict |
+|---|---|---|
+| H19 | S, with a threshold fixed on eight dev cases, predicts the E14 outcome of >= 90% of eligible fresh cases (>= 4 eligible) | **not judged**: right on 2 of 2 eligible; 17 of 19 fresh cases had a gap below one point |
+| H20 | On near-perfect fresh benchmarks, leakage hides in the rare classes | **not judged**: no fresh case had macro-F1 >= 0.98 and a leaked rare class |
+
+The 19 predictions were committed and pushed before any fresh model was trained
+(commit `44f56fb`); E14 ran from that commit on Kaggle.
+
 ## Data provenance and method notes
 
 - **Where the data came from.** Every dataset is pinned by SHA-256 in
@@ -266,7 +295,7 @@ reference, is in [data/README.md](data/README.md).
 ```
 python -m venv .venv
 .venv/Scripts/python -m pip install -e ".[dev]"
-.venv/Scripts/python -m pytest                       # 121 tests
+.venv/Scripts/python -m pytest                       # 129 tests
 
 python scripts/fetch.py                              # ~2.1 GB, hash-verified
 python -m experiments.e0_sources && python -m experiments.e0_sources_week4
@@ -283,6 +312,12 @@ python -m experiments.e2_retrain edgeiiot edgeiiot:no_identifiers cseids2018 cse
 python -m experiments.e9_controls kdd99 nslkdd unsw_nb15 cicids2017 uci_phishing phiusiil sms_spam ember2018 edgeiiot
 python -m experiments.e12_cic_within
 python -m experiments.e5_predictions edgeiiot cseids2018 ciciot2023 && python -m experiments.e6_analysis
+
+# phase 4: easy or memorised (one process per case keeps memory flat)
+python -m experiments.e14_explain stat kdd99         # ... and each of the 14 E13 datasets
+python scripts/h19_threshold.py                      # s* from the eight dev cases, written into leakcheck/explain.py
+python -m experiments.e14_explain predict ton_network    # ... each of the 19 fresh cases; commit before the next line
+python scripts/kaggle_e14.py push-data && python scripts/kaggle_e14.py run ton_network ...   # E14 on Kaggle CPU
 python scripts/report.py                             # docs/RESULTS.md + site/data.json
 ```
 

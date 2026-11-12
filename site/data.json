@@ -1678,5 +1678,229 @@
     "cost": 0.012894
    }
   }
+ },
+ "phase4": {
+  "hypotheses": [
+   {
+    "id": "H19",
+    "text": "An audit can tell easy from memorised leaks: S (no model trained), with a threshold fixed on eight dev cases, predicts each eligible fresh case's E14 outcome right on >= 90% of them (>= 4 eligible)",
+    "verdict": "not judged",
+    "evidence": "s* = +0.0721; right on 2/2 eligible fresh cases: ton_network S +0.015 predicted memorised, was memorised; ton_network:no_identifiers S -0.403 predicted memorised, was memorised. Not eligible (full gap below 1 point): 17"
+   },
+   {
+    "id": "H20",
+    "text": "Leakage hides in the rare classes of near-perfect benchmarks: on every fresh case with macro-F1 >= 0.98 and a rare and a common class, the rare classes' median per-class gap exceeds the common classes' in >= 10 of 12 cells (>= 2 eligible)",
+    "verdict": "not judged",
+    "evidence": "no case. Eligible 0 of 19 (rare and common classes in every seed's split). Macro-F1 >= 0.98 but no rare class with a leaked row: ton_modbus, ton_modbus:no_identifiers. A rare class with leaked rows but macro-F1 below 0.98: ton_network (0.9782), ton_network:no_identifiers (0.8327), xiiotid (0.9145), xiiotid:no_identifiers (0.9229)"
+   }
+  ],
+  "dev": {
+   "kdd99": {
+    "S": 0.19855,
+    "outcome": "easy"
+   },
+   "nslkdd": {
+    "S": 0.258716,
+    "outcome": "easy"
+   },
+   "unsw_nb15": {
+    "S": 0.095174,
+    "outcome": "easy"
+   },
+   "ember2018": {
+    "S": 0.02335,
+    "outcome": "memorised"
+   },
+   "ember2018_official": {
+    "S": 0.04905,
+    "outcome": "memorised"
+   },
+   "uci_phishing": {
+    "S": -0.04866,
+    "outcome": "memorised"
+   },
+   "sms_spam": {
+    "S": -0.114662,
+    "outcome": "memorised"
+   },
+   "cseids2018:no_identifiers": {
+    "S": -0.10785,
+    "outcome": "memorised"
+   }
+  },
+  "s_star": 0.072112,
+  "fresh": {
+   "ton_network": {
+    "S": 0.014541,
+    "prediction": "memorised",
+    "leaked_share": 0.823071,
+    "outcome": "memorised",
+    "full_gap": 0.015082,
+    "copy_free_gap": 0.006577,
+    "macro_f1": 0.978235
+   },
+   "ton_network:no_identifiers": {
+    "S": -0.402961,
+    "prediction": "memorised",
+    "leaked_share": 0.923452,
+    "outcome": "memorised",
+    "full_gap": 0.070066,
+    "copy_free_gap": -0.369461,
+    "macro_f1": 0.832735
+   },
+   "ton_fridge": {
+    "S": 0.494576,
+    "prediction": "easy",
+    "leaked_share": 0.129553,
+    "outcome": null,
+    "full_gap": -0.000208,
+    "copy_free_gap": -0.000254,
+    "macro_f1": 0.693045
+   },
+   "ton_fridge:no_identifiers": {
+    "S": -0.680862,
+    "prediction": "memorised",
+    "leaked_share": 0.999374,
+    "outcome": null,
+    "full_gap": -0.308188,
+    "copy_free_gap": -0.647015,
+    "macro_f1": 0.691812
+   },
+   "ton_garage_door": {
+    "S": -0.00767,
+    "prediction": "memorised",
+    "leaked_share": 0.604824,
+    "outcome": null,
+    "full_gap": 0.00128,
+    "copy_free_gap": -0.010462,
+    "macro_f1": 0.693635
+   },
+   "ton_garage_door:no_identifiers": {
+    "S": null,
+    "prediction": null,
+    "leaked_share": 1.0,
+    "outcome": null,
+    "full_gap": 0.0,
+    "copy_free_gap": null,
+    "macro_f1": 0.691866
+   },
+   "ton_gps_tracker": {
+    "S": 0.477179,
+    "prediction": "easy",
+    "leaked_share": 0.239605,
+    "outcome": null,
+    "full_gap": 0.000986,
+    "copy_free_gap": 0.001021,
+    "macro_f1": 0.968259
+   },
+   "ton_gps_tracker:no_identifiers": {
+    "S": -0.271922,
+    "prediction": "memorised",
+    "leaked_share": 0.999615,
+    "outcome": null,
+    "full_gap": -0.031794,
+    "copy_free_gap": -0.563056,
+    "macro_f1": 0.968206
+   },
+   "ton_modbus": {
+    "S": 0.730734,
+    "prediction": "easy",
+    "leaked_share": 0.58711,
+    "outcome": null,
+    "full_gap": 0.0,
+    "copy_free_gap": 5e-06,
+    "macro_f1": 1.0
+   },
+   "ton_modbus:no_identifiers": {
+    "S": 0.0,
+    "prediction": "memorised",
+    "leaked_share": 0.966731,
+    "outcome": null,
+    "full_gap": 0.0,
+    "copy_free_gap": -0.000831,
+    "macro_f1": 1.0
+   },
+   "ton_motion_light": {
+    "S": -0.096971,
+    "prediction": "memorised",
+    "leaked_share": 0.404659,
+    "outcome": null,
+    "full_gap": 0.007193,
+    "copy_free_gap": 0.002392,
+    "macro_f1": 0.540167
+   },
+   "ton_motion_light:no_identifiers": {
+    "S": null,
+    "prediction": null,
+    "leaked_share": 1.0,
+    "outcome": null,
+    "full_gap": 0.0,
+    "copy_free_gap": null,
+    "macro_f1": 0.542827
+   },
+   "ton_thermostat": {
+    "S": 0.43459,
+    "prediction": "easy",
+    "leaked_share": 0.132418,
+    "outcome": null,
+    "full_gap": -0.000185,
+    "copy_free_gap": -0.000191,
+    "macro_f1": 0.83814
+   },
+   "ton_thermostat:no_identifiers": {
+    "S": -0.038693,
+    "prediction": "memorised",
+    "leaked_share": 0.992372,
+    "outcome": null,
+    "full_gap": 0.008242,
+    "copy_free_gap": -0.165843,
+    "macro_f1": 0.833733
+   },
+   "ton_weather": {
+    "S": 0.307859,
+    "prediction": "easy",
+    "leaked_share": 0.000127,
+    "outcome": null,
+    "full_gap": 0.0,
+    "copy_free_gap": 0.0,
+    "macro_f1": 0.962703
+   },
+   "ton_weather:no_identifiers": {
+    "S": -0.001494,
+    "prediction": "memorised",
+    "leaked_share": 0.695492,
+    "outcome": null,
+    "full_gap": 0.001417,
+    "copy_free_gap": -0.001482,
+    "macro_f1": 0.96258
+   },
+   "botiot": {
+    "S": null,
+    "prediction": null,
+    "leaked_share": 0.0,
+    "outcome": null,
+    "full_gap": 0.0,
+    "copy_free_gap": null,
+    "macro_f1": 0.807366
+   },
+   "xiiotid": {
+    "S": 0.024573,
+    "prediction": "memorised",
+    "leaked_share": 0.005781,
+    "outcome": null,
+    "full_gap": 0.000709,
+    "copy_free_gap": 6.7e-05,
+    "macro_f1": 0.914509
+   },
+   "xiiotid:no_identifiers": {
+    "S": -0.4732,
+    "prediction": "memorised",
+    "leaked_share": 0.135173,
+    "outcome": null,
+    "full_gap": 0.001053,
+    "copy_free_gap": -0.007283,
+    "macro_f1": 0.92289
+   }
+  }
  }
 }

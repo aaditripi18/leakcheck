@@ -250,6 +250,8 @@ SHORT_H = {
     "H7": "Weaker models lean harder on copies, with intervals and a tuned model.",
     "H8": "Whether a gap clears one point does not depend on the near-copy threshold.",
     "H9": "On network traffic, a time split costs more than removing copies.",
+    "H19": "Without training a model, an audit can tell easy leaks from memorised ones.",
+    "H20": "On near-perfect benchmarks, leakage hides in the rare classes.",
 }
 
 
@@ -295,6 +297,60 @@ def short_evidence(h: dict, d: dict) -> str:
         a = max(d["audit"], key=lambda a: a["best_single_feature_bacc"] or 0)
         return f"{a['name']}: {a['best_single_feature']} alone reaches {fpct(a['best_single_feature_bacc'])} balanced accuracy."
     return h["evidence"]
+
+
+NUM_WORDS = {3: "Three", 4: "Four", 5: "Five", 6: "Six"}
+
+
+def phase4_section(p4: dict) -> str:
+    """Section 06: `leakcheck explain`, S on the dev cases, and the fresh predictions (H19)."""
+    s_star = p4["s_star"]
+    dev = sorted(p4["dev"].items(), key=lambda kv: -kv[1]["S"])
+    dev_rows = "".join(f"""<tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">{e(n)}</th>
+  <td class="py-2 px-3 text-right tabular{' text-primary font-semibold' if v['S'] > s_star else ''}">{v['S']:+.3f}</td>
+  <td class="py-2 px-3">{e(v['outcome'])}</td>
+</tr>""" for n, v in dev)
+    fr = p4["fresh"]
+    elig = {n: v for n, v in fr.items() if v["outcome"] is not None}
+    fresh_rows = "".join(f"""<tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">{e(n)}</th>
+  <td class="py-2 px-3 text-right tabular">{fpct(v['leaked_share'])}</td>
+  <td class="py-2 px-3 text-right tabular">{'' if v['S'] is None else format(v['S'], '+.3f')}</td>
+  <td class="py-2 px-3">{e(v['prediction'] or 'undefined')}</td>
+  <td class="py-2 px-3 text-right tabular">{'' if v['full_gap'] is None else fpt(v['full_gap'])}</td>
+  <td class="py-2 px-3">{e(v['outcome'] or 'not judged')}</td>
+</tr>""" for n, v in fr.items())
+    right = sum(v["prediction"] == v["outcome"] for v in elig.values())
+    h19 = next(h for h in p4["hypotheses"] if h["id"] == "H19")
+    return f"""<section class="flex flex-col gap-space-md">
+  {sec_head("06", "Diagnose a leak", "Easy or memorised, without training a model", "explain")}
+  <div class="p-space-md bg-surface-container border border-surface-container-high">
+    <p class="font-body-lg text-body-lg text-on-surface font-medium">Copies inflate a score only when a model needed them. <code>leakcheck explain</code> removes each leaked row's training copies and asks whether its nearest remaining neighbour still has the right label. If it does, the leaked rows are easy; if not, a model could only get them right by memorising the copy.</p>
+  </div>
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
+    <div class="lg:col-span-5 flex flex-col gap-space-xs">
+      <p class="font-body-sm text-body-sm text-on-surface-variant">S on the eight dev cases (neighbour-vote accuracy on the leaked rows minus on the rest) beside what retraining found (E13). The threshold s* = {s_star:+.3f} is the midpoint between the two groups.</p>
+      <div class="border border-surface-container-high bg-surface overflow-x-auto">
+        <table class="w-full text-left border-collapse font-mono-data-sm text-mono-data-sm text-on-surface">
+          <thead><tr class="bg-surface-container-low border-b border-on-surface sec-label text-secondary"><th scope="col" class="py-2 px-3">Dev case</th><th scope="col" class="py-2 px-3 text-right">S</th><th scope="col" class="py-2 px-3">Retraining found</th></tr></thead>
+          <tbody class="divide-y divide-surface-container-high">{dev_rows}</tbody>
+        </table>
+      </div>
+    </div>
+    <div class="lg:col-span-7 flex flex-col gap-space-xs">
+      <p class="font-body-sm text-body-sm text-on-surface-variant">On 19 fresh cases, each prediction was committed before any model was trained on them. A case is judged only if its leakage gap is at least one point.</p>
+      <div class="border border-surface-container-high bg-surface overflow-x-auto" tabindex="0" role="region" aria-label="Fresh cases, scrolls sideways">
+        <table class="w-full text-left border-collapse font-mono-data-sm text-mono-data-sm text-on-surface min-w-[620px]">
+          <thead><tr class="bg-surface-container-low border-b border-on-surface sec-label text-secondary"><th scope="col" class="py-2 px-3">Fresh case</th><th scope="col" class="py-2 px-3 text-right">Leaked</th><th scope="col" class="py-2 px-3 text-right">S</th><th scope="col" class="py-2 px-3">Predicted</th><th scope="col" class="py-2 px-3 text-right">Gap (pts)</th><th scope="col" class="py-2 px-3">Retraining found</th></tr></thead>
+          <tbody class="divide-y divide-surface-container-high">{fresh_rows}</tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <p class="font-body-sm text-body-sm text-on-surface-variant">Right on {right} of {len(elig)} judgeable fresh cases; the pre-registered rule needs four, so H19 is <strong>{e(h19['verdict'])}</strong>. Run it on your own split: <code>leakcheck explain --train train.csv --test test.csv --label y</code>.</p>
+</section>
+"""
 
 
 def build_index(d: dict, ex: dict, generated: str) -> str:
@@ -378,10 +434,11 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
                        f"{fpt(lo)} to {fpt(hi)}, which includes zero.")
 
     hyps = []
-    all_h = d["hypotheses"] + d.get("phase3", {}).get("hypotheses", [])
+    all_h = d["hypotheses"] + d.get("phase3", {}).get("hypotheses", []) + d.get("phase4", {}).get("hypotheses", [])
     for h in all_h:
         ok = h["verdict"] == "supported"
-        label = ("SUPPORTED" if ok else "PENDING" if h["verdict"] == "pending" else "NOT SUPPORTED")
+        label = ("SUPPORTED" if ok else "PENDING" if h["verdict"] == "pending"
+                 else "NOT JUDGED" if h["verdict"] == "not judged" else "NOT SUPPORTED")
         pill = ('<span class="inline-flex items-center px-2.5 py-0.5 font-mono-data-sm text-mono-data-sm font-semibold '
                 + ('bg-success/10 text-success border border-success/30">' if ok
                    else 'bg-surface-container-high text-secondary border border-outline-variant">') + label + "</span>")
@@ -438,6 +495,22 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
          f"the cost is {p3_e12_lo:.1f}–{p3_e12_hi:.1f} points: the collapse was the unseen attacks, not time.",
          f"Gradient boosting: random split {cic['hgb']['original'] * 100:.1f}% → later days {cic['hgb']['time'] * 100:.1f}%"),
     ]
+    p4 = d.get("phase4", {})
+    p4_section = phase4_section(p4) if p4.get("s_star") is not None else ""
+    fr = p4.get("fresh", {})
+    if fr and all(v["full_gap"] is not None for v in fr.values()):
+        leaky = [v for v in fr.values() if (v["leaked_share"] or 0) >= 0.10]
+        small = [v for v in leaky if v["full_gap"] < 0.01]
+        harder = sorted(-v["full_gap"] * 100 for v in leaky if v["full_gap"] <= -0.01)
+        findings.append(("Leaked is not the same as inflated.",
+                         f"On TON_IoT, BoT-IoT and X-IIoTID (19 fresh cases), {len(leaky)} cases leak at least 10% of "
+                         f"their test rows, up to {max(v['leaked_share'] for v in leaky) * 100:.0f}%. In {len(small)} of "
+                         "them the leaked rows inflate macro-F1 by less than one point"
+                         + (f"; in {len(harder)} the leaked rows are the hard ones, and the score is "
+                            f"{harder[0]:.0f}–{harder[-1]:.0f} points higher without them" if harder else "")
+                         + " (E14). A duplicate count alone does not say a score is inflated; leakcheck explain and a "
+                         "retrain do.",
+                         f"{len(small)} of {len(leaky)} heavily leaked cases: inflation under 1 point"))
     p3_rows = "".join(f"""<tr>
   <th scope="row" class="py-space-sm px-space-md font-medium text-left">{e(x['name'])}</th>
   <td class="py-space-sm px-space-md text-right tabular">{x['n_test']:,}</td>
@@ -501,6 +574,9 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
         "EMBER's feature view: measured. The official 2,381-dimension vectors give the same copies and gaps within "
         "0.4 points (E11).",
         "Provenance: IDS2018 is byte-identical to the official bucket; CIC-IoT2023 matches all 34 published label counts.",
+        "The cheap diagnosis (H19): measured on eight dev cases (separated; s* fixed between them) and on 19 fresh "
+        "ones whose predictions were committed before any fresh model was trained. Only two fresh cases had a gap "
+        "large enough to judge, so H19 is reported as not judged, with both predictions right.",
     ]
     lim = "".join(f"<li>{e(x)}</li>" for x in limitations)
 
@@ -639,19 +715,20 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
   <div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">{p3_cards}</div>
 </section>
 
+{p4_section}
 <section class="flex flex-col gap-space-md">
-  {sec_head("06", "Pre-registered", f"{len(d['hypotheses']) + len(d.get('phase3', {}).get('hypotheses', []))} hypotheses, decided by rules fixed before the runs", "hypotheses")}
+  {sec_head("07", "Pre-registered", f"{len(all_h)} hypotheses, decided by rules fixed before the runs", "hypotheses")}
   <div class="flex flex-col border border-surface-container-high divide-y divide-surface-container-high bg-surface">{"".join(hyps)}</div>
   <p class="font-mono-data-sm text-mono-data-sm text-secondary">Each decision rule was committed to <a class="underline underline-offset-2 hover:text-on-surface" href="{REPO_URL}/blob/main/PLAN.md" rel="noopener noreferrer">PLAN.md</a> before the experiment it judges was run.</p>
 </section>
 
 <section class="flex flex-col gap-space-md">
-  {sec_head("07", "What we learned", "Four findings")}
+  {sec_head("08", "What we learned", f"{NUM_WORDS[len(findings)]} findings")}
   <div class="grid grid-cols-1 md:grid-cols-2 gap-space-lg">{finding_cards}</div>
 </section>
 
 <section class="flex flex-col gap-space-md">
-  {sec_head("08", "Validation", "Checked against the literature")}
+  {sec_head("09", "Validation", "Checked against the literature")}
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-start">
     <div class="lg:col-span-7 flex flex-col gap-space-xs">
       <p class="font-body-sm text-body-sm text-on-surface-variant">KDD Cup 99 records / distinct records, against Tables I and II of Tavallaee et al. (2009), the paper that introduced NSL-KDD:</p>
@@ -674,7 +751,7 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
 
 <section class="flex flex-col gap-space-md" aria-labelledby="reproduce-title">
   <div id="reproduce" class="scroll-mt-20">
-    <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">09</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">Reproduce</span></div>
+    <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">10</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">Reproduce</span></div>
     <h2 id="reproduce-title" class="font-headline-md text-headline-md text-on-surface mt-1">Reproduce every number</h2>
   </div>
   <div class="bg-[#111110] text-[#f4f4f1] p-space-md md:p-space-lg border border-[#2f312f]">
@@ -692,7 +769,7 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
 </section>
 
 <section class="flex flex-col gap-space-md pt-space-md border-t border-surface-container-high">
-  {sec_head("10", "Scope", "Every caveat, measured", level="h2")}
+  {sec_head("11", "Scope", "Every caveat, measured", level="h2")}
   <ul class="grid grid-cols-1 md:grid-cols-2 gap-x-space-xl gap-y-space-xs font-body-sm text-body-sm text-on-surface-variant list-disc pl-4">{lim}</ul>
 </section>
 

@@ -330,9 +330,205 @@
 </section>
 
 <section class="flex flex-col gap-space-md">
+  <div id="explain" class="scroll-mt-20">
+  <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">06</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">Diagnose a leak</span></div>
+  <h2 class="font-headline-md text-headline-md text-on-surface mt-1">Easy or memorised, without training a model</h2>
+</div>
+  <div class="p-space-md bg-surface-container border border-surface-container-high">
+    <p class="font-body-lg text-body-lg text-on-surface font-medium">Copies inflate a score only when a model needed them. <code>leakcheck explain</code> removes each leaked row's training copies and asks whether its nearest remaining neighbour still has the right label. If it does, the leaked rows are easy; if not, a model could only get them right by memorising the copy.</p>
+  </div>
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
+    <div class="lg:col-span-5 flex flex-col gap-space-xs">
+      <p class="font-body-sm text-body-sm text-on-surface-variant">S on the eight dev cases (neighbour-vote accuracy on the leaked rows minus on the rest) beside what retraining found (E13). The threshold s* = +0.072 is the midpoint between the two groups.</p>
+      <div class="border border-surface-container-high bg-surface overflow-x-auto">
+        <table class="w-full text-left border-collapse font-mono-data-sm text-mono-data-sm text-on-surface">
+          <thead><tr class="bg-surface-container-low border-b border-on-surface sec-label text-secondary"><th scope="col" class="py-2 px-3">Dev case</th><th scope="col" class="py-2 px-3 text-right">S</th><th scope="col" class="py-2 px-3">Retraining found</th></tr></thead>
+          <tbody class="divide-y divide-surface-container-high"><tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">nslkdd</th>
+  <td class="py-2 px-3 text-right tabular text-primary font-semibold">+0.259</td>
+  <td class="py-2 px-3">easy</td>
+</tr><tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">kdd99</th>
+  <td class="py-2 px-3 text-right tabular text-primary font-semibold">+0.199</td>
+  <td class="py-2 px-3">easy</td>
+</tr><tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">unsw_nb15</th>
+  <td class="py-2 px-3 text-right tabular text-primary font-semibold">+0.095</td>
+  <td class="py-2 px-3">easy</td>
+</tr><tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">ember2018_official</th>
+  <td class="py-2 px-3 text-right tabular">+0.049</td>
+  <td class="py-2 px-3">memorised</td>
+</tr><tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">ember2018</th>
+  <td class="py-2 px-3 text-right tabular">+0.023</td>
+  <td class="py-2 px-3">memorised</td>
+</tr><tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">uci_phishing</th>
+  <td class="py-2 px-3 text-right tabular">-0.049</td>
+  <td class="py-2 px-3">memorised</td>
+</tr><tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">cseids2018:no_identifiers</th>
+  <td class="py-2 px-3 text-right tabular">-0.108</td>
+  <td class="py-2 px-3">memorised</td>
+</tr><tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">sms_spam</th>
+  <td class="py-2 px-3 text-right tabular">-0.115</td>
+  <td class="py-2 px-3">memorised</td>
+</tr></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="lg:col-span-7 flex flex-col gap-space-xs">
+      <p class="font-body-sm text-body-sm text-on-surface-variant">On 19 fresh cases, each prediction was committed before any model was trained on them. A case is judged only if its leakage gap is at least one point.</p>
+      <div class="border border-surface-container-high bg-surface overflow-x-auto" tabindex="0" role="region" aria-label="Fresh cases, scrolls sideways">
+        <table class="w-full text-left border-collapse font-mono-data-sm text-mono-data-sm text-on-surface min-w-[620px]">
+          <thead><tr class="bg-surface-container-low border-b border-on-surface sec-label text-secondary"><th scope="col" class="py-2 px-3">Fresh case</th><th scope="col" class="py-2 px-3 text-right">Leaked</th><th scope="col" class="py-2 px-3 text-right">S</th><th scope="col" class="py-2 px-3">Predicted</th><th scope="col" class="py-2 px-3 text-right">Gap (pts)</th><th scope="col" class="py-2 px-3">Retraining found</th></tr></thead>
+          <tbody class="divide-y divide-surface-container-high"><tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">ton_network</th>
+  <td class="py-2 px-3 text-right tabular">82.3%</td>
+  <td class="py-2 px-3 text-right tabular">+0.015</td>
+  <td class="py-2 px-3">memorised</td>
+  <td class="py-2 px-3 text-right tabular">1.5</td>
+  <td class="py-2 px-3">memorised</td>
+</tr><tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">ton_network:no_identifiers</th>
+  <td class="py-2 px-3 text-right tabular">92.3%</td>
+  <td class="py-2 px-3 text-right tabular">-0.403</td>
+  <td class="py-2 px-3">memorised</td>
+  <td class="py-2 px-3 text-right tabular">7.0</td>
+  <td class="py-2 px-3">memorised</td>
+</tr><tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">ton_fridge</th>
+  <td class="py-2 px-3 text-right tabular">13.0%</td>
+  <td class="py-2 px-3 text-right tabular">+0.495</td>
+  <td class="py-2 px-3">easy</td>
+  <td class="py-2 px-3 text-right tabular">-0.0</td>
+  <td class="py-2 px-3">not judged</td>
+</tr><tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">ton_fridge:no_identifiers</th>
+  <td class="py-2 px-3 text-right tabular">99.9%</td>
+  <td class="py-2 px-3 text-right tabular">-0.681</td>
+  <td class="py-2 px-3">memorised</td>
+  <td class="py-2 px-3 text-right tabular">-30.8</td>
+  <td class="py-2 px-3">not judged</td>
+</tr><tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">ton_garage_door</th>
+  <td class="py-2 px-3 text-right tabular">60.5%</td>
+  <td class="py-2 px-3 text-right tabular">-0.008</td>
+  <td class="py-2 px-3">memorised</td>
+  <td class="py-2 px-3 text-right tabular">0.1</td>
+  <td class="py-2 px-3">not judged</td>
+</tr><tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">ton_garage_door:no_identifiers</th>
+  <td class="py-2 px-3 text-right tabular">100.0%</td>
+  <td class="py-2 px-3 text-right tabular"></td>
+  <td class="py-2 px-3">undefined</td>
+  <td class="py-2 px-3 text-right tabular">0.0</td>
+  <td class="py-2 px-3">not judged</td>
+</tr><tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">ton_gps_tracker</th>
+  <td class="py-2 px-3 text-right tabular">24.0%</td>
+  <td class="py-2 px-3 text-right tabular">+0.477</td>
+  <td class="py-2 px-3">easy</td>
+  <td class="py-2 px-3 text-right tabular">0.1</td>
+  <td class="py-2 px-3">not judged</td>
+</tr><tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">ton_gps_tracker:no_identifiers</th>
+  <td class="py-2 px-3 text-right tabular">100.0%</td>
+  <td class="py-2 px-3 text-right tabular">-0.272</td>
+  <td class="py-2 px-3">memorised</td>
+  <td class="py-2 px-3 text-right tabular">-3.2</td>
+  <td class="py-2 px-3">not judged</td>
+</tr><tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">ton_modbus</th>
+  <td class="py-2 px-3 text-right tabular">58.7%</td>
+  <td class="py-2 px-3 text-right tabular">+0.731</td>
+  <td class="py-2 px-3">easy</td>
+  <td class="py-2 px-3 text-right tabular">0.0</td>
+  <td class="py-2 px-3">not judged</td>
+</tr><tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">ton_modbus:no_identifiers</th>
+  <td class="py-2 px-3 text-right tabular">96.7%</td>
+  <td class="py-2 px-3 text-right tabular">+0.000</td>
+  <td class="py-2 px-3">memorised</td>
+  <td class="py-2 px-3 text-right tabular">0.0</td>
+  <td class="py-2 px-3">not judged</td>
+</tr><tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">ton_motion_light</th>
+  <td class="py-2 px-3 text-right tabular">40.5%</td>
+  <td class="py-2 px-3 text-right tabular">-0.097</td>
+  <td class="py-2 px-3">memorised</td>
+  <td class="py-2 px-3 text-right tabular">0.7</td>
+  <td class="py-2 px-3">not judged</td>
+</tr><tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">ton_motion_light:no_identifiers</th>
+  <td class="py-2 px-3 text-right tabular">100.0%</td>
+  <td class="py-2 px-3 text-right tabular"></td>
+  <td class="py-2 px-3">undefined</td>
+  <td class="py-2 px-3 text-right tabular">0.0</td>
+  <td class="py-2 px-3">not judged</td>
+</tr><tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">ton_thermostat</th>
+  <td class="py-2 px-3 text-right tabular">13.2%</td>
+  <td class="py-2 px-3 text-right tabular">+0.435</td>
+  <td class="py-2 px-3">easy</td>
+  <td class="py-2 px-3 text-right tabular">-0.0</td>
+  <td class="py-2 px-3">not judged</td>
+</tr><tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">ton_thermostat:no_identifiers</th>
+  <td class="py-2 px-3 text-right tabular">99.2%</td>
+  <td class="py-2 px-3 text-right tabular">-0.039</td>
+  <td class="py-2 px-3">memorised</td>
+  <td class="py-2 px-3 text-right tabular">0.8</td>
+  <td class="py-2 px-3">not judged</td>
+</tr><tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">ton_weather</th>
+  <td class="py-2 px-3 text-right tabular">0.01%</td>
+  <td class="py-2 px-3 text-right tabular">+0.308</td>
+  <td class="py-2 px-3">easy</td>
+  <td class="py-2 px-3 text-right tabular">0.0</td>
+  <td class="py-2 px-3">not judged</td>
+</tr><tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">ton_weather:no_identifiers</th>
+  <td class="py-2 px-3 text-right tabular">69.5%</td>
+  <td class="py-2 px-3 text-right tabular">-0.001</td>
+  <td class="py-2 px-3">memorised</td>
+  <td class="py-2 px-3 text-right tabular">0.1</td>
+  <td class="py-2 px-3">not judged</td>
+</tr><tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">botiot</th>
+  <td class="py-2 px-3 text-right tabular">0.0%</td>
+  <td class="py-2 px-3 text-right tabular"></td>
+  <td class="py-2 px-3">undefined</td>
+  <td class="py-2 px-3 text-right tabular">0.0</td>
+  <td class="py-2 px-3">not judged</td>
+</tr><tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">xiiotid</th>
+  <td class="py-2 px-3 text-right tabular">0.58%</td>
+  <td class="py-2 px-3 text-right tabular">+0.025</td>
+  <td class="py-2 px-3">memorised</td>
+  <td class="py-2 px-3 text-right tabular">0.1</td>
+  <td class="py-2 px-3">not judged</td>
+</tr><tr>
+  <th scope="row" class="py-2 px-3 font-medium text-left">xiiotid:no_identifiers</th>
+  <td class="py-2 px-3 text-right tabular">13.5%</td>
+  <td class="py-2 px-3 text-right tabular">-0.473</td>
+  <td class="py-2 px-3">memorised</td>
+  <td class="py-2 px-3 text-right tabular">0.1</td>
+  <td class="py-2 px-3">not judged</td>
+</tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <p class="font-body-sm text-body-sm text-on-surface-variant">Right on 2 of 2 judgeable fresh cases; the pre-registered rule needs four, so H19 is <strong>not judged</strong>. Run it on your own split: <code>leakcheck explain --train train.csv --test test.csv --label y</code>.</p>
+</section>
+
+<section class="flex flex-col gap-space-md">
   <div id="hypotheses" class="scroll-mt-20">
-  <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">06</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">Pre-registered</span></div>
-  <h2 class="font-headline-md text-headline-md text-on-surface mt-1">18 hypotheses, decided by rules fixed before the runs</h2>
+  <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">07</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">Pre-registered</span></div>
+  <h2 class="font-headline-md text-headline-md text-on-surface mt-1">20 hypotheses, decided by rules fixed before the runs</h2>
 </div>
   <div class="flex flex-col border border-surface-container-high divide-y divide-surface-container-high bg-surface"><div class="p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-sm hover:bg-surface-container-low transition-colors">
   <div class="flex items-start gap-space-md max-w-3xl">
@@ -496,14 +692,32 @@
     </div>
   </div>
   <div class="self-start md:self-center shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 font-mono-data-sm text-mono-data-sm font-semibold bg-surface-container-high text-secondary border border-outline-variant">NOT SUPPORTED</span></div>
+</div><div class="p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-sm hover:bg-surface-container-low transition-colors">
+  <div class="flex items-start gap-space-md max-w-3xl">
+    <span class="font-mono-data-md text-mono-data-md font-bold text-on-surface bg-surface-container px-2 py-0.5">H19</span>
+    <div class="flex flex-col">
+      <span class="font-body-md text-body-md font-medium text-on-surface">Without training a model, an audit can tell easy leaks from memorised ones.</span>
+      <span class="font-mono-data-sm text-mono-data-sm text-secondary mt-0.5">s* = +0.0721; right on 2/2 eligible fresh cases: ton_network S +0.015 predicted memorised, was memorised; ton_network:no_identifiers S -0.403 predicted memorised, was memorised. Not eligible (full gap below 1 point): 17</span>
+    </div>
+  </div>
+  <div class="self-start md:self-center shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 font-mono-data-sm text-mono-data-sm font-semibold bg-surface-container-high text-secondary border border-outline-variant">NOT JUDGED</span></div>
+</div><div class="p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-sm hover:bg-surface-container-low transition-colors">
+  <div class="flex items-start gap-space-md max-w-3xl">
+    <span class="font-mono-data-md text-mono-data-md font-bold text-on-surface bg-surface-container px-2 py-0.5">H20</span>
+    <div class="flex flex-col">
+      <span class="font-body-md text-body-md font-medium text-on-surface">On near-perfect benchmarks, leakage hides in the rare classes.</span>
+      <span class="font-mono-data-sm text-mono-data-sm text-secondary mt-0.5">no case. Eligible 0 of 19 (rare and common classes in every seed&#x27;s split). Macro-F1 &gt;= 0.98 but no rare class with a leaked row: ton_modbus, ton_modbus:no_identifiers. A rare class with leaked rows but macro-F1 below 0.98: ton_network (0.9782), ton_network:no_identifiers (0.8327), xiiotid (0.9145), xiiotid:no_identifiers (0.9229)</span>
+    </div>
+  </div>
+  <div class="self-start md:self-center shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 font-mono-data-sm text-mono-data-sm font-semibold bg-surface-container-high text-secondary border border-outline-variant">NOT JUDGED</span></div>
 </div></div>
   <p class="font-mono-data-sm text-mono-data-sm text-secondary">Each decision rule was committed to <a class="underline underline-offset-2 hover:text-on-surface" href="https://github.com/aaditripi18/leakcheck/blob/main/PLAN.md" rel="noopener noreferrer">PLAN.md</a> before the experiment it judges was run.</p>
 </section>
 
 <section class="flex flex-col gap-space-md">
   <div class="scroll-mt-20">
-  <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">07</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">What we learned</span></div>
-  <h2 class="font-headline-md text-headline-md text-on-surface mt-1">Four findings</h2>
+  <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">08</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">What we learned</span></div>
+  <h2 class="font-headline-md text-headline-md text-on-surface mt-1">Five findings</h2>
 </div>
   <div class="grid grid-cols-1 md:grid-cols-2 gap-space-lg"><div class="p-space-lg bg-surface-container-low border border-surface-container-high flex flex-col justify-between">
   <div class="flex flex-col gap-space-xs">
@@ -533,12 +747,19 @@
     <p class="font-body-md text-body-md text-on-surface-variant mt-2">On CIC-IDS2017 the baselines score 97.1–99.9% macro-F1 on a random split, and 46.2–56.5% when trained on earlier capture days and tested on the last ones, whose attack types (PortScan, DDoS) never appear in training. Split by time within each attack type instead, the cost is 0.5–1.5 points: the collapse was the unseen attacks, not time.</p>
   </div>
   <div class="mt-space-md pt-space-xs border-t border-surface-container-high font-mono-data-sm text-mono-data-sm text-secondary">Gradient boosting: random split 99.9% → later days 46.2%</div>
+</div><div class="p-space-lg bg-surface-container-low border border-surface-container-high flex flex-col justify-between">
+  <div class="flex flex-col gap-space-xs">
+    <span class="font-mono-data-sm text-mono-data-sm text-primary font-semibold">FINDING 05</span>
+    <h3 class="font-headline-sm text-headline-sm text-on-surface">Leaked is not the same as inflated.</h3>
+    <p class="font-body-md text-body-md text-on-surface-variant mt-2">On TON_IoT, BoT-IoT and X-IIoTID (19 fresh cases), 16 cases leak at least 10% of their test rows, up to 100%. In 14 of them the leaked rows inflate macro-F1 by less than one point; in 2 the leaked rows are the hard ones, and the score is 3–31 points higher without them (E14). A duplicate count alone does not say a score is inflated; leakcheck explain and a retrain do.</p>
+  </div>
+  <div class="mt-space-md pt-space-xs border-t border-surface-container-high font-mono-data-sm text-mono-data-sm text-secondary">14 of 16 heavily leaked cases: inflation under 1 point</div>
 </div></div>
 </section>
 
 <section class="flex flex-col gap-space-md">
   <div class="scroll-mt-20">
-  <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">08</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">Validation</span></div>
+  <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">09</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">Validation</span></div>
   <h2 class="font-headline-md text-headline-md text-on-surface mt-1">Checked against the literature</h2>
 </div>
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl items-start">
@@ -593,7 +814,7 @@
 
 <section class="flex flex-col gap-space-md" aria-labelledby="reproduce-title">
   <div id="reproduce" class="scroll-mt-20">
-    <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">09</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">Reproduce</span></div>
+    <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">10</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">Reproduce</span></div>
     <h2 id="reproduce-title" class="font-headline-md text-headline-md text-on-surface mt-1">Reproduce every number</h2>
   </div>
   <div class="bg-[#111110] text-[#f4f4f1] p-space-md md:p-space-lg border border-[#2f312f]">
@@ -634,10 +855,10 @@ python scripts/report.py</pre>
 
 <section class="flex flex-col gap-space-md pt-space-md border-t border-surface-container-high">
   <div class="scroll-mt-20">
-  <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">10</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">Scope</span></div>
+  <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">11</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">Scope</span></div>
   <h2 class="font-headline-md text-headline-md text-on-surface mt-1">Every caveat, measured</h2>
 </div>
-  <ul class="grid grid-cols-1 md:grid-cols-2 gap-x-space-xl gap-y-space-xs font-body-sm text-body-sm text-on-surface-variant list-disc pl-4"><li>A copy is not always a bug: measured. On KDD Cup 99 and NSL-KDD the copied rows are easy (a model trained without them still gets 97% right, E9); on CSE-CIC-IDS2018 and EMBER they are memorised (E13).</li><li>The cleaned test set is harder by construction: measured. A random removal of the same size is reported beside every gap (up to 1.5 points, against 15–17 on KDD Cup 99, E10).</li><li>Near-copy thresholds: measured. Every gap is recomputed from eps 0.001 to 0.1 and Jaccard 0.6 to 0.95 (E6).</li><li>Untuned baselines: measured. Every gap is repeated with full training sets, a tuned model and a paired bootstrap (E5/E6); the two largest current benchmarks are scored on a 200,000-row test sample.</li><li>EMBER&#x27;s feature view: measured. The official 2,381-dimension vectors give the same copies and gaps within 0.4 points (E11).</li><li>Provenance: IDS2018 is byte-identical to the official bucket; CIC-IoT2023 matches all 34 published label counts.</li></ul>
+  <ul class="grid grid-cols-1 md:grid-cols-2 gap-x-space-xl gap-y-space-xs font-body-sm text-body-sm text-on-surface-variant list-disc pl-4"><li>A copy is not always a bug: measured. On KDD Cup 99 and NSL-KDD the copied rows are easy (a model trained without them still gets 97% right, E9); on CSE-CIC-IDS2018 and EMBER they are memorised (E13).</li><li>The cleaned test set is harder by construction: measured. A random removal of the same size is reported beside every gap (up to 1.5 points, against 15–17 on KDD Cup 99, E10).</li><li>Near-copy thresholds: measured. Every gap is recomputed from eps 0.001 to 0.1 and Jaccard 0.6 to 0.95 (E6).</li><li>Untuned baselines: measured. Every gap is repeated with full training sets, a tuned model and a paired bootstrap (E5/E6); the two largest current benchmarks are scored on a 200,000-row test sample.</li><li>EMBER&#x27;s feature view: measured. The official 2,381-dimension vectors give the same copies and gaps within 0.4 points (E11).</li><li>Provenance: IDS2018 is byte-identical to the official bucket; CIC-IoT2023 matches all 34 published label counts.</li><li>The cheap diagnosis (H19): measured on eight dev cases (separated; s* fixed between them) and on 19 fresh ones whose predictions were committed before any fresh model was trained. Only two fresh cases had a gap large enough to judge, so H19 is reported as not judged, with both predictions right.</li></ul>
 </section>
 
 </article>
@@ -659,7 +880,7 @@ python scripts/report.py</pre>
   </div>
   <div class="max-w-[1100px] mx-auto px-margin-mobile md:px-gutter mt-space-lg pt-space-md border-t border-surface-container-highest flex flex-col sm:flex-row gap-space-xs justify-between text-on-surface-variant font-mono-data-sm text-mono-data-sm">
     <span>Every number on this site is generated from <code>results/ledger.jsonl</code>.</span>
-    <span>Generated 2026-11-08</span>
+    <span>Generated 2026-11-12</span>
   </div>
 </footer>
 <script src="assets/site.js"></script>

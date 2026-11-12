@@ -1,4 +1,4 @@
-# Findings (phases 1-3)
+# Findings (phases 1-4)
 
 Every number here is in [RESULTS.md](RESULTS.md), which is generated from
 `results/ledger.jsonl`. E0 ran at commit `0f452ad`, E1 at `6780929`. This file
@@ -561,6 +561,53 @@ copied rows are *harder* than the rest for a model that never saw them (86% vs
 98% accuracy), so its 11.7-point gap is the copies being memorised, not easy
 rows being removed. The difficulty explanation, the strongest objection to the
 leakage gap, holds on the 1999 benchmarks and fails on the current ones.
+
+## 31. E14: telling easy leaks from memorised ones without training (H19, H20 not judged)
+
+E13 answers "easy or memorised?" by training every model twice. Phase 4 asked
+whether an audit can answer it without training anything (PLAN.md amendment
+2026-11-09, committed before any fresh data was downloaded). The statistic S
+removes each leaked row's training copies and takes the label of its nearest
+remaining training row as a vote: S is the vote accuracy on the leaked rows
+minus that on the other test rows. `leakcheck explain` reports it.
+
+**Dev.** On the eight eligible dev cases S separates the two groups completely:
+KDD99 +0.199, NSL-KDD +0.259 and UNSW-NB15 +0.095 are easy by E13; EMBER
+(+0.023, official vectors +0.049), UCI Phishing (-0.049), SMS Spam (-0.115) and
+CSE-CIC-IDS2018 without identifiers (-0.108) are memorised. The pre-registered
+rule put the threshold at the midpoint, **s\* = +0.0721**.
+
+**Fresh.** Nineteen cases from TON_IoT (network and seven device files, two
+views each), BoT-IoT and X-IIoTID. Every prediction was committed and pushed
+(`44f56fb`) before E14 trained a model on any of them; E14 then ran on Kaggle
+from that commit, with the laptop's library versions pinned.
+
+| Fresh case | Leaked | S | Predicted | Gap, full | Gap, copy-free | Outcome |
+|---|--:|--:|---|--:|--:|---|
+| TON network | 82.3% | +0.015 | memorised | +1.51 | +0.66 | **memorised** |
+| TON network, no identifiers | 92.3% | -0.403 | memorised | +7.01 | -36.95 | **memorised** |
+| 17 other cases | 0-100% | | | below +1 | | not eligible |
+
+**H19 not judged.** Both eligible predictions were right, but the rule needs at
+least four eligible cases. Seventeen of 19 had a full-model gap below one
+point. Three cases have no prediction by construction: BoT-IoT has no leaked
+row, and in two TON files without identifiers every training row is a copy of
+some leaked test row, so nothing is left to vote (S undefined; the same cases
+have no copy-free model).
+
+**H20 not judged.** No fresh case had both a macro-F1 of 0.98 and a rare class
+with leaked rows. TON Modbus is perfect (1.000) but has no rare class; TON
+network (0.978) and X-IIoTID (0.915, 0.923 without identifiers) have rare
+leaked classes but are not near-perfect.
+
+**The finding the fresh data gave instead: leaked is not the same as inflated.**
+Sixteen fresh cases leak at least 10% of their test rows, up to 100%. In 14 of
+them the leaked rows inflate macro-F1 by less than one point; in two (TON
+fridge and GPS tracker without identifiers) they are the *hard* rows, and the
+score is 31 and 3 points higher without them. On these IoT benchmarks a
+duplicate count says nothing about whether a reported score is inflated; the
+retrain does, and on the two cases where there was a gap to explain, S said
+which kind it was before any model was trained.
 
 ## Open items before any of this is published
 
