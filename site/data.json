@@ -1698,6 +1698,12 @@
     "text": "H19 on a second fresh round (five UCI security benchmarks, 8 cases): the same S and s* predict each eligible case's E14 outcome right on >= 90% of them (>= 4 eligible)",
     "verdict": "not supported",
     "evidence": "s* = +0.0721; right on 5/8 eligible: uci_spambase S +0.024 predicted memorised, was memorised (copy-free keeps 78% of the gap); uci_spambase:no_identifiers S +0.017 predicted memorised, was memorised (copy-free keeps 79% of the gap); uci_website_phishing S +0.067 predicted memorised, was easy (copy-free keeps 121% of the gap); uci_youtube_spam S +0.302 predicted easy, was memorised (copy-free keeps 75% of the gap); uci_youtube_spam:no_identifiers S +0.302 predicted easy, was memorised (copy-free keeps 78% of the gap); uci_tuandromd S -0.027 predicted memorised, was memorised (copy-free keeps -26% of the gap); uci_rt_iot2022 S +0.055 predicted memorised, was memorised (copy-free keeps -190% of the gap); uci_rt_iot2022:no_identifiers S +0.062 predicted memorised, was memorised (copy-free keeps -51% of the gap). Both rounds together (description only): 7/10"
+   },
+   {
+    "id": "H21",
+    "text": "EMBER 2018's pre-2018 training files (50,000, all benign) do not change its verdicts: every model's mean effect is below 0.5 macro-F1 points",
+    "verdict": "supported",
+    "evidence": "50,000 of 600,000 training files predate 2018, labels benign 50,000; mean effect (as published minus 2018 only): lr +0.24, rf -0.06, hgb +0.17, mlp +0.00 points"
    }
   ],
   "dev": {
@@ -2007,5 +2013,280 @@
     "macro_f1": 0.912381
    }
   }
- }
+ },
+ "clean_splits": [
+  {
+   "case": "cicids2017",
+   "n_test": 566149,
+   "n_drop": 439577,
+   "exact_only": false,
+   "clean": true
+  },
+  {
+   "case": "ciciot2023",
+   "n_test": 9337316,
+   "n_drop": 4132392,
+   "exact_only": true,
+   "clean": true
+  },
+  {
+   "case": "cseids2018",
+   "n_test": 3246589,
+   "n_drop": 159373,
+   "exact_only": true,
+   "clean": true
+  },
+  {
+   "case": "cseids2018:no_identifiers",
+   "n_test": 3246589,
+   "n_drop": 1307051,
+   "exact_only": true,
+   "clean": true
+  },
+  {
+   "case": "edgeiiot",
+   "n_test": 443841,
+   "n_drop": 200,
+   "exact_only": false,
+   "clean": true
+  },
+  {
+   "case": "edgeiiot:no_identifiers",
+   "n_test": 443841,
+   "n_drop": 243554,
+   "exact_only": false,
+   "clean": true
+  },
+  {
+   "case": "ember2018",
+   "n_test": 200000,
+   "n_drop": 18,
+   "exact_only": true,
+   "clean": true
+  },
+  {
+   "case": "kdd99",
+   "n_test": 311029,
+   "n_drop": 258496,
+   "exact_only": false,
+   "clean": true
+  },
+  {
+   "case": "nslkdd",
+   "n_test": 22544,
+   "n_drop": 7455,
+   "exact_only": false,
+   "clean": true
+  },
+  {
+   "case": "phiusiil",
+   "n_test": 47159,
+   "n_drop": 2090,
+   "exact_only": false,
+   "clean": true
+  },
+  {
+   "case": "sms_spam",
+   "n_test": 1115,
+   "n_drop": 148,
+   "exact_only": false,
+   "clean": true
+  },
+  {
+   "case": "ton_fridge",
+   "n_test": 7989,
+   "n_drop": 1035,
+   "exact_only": false,
+   "clean": true
+  },
+  {
+   "case": "ton_fridge:no_identifiers",
+   "n_test": 7989,
+   "n_drop": 7984,
+   "exact_only": false,
+   "clean": true
+  },
+  {
+   "case": "ton_garage_door",
+   "n_test": 7918,
+   "n_drop": 4789,
+   "exact_only": false,
+   "clean": true
+  },
+  {
+   "case": "ton_garage_door:no_identifiers",
+   "n_test": 7918,
+   "n_drop": 7918,
+   "exact_only": false,
+   "clean": true
+  },
+  {
+   "case": "ton_gps_tracker",
+   "n_test": 7792,
+   "n_drop": 1867,
+   "exact_only": false,
+   "clean": true
+  },
+  {
+   "case": "ton_gps_tracker:no_identifiers",
+   "n_test": 7792,
+   "n_drop": 7789,
+   "exact_only": false,
+   "clean": true
+  },
+  {
+   "case": "ton_modbus",
+   "n_test": 6222,
+   "n_drop": 3653,
+   "exact_only": false,
+   "clean": true
+  },
+  {
+   "case": "ton_modbus:no_identifiers",
+   "n_test": 6222,
+   "n_drop": 6015,
+   "exact_only": false,
+   "clean": true
+  },
+  {
+   "case": "ton_motion_light",
+   "n_test": 7898,
+   "n_drop": 3196,
+   "exact_only": false,
+   "clean": true
+  },
+  {
+   "case": "ton_motion_light:no_identifiers",
+   "n_test": 7898,
+   "n_drop": 7898,
+   "exact_only": false,
+   "clean": true
+  },
+  {
+   "case": "ton_network",
+   "n_test": 42209,
+   "n_drop": 34741,
+   "exact_only": false,
+   "clean": true
+  },
+  {
+   "case": "ton_network:no_identifiers",
+   "n_test": 42209,
+   "n_drop": 38978,
+   "exact_only": false,
+   "clean": true
+  },
+  {
+   "case": "ton_thermostat",
+   "n_test": 6555,
+   "n_drop": 868,
+   "exact_only": false,
+   "clean": true
+  },
+  {
+   "case": "ton_thermostat:no_identifiers",
+   "n_test": 6555,
+   "n_drop": 6505,
+   "exact_only": false,
+   "clean": true
+  },
+  {
+   "case": "ton_weather",
+   "n_test": 7852,
+   "n_drop": 1,
+   "exact_only": false,
+   "clean": true
+  },
+  {
+   "case": "ton_weather:no_identifiers",
+   "n_test": 7852,
+   "n_drop": 5461,
+   "exact_only": false,
+   "clean": true
+  },
+  {
+   "case": "uci_phishing",
+   "n_test": 2211,
+   "n_drop": 1424,
+   "exact_only": false,
+   "clean": true
+  },
+  {
+   "case": "uci_rt_iot2022",
+   "n_test": 24624,
+   "n_drop": 20904,
+   "exact_only": false,
+   "clean": true
+  },
+  {
+   "case": "uci_rt_iot2022:no_identifiers",
+   "n_test": 24624,
+   "n_drop": 21199,
+   "exact_only": false,
+   "clean": true
+  },
+  {
+   "case": "uci_spambase",
+   "n_test": 921,
+   "n_drop": 133,
+   "exact_only": false,
+   "clean": true
+  },
+  {
+   "case": "uci_spambase:no_identifiers",
+   "n_test": 921,
+   "n_drop": 132,
+   "exact_only": false,
+   "clean": true
+  },
+  {
+   "case": "uci_tuandromd",
+   "n_test": 893,
+   "n_drop": 811,
+   "exact_only": false,
+   "clean": true
+  },
+  {
+   "case": "uci_website_phishing",
+   "n_test": 271,
+   "n_drop": 187,
+   "exact_only": false,
+   "clean": true
+  },
+  {
+   "case": "uci_youtube_spam",
+   "n_test": 392,
+   "n_drop": 63,
+   "exact_only": false,
+   "clean": true
+  },
+  {
+   "case": "uci_youtube_spam:no_identifiers",
+   "n_test": 392,
+   "n_drop": 63,
+   "exact_only": false,
+   "clean": true
+  },
+  {
+   "case": "unsw_nb15",
+   "n_test": 82332,
+   "n_drop": 14727,
+   "exact_only": false,
+   "clean": true
+  },
+  {
+   "case": "xiiotid",
+   "n_test": 164167,
+   "n_drop": 1919,
+   "exact_only": false,
+   "clean": true
+  },
+  {
+   "case": "xiiotid:no_identifiers",
+   "n_test": 164167,
+   "n_drop": 25891,
+   "exact_only": false,
+   "clean": true
+  }
+ ]
 }

@@ -148,6 +148,30 @@ reason.
 Speed on a laptop CPU: L1 + L3 + L5 on 1M train / 300k test rows in 31 s; L2
 tabular with 20k sampled test rows in 59 s; L2 text on 160k URLs in 16 s.
 
+### Clean benchmark splits, ready to use
+
+For 39 benchmark cases studied here, [splits/README.md](splits/README.md) lists
+which test rows copy the training set, by row number in the original data, so
+they can be dropped without running leakcheck. Every cleaned split was
+re-checked on every row. KDD99 loses 83% of its test set this way, CIC-IDS2017
+78%, NSL-KDD 33%. `python -m experiments.clean_splits write kdd99 --out DIR`
+rebuilds the clean files from the pinned data.
+
+### In CI
+
+```yaml
+- uses: aaditripi18/leakcheck@main
+  with:
+    train: data/train.csv
+    test: data/test.csv
+    label: label
+    fail-on: high          # or medium, or never (report only)
+```
+
+The action writes the report to the run's summary page, adds `explain` when
+rows leak, and fails the step at the chosen severity. The repository's own CI
+runs it on a planted leak (must fail) and a clean split (must pass).
+
 ## Website and in-browser scanner
 
 `site/` is a static site: the project page (`index.html`) and a scanner
@@ -262,6 +286,7 @@ judged once on four datasets their quantities had never been computed on.
 | H20 | On near-perfect fresh benchmarks, leakage hides in the rare classes | **not judged**: no fresh case had macro-F1 >= 0.98 and a leaked rare class |
 
 | H19b | The same S and s*, on a second fresh round of five UCI security benchmarks (8 cases, amendment 2026-11-12) | **not supported**: right on 5 of 8 eligible; the three misses sit at a cut-off (S 0.005 below s*; copy-free models keeping 75-78% of the gap against 80%) |
+| H21 | EMBER 2018's 50,000 pre-2018 training files (all benign, found while setting up E15) do not change its results | **supported**: no model moves by half a point (+0.24, -0.06, +0.17, +0.00) |
 
 Each round's predictions were committed and pushed before any of its models
 was trained (`44f56fb` for phase 4, `9151e80` for phase 5); phase 4's E14 ran
@@ -299,7 +324,7 @@ reference, is in [data/README.md](data/README.md).
 ```
 python -m venv .venv
 .venv/Scripts/python -m pip install -e ".[dev]"
-.venv/Scripts/python -m pytest                       # 130 tests
+.venv/Scripts/python -m pytest                       # 133 tests
 
 python scripts/fetch.py                              # ~2.1 GB, hash-verified
 python -m experiments.e0_sources && python -m experiments.e0_sources_week4

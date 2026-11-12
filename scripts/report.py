@@ -622,6 +622,7 @@ def site_data(runs: dict) -> dict:
                     "models": list(MODELS), "seeds": 5},
         "checks": CHECKS, "hypotheses": hypotheses(runs) + phase2_hypotheses(runs), "audit": audit, "retrain": retrain,
         "ablation": ablation, "validation": validation, "phase3": phase3, "phase4": phase4_data(runs),
+        "clean_splits": clean_splits_data(),
     }
 
 
@@ -1028,8 +1029,22 @@ def h19b(runs: dict) -> dict:
     return {"id": "H19b", "text": text, "verdict": _verdict(right >= 0.9 * len(rows)), "evidence": ev}
 
 
+def h21(runs: dict) -> dict:
+    text = ("EMBER 2018's pre-2018 training files (50,000, all benign) do not change its verdicts: every model's mean "
+            "effect is below 0.5 macro-F1 points")
+    d = runs.get("e15_ember_pre2018")
+    if d is None:
+        return {"id": "H21", "text": text, "verdict": "pending", "evidence": "needs E15"}
+    r = d["results"]
+    ev = (f"{r['n_pre2018']:,} of {r['n_train']:,} training files predate 2018, labels "
+          + ", ".join(f"{'benign' if k == '0' else 'malicious'} {v:,}" for k, v in r["pre2018_labels"].items())
+          + "; mean effect (as published minus 2018 only): "
+          + ", ".join(f"{m} {v * 100:+.2f}" for m, v in r["mean_effect"].items()) + " points")
+    return {"id": "H21", "text": text, "verdict": _verdict(r["h21"]), "evidence": ev}
+
+
 def phase4_hypotheses(runs: dict) -> list[dict]:
-    return [h19(runs), h20(runs), h19b(runs)]
+    return [h19(runs), h20(runs), h19b(runs), h21(runs)]
 
 
 def e14(runs: dict) -> list[str]:
@@ -1068,6 +1083,19 @@ def e14(runs: dict) -> list[str]:
             out.append(f"| {n} | {'phase 5' if n in P5_FRESH else 'phase 4'} | {s} | {p['prediction']} | {cells} |")
     hs = phase4_hypotheses(runs)
     out += [""] + [f"**{h['id']} {h['verdict']}.** {h['evidence']}." for h in hs] + [""]
+    return out
+
+
+def clean_splits_data() -> list[dict]:
+    """The clean-split manifests (experiments/clean_splits.py), for the site."""
+    out = []
+    for j in sorted((ROOT / "splits").glob("*.json")):
+        if j.name == "index.json":
+            continue
+        d = json.loads(j.read_text(encoding="utf-8"))
+        out.append({"case": d["case"], "n_test": d["n_test"], "n_drop": d["n_drop"],
+                    "exact_only": not isinstance(d["near"], dict),
+                    "clean": all(v["ok"] for v in d["recheck"].values())})
     return out
 
 

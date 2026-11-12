@@ -578,13 +578,39 @@
       </div>
     </div>
   </div>
+  <div class="flex flex-col gap-space-sm pt-space-md border-t border-surface-container-high">
+    <h3 class="font-headline-sm text-headline-sm text-on-surface">Clean splits, ready to use</h3>
+    <p class="font-body-md text-body-md text-on-surface-variant">For 39 benchmark cases, the test rows that copy training, as row numbers in the original data: drop them and the test set no longer overlaps. Each cleaned split was re-checked on every row (39 of 39 clean). Index: <a class="underline underline-offset-2 hover:text-on-surface" href="https://github.com/aaditripi18/leakcheck/blob/main/splits/README.md" rel="noopener noreferrer">splits/README.md</a>.</p>
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-space-sm"><div class="p-space-sm bg-surface-container-low border border-surface-container-high flex flex-col">
+  <span class="font-mono-data-sm text-mono-data-sm text-secondary">kdd99</span>
+  <span class="font-mono-data-lg text-[24px] leading-tight text-on-surface font-bold tabular">83%</span>
+  <span class="font-body-sm text-body-sm text-on-surface-variant">258,496 of 311,029 test rows</span>
+</div><div class="p-space-sm bg-surface-container-low border border-surface-container-high flex flex-col">
+  <span class="font-mono-data-sm text-mono-data-sm text-secondary">nslkdd</span>
+  <span class="font-mono-data-lg text-[24px] leading-tight text-on-surface font-bold tabular">33%</span>
+  <span class="font-body-sm text-body-sm text-on-surface-variant">7,455 of 22,544 test rows</span>
+</div><div class="p-space-sm bg-surface-container-low border border-surface-container-high flex flex-col">
+  <span class="font-mono-data-sm text-mono-data-sm text-secondary">unsw_nb15</span>
+  <span class="font-mono-data-lg text-[24px] leading-tight text-on-surface font-bold tabular">18%</span>
+  <span class="font-body-sm text-body-sm text-on-surface-variant">14,727 of 82,332 test rows</span>
+</div><div class="p-space-sm bg-surface-container-low border border-surface-container-high flex flex-col">
+  <span class="font-mono-data-sm text-mono-data-sm text-secondary">cicids2017</span>
+  <span class="font-mono-data-lg text-[24px] leading-tight text-on-surface font-bold tabular">78%</span>
+  <span class="font-body-sm text-body-sm text-on-surface-variant">439,577 of 566,149 test rows</span>
+</div><div class="p-space-sm bg-surface-container-low border border-surface-container-high flex flex-col">
+  <span class="font-mono-data-sm text-mono-data-sm text-secondary">ciciot2023</span>
+  <span class="font-mono-data-lg text-[24px] leading-tight text-on-surface font-bold tabular">44%</span>
+  <span class="font-body-sm text-body-sm text-on-surface-variant">4,132,392 of 9,337,316 test rows (exact copies; near pending)</span>
+</div></div>
+    <p class="font-body-sm text-body-sm text-on-surface-variant">In CI, one step audits a split before results are reported: <code>uses: aaditripi18/leakcheck@main</code> with <code>train</code>, <code>test</code> and <code>label</code>; it writes the report to the run summary, adds <code>explain</code> when rows leak, and fails at the severity you choose.</p>
+  </div>
   <p class="font-body-sm text-body-sm text-on-surface-variant">First round: right on 2 of 2 judgeable cases; the rule needs four, so H19 is <strong>not judged</strong>. Second round, pre-registered after it: right on 5 of 8, below the 90% the rule asks, so H19b is <strong>not supported</strong>. Every large gap was called right (TUANDROMD, RT-IoT2022); the three misses sit at a cut-off: an S of +0.067 against s* = +0.072, and copy-free models keeping 75–78% of the gap against the 80% that separates easy from memorised. Use <code>leakcheck explain</code> as a first look, and retrain where the verdict matters: <code>leakcheck explain --train train.csv --test test.csv --label y</code>.</p>
 </section>
 
 <section class="flex flex-col gap-space-md">
   <div id="hypotheses" class="scroll-mt-20">
   <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">07</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">Pre-registered</span></div>
-  <h2 class="font-headline-md text-headline-md text-on-surface mt-1">21 hypotheses, decided by rules fixed before the runs</h2>
+  <h2 class="font-headline-md text-headline-md text-on-surface mt-1">22 hypotheses, decided by rules fixed before the runs</h2>
 </div>
   <div class="flex flex-col border border-surface-container-high divide-y divide-surface-container-high bg-surface"><div class="p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-sm hover:bg-surface-container-low transition-colors">
   <div class="flex items-start gap-space-md max-w-3xl">
@@ -775,6 +801,15 @@
     </div>
   </div>
   <div class="self-start md:self-center shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 font-mono-data-sm text-mono-data-sm font-semibold bg-surface-container-high text-secondary border border-outline-variant">NOT SUPPORTED</span></div>
+</div><div class="p-space-md flex flex-col md:flex-row md:items-center justify-between gap-space-sm hover:bg-surface-container-low transition-colors">
+  <div class="flex items-start gap-space-md max-w-3xl">
+    <span class="font-mono-data-md text-mono-data-md font-bold text-on-surface bg-surface-container px-2 py-0.5">H21</span>
+    <div class="flex flex-col">
+      <span class="font-body-md text-body-md font-medium text-on-surface">EMBER&#x27;s 50,000 pre-2018 training files (all benign) do not change its results.</span>
+      <span class="font-mono-data-sm text-mono-data-sm text-secondary mt-0.5">50,000 of 600,000 training files predate 2018, labels benign 50,000; mean effect (as published minus 2018 only): lr +0.24, rf -0.06, hgb +0.17, mlp +0.00 points</span>
+    </div>
+  </div>
+  <div class="self-start md:self-center shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 font-mono-data-sm text-mono-data-sm font-semibold bg-success/10 text-success border border-success/30">SUPPORTED</span></div>
 </div></div>
   <p class="font-mono-data-sm text-mono-data-sm text-secondary">Each decision rule was committed to <a class="underline underline-offset-2 hover:text-on-surface" href="https://github.com/aaditripi18/leakcheck/blob/main/PLAN.md" rel="noopener noreferrer">PLAN.md</a> before the experiment it judges was run.</p>
 </section>

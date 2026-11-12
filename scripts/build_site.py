@@ -253,6 +253,7 @@ SHORT_H = {
     "H19": "Without training a model, an audit can tell easy leaks from memorised ones.",
     "H20": "On near-perfect benchmarks, leakage hides in the rare classes.",
     "H19b": "The same diagnosis, unchanged, on a second fresh round of five benchmarks.",
+    "H21": "EMBER's 50,000 pre-2018 training files (all benign) do not change its results.",
 }
 
 
@@ -327,6 +328,24 @@ def phase4_section(p4: dict) -> str:
 </tr>""" for n, v in fr.items())
     right = sum(v["prediction"] == v["outcome"] for v in elig.values())
     h19 = next(h for h in p4["hypotheses"] if h["id"] == "H19")
+    cs = p4.get("_clean_splits", [])
+    clean_block = ""
+    if cs:
+        big = sorted(cs, key=lambda x: -x["n_drop"] / x["n_test"])
+        named = {x["case"]: x for x in cs}
+        show = [named[c] for c in ("kdd99", "nslkdd", "unsw_nb15", "cicids2017", "ciciot2023") if c in named]
+        cards = "".join(f"""<div class="p-space-sm bg-surface-container-low border border-surface-container-high flex flex-col">
+  <span class="font-mono-data-sm text-mono-data-sm text-secondary">{e(x['case'])}</span>
+  <span class="font-mono-data-lg text-[24px] leading-tight text-on-surface font-bold tabular">{x['n_drop'] / x['n_test'] * 100:.0f}%</span>
+  <span class="font-body-sm text-body-sm text-on-surface-variant">{x['n_drop']:,} of {x['n_test']:,} test rows{' (exact copies; near pending)' if x['exact_only'] else ''}</span>
+</div>""" for x in show)
+        n_clean = sum(x["clean"] for x in cs)
+        clean_block = f"""<div class="flex flex-col gap-space-sm pt-space-md border-t border-surface-container-high">
+    <h3 class="font-headline-sm text-headline-sm text-on-surface">Clean splits, ready to use</h3>
+    <p class="font-body-md text-body-md text-on-surface-variant">For {len(cs)} benchmark cases, the test rows that copy training, as row numbers in the original data: drop them and the test set no longer overlaps. Each cleaned split was re-checked on every row ({n_clean} of {len(cs)} clean). Index: <a class="underline underline-offset-2 hover:text-on-surface" href="{REPO_URL}/blob/main/splits/README.md" rel="noopener noreferrer">splits/README.md</a>.</p>
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-space-sm">{cards}</div>
+    <p class="font-body-sm text-body-sm text-on-surface-variant">In CI, one step audits a split before results are reported: <code>uses: aaditripi18/leakcheck@main</code> with <code>train</code>, <code>test</code> and <code>label</code>; it writes the report to the run summary, adds <code>explain</code> when rows leak, and fails at the severity you choose.</p>
+  </div>"""
     return f"""<section class="flex flex-col gap-space-md">
   {sec_head("06", "Diagnose a leak", "Easy or memorised, without training a model", "explain")}
   <div class="p-space-md bg-surface-container border border-surface-container-high">
@@ -352,6 +371,7 @@ def phase4_section(p4: dict) -> str:
       </div>
     </div>
   </div>
+  {clean_block}
   <p class="font-body-sm text-body-sm text-on-surface-variant">First round: right on {right} of {len(elig)} judgeable cases; the rule needs four, so H19 is <strong>{e(h19['verdict'])}</strong>. Second round, pre-registered after it: right on {right5} of {len(elig5)}, below the 90% the rule asks, so H19b is <strong>{e(h19b['verdict'] if h19b else 'pending')}</strong>. Every large gap was called right (TUANDROMD, RT-IoT2022); the three misses sit at a cut-off: an S of +0.067 against s* = {s_star:+.3f}, and copy-free models keeping 75–78% of the gap against the 80% that separates easy from memorised. Use <code>leakcheck explain</code> as a first look, and retrain where the verdict matters: <code>leakcheck explain --train train.csv --test test.csv --label y</code>.</p>
 </section>
 """
@@ -500,6 +520,7 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
          f"Gradient boosting: random split {cic['hgb']['original'] * 100:.1f}% → later days {cic['hgb']['time'] * 100:.1f}%"),
     ]
     p4 = d.get("phase4", {})
+    p4 = {**p4, "_clean_splits": d.get("clean_splits", [])}
     p4_section = phase4_section(p4) if p4.get("s_star") is not None else ""
     fr = {n: v for n, v in p4.get("fresh", {}).items() if v.get("round", 4) == 4}
     if fr and all(v["full_gap"] is not None for v in fr.values()):

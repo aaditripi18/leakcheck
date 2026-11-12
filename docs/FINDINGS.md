@@ -646,14 +646,48 @@ and partly memorised, and a two-way verdict cannot describe them. `leakcheck
 explain` now prints S's distance from s* and states the fresh record, so a
 user can see a close call and retrain.
 
-## Open items before any of this is published
+## 33. E15: EMBER's pre-2018 training files are benign and change nothing (H21 supported)
 
-- How the PhiUSIIL paper defines URLSimilarityIndex. Neither the UCI page nor
-  the Mendeley entry describes it; it is in the paywalled paper
-  (doi:10.1016/j.cose.2023.103545).
+Since phase 1, the origin of EMBER 2018's pre-2018 training files was an open
+question (§11). Counting them for the E15 amendment showed something the
+documentation does not say: all 50,000 (2006-2017) are **benign**; every
+malicious training file and every test file is from 2018. A mix like that could
+let a model learn "old means benign". E15 retrained the four baselines on the
+official split, three seeds, with training sets of the same size drawn with and
+without those files, and scored both on the whole test set. The effect (as
+published minus 2018 only) is +0.24 (LR), -0.06 (RF), +0.17 (HistGB) and +0.00
+(MLP) macro-F1 points. **H21 supported**: no model moves by half a point. Their
+origin is still undocumented; their effect is measured and negligible.
+
+## 34. Clean benchmark splits for 39 cases
+
+`experiments/clean_splits.py` runs `leakcheck clean` on every benchmark split in
+this study and publishes, per case, which test rows have an exact or near copy
+in training, by row number in the original data, with a re-check of every
+cleaned split (39 of 39 clean) and the measured gap (index:
+[splits/README.md](../splits/README.md)). The largest: KDD99 83% of its test
+rows (gap +16.1 points), CIC-IDS2017 78%, RT-IoT2022 85-86% (+3.2 / +14.6),
+TUANDROMD 91% (+21.2), CSE-CIC-IDS2018 without identifiers 40% (+11.7).
+
+Building the lists found and fixed a bug: text near-copy candidates were chosen
+in an unstable order, so on PhiUSIIL the re-check of a cleaned split found one
+text near-copy left. Candidates are now ordered with a tie-break, so a row's
+result depends only on that row and the training set (`9cbe887`). For the
+largest benchmarks the nearest-neighbour search runs on a GPU
+(`leakcheck/checks/near_torch.py`), validated to give the same decision as the
+CPU search on every row of seven benchmarks; its first version used float32
+and was wrong on RT-IoT2022, where robust scaling leaves features near 3e5.
+
+## Questions for third parties, and what was measured instead
+
+- *How PhiUSIIL's URLSimilarityIndex is computed* (paywalled paper,
+  doi:10.1016/j.cose.2023.103545). It does not change any conclusion here:
+  removing it, with the three other features that each reach 95%, leaves every
+  baseline at 0.9995 macro-F1 or above (E4, §20).
 - ~~Whether Tavallaee et al. meant NSL-KDD's de-duplication to cover train/test
   overlap.~~ Resolved: the paper removes redundancy within each set only (§4).
-- The origin of EMBER 2018's 50,000 pre-2018 training files (§11).
+- *Where EMBER 2018's 50,000 pre-2018 training files come from.* Measured
+  instead: all benign, and they move no model by half a point (E15, §33).
 - **Pipeline fix found in week 6:** scikit-learn's RandomForest takes NaN only
   in dense input. With a text column, the input is sparse, so missing values
   are now a sentinel for RF on text datasets. This affected only PhiUSIIL, the
