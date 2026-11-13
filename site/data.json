@@ -1704,6 +1704,12 @@
     "text": "EMBER 2018's pre-2018 training files (50,000, all benign) do not change its verdicts: every model's mean effect is below 0.5 macro-F1 points",
     "verdict": "supported",
     "evidence": "50,000 of 600,000 training files predate 2018, labels benign 50,000; mean effect (as published minus 2018 only): lr +0.24, rf -0.06, hgb +0.17, mlp +0.00 points"
+   },
+   {
+    "id": "H22",
+    "text": "With an uncertain band (the refit threshold's 90% bootstrap interval), S's decided predictions are right on >= 90% of the third round's eligible cases with a clear outcome (>= 4 such cases)",
+    "verdict": "not judged",
+    "evidence": "s* = +0.0645, uncertain from +0.0580 to +0.1303; 3 of 12 cases eligible (full gap >= 1 point); right on 2/2 with a clear outcome and a decided prediction: uci_firewall S -0.295 predicted memorised, was memorised (clear); openml_timing_attack:no_identifiers S -0.119 predicted memorised, was memorised (clear); openml_padding_attack S +0.089 predicted uncertain, was memorised (clear). Uncertain on 1 case(s), S undefined on 2, borderline outcomes 0; strict tally (uncertain counted wrong) 2/3"
    }
   ],
   "dev": {
@@ -2011,6 +2017,126 @@
     "full_gap": 0.146211,
     "copy_free_gap": -0.074673,
     "macro_f1": 0.912381
+   },
+   "uci_bhp": {
+    "S": null,
+    "prediction": null,
+    "leaked_share": 1.0,
+    "round": 6,
+    "outcome": null,
+    "full_gap": 0.0,
+    "copy_free_gap": null,
+    "macro_f1": 0.922827
+   },
+   "uci_bhp:no_identifiers": {
+    "S": null,
+    "prediction": null,
+    "leaked_share": 1.0,
+    "round": 6,
+    "outcome": null,
+    "full_gap": 0.0,
+    "copy_free_gap": null,
+    "macro_f1": 0.938957
+   },
+   "uci_bitcoin_heist": {
+    "S": -0.0015,
+    "prediction": "memorised",
+    "leaked_share": 0.232662,
+    "round": 6,
+    "outcome": null,
+    "full_gap": -0.003725,
+    "copy_free_gap": -0.005588,
+    "macro_f1": 0.068779
+   },
+   "uci_firewall": {
+    "S": -0.294694,
+    "prediction": "memorised",
+    "leaked_share": 0.664149,
+    "round": 6,
+    "outcome": "memorised",
+    "full_gap": 0.191833,
+    "copy_free_gap": -0.271438,
+    "macro_f1": 0.795865
+   },
+   "uci_firewall:no_identifiers": {
+    "S": -0.269029,
+    "prediction": "memorised",
+    "leaked_share": 0.851225,
+    "round": 6,
+    "outcome": null,
+    "full_gap": -0.279061,
+    "copy_free_gap": -0.59301,
+    "macro_f1": 0.624956
+   },
+   "openml_creditcard": {
+    "S": 0.0008,
+    "prediction": "memorised",
+    "leaked_share": 0.084425,
+    "round": 6,
+    "outcome": null,
+    "full_gap": 0.005801,
+    "copy_free_gap": 0.005775,
+    "macro_f1": 0.88871
+   },
+   "openml_timing_attack": {
+    "S": 0.049664,
+    "prediction": "memorised",
+    "leaked_share": 0.007504,
+    "round": 6,
+    "outcome": null,
+    "full_gap": -6e-05,
+    "copy_free_gap": 0.000145,
+    "macro_f1": 0.082083
+   },
+   "openml_timing_attack:no_identifiers": {
+    "S": -0.119072,
+    "prediction": "memorised",
+    "leaked_share": 0.992996,
+    "round": 6,
+    "outcome": "memorised",
+    "full_gap": 0.049239,
+    "copy_free_gap": -0.016723,
+    "macro_f1": 0.072435
+   },
+   "openml_padding_attack": {
+    "S": 0.088862,
+    "prediction": "uncertain",
+    "leaked_share": 0.9997,
+    "round": 6,
+    "outcome": "memorised",
+    "full_gap": 0.044991,
+    "copy_free_gap": -0.01423,
+    "macro_f1": 0.079435
+   },
+   "openml_ieee_fraud": {
+    "S": 0.029247,
+    "prediction": "memorised",
+    "leaked_share": 0.005639,
+    "round": 6,
+    "outcome": null,
+    "full_gap": -7.9e-05,
+    "copy_free_gap": -0.000107,
+    "macro_f1": 0.787916
+   },
+   "openml_ieee_fraud:no_identifiers": {
+    "S": 0.021533,
+    "prediction": "memorised",
+    "leaked_share": 0.007569,
+    "round": 6,
+    "outcome": null,
+    "full_gap": 0.000554,
+    "copy_free_gap": 0.000542,
+    "macro_f1": 0.78576
+   },
+   "openml_phishing_tan": {
+    "S": 0.02689,
+    "prediction": "memorised",
+    "leaked_share": 0.1065,
+    "round": 6,
+    "outcome": null,
+    "full_gap": 0.002233,
+    "copy_free_gap": -6.1e-05,
+    "macro_f1": 0.973915
    }
   }
  },

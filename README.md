@@ -42,6 +42,10 @@ for each hypothesis were committed before the runs they govern.
   model was trained, it was right on 7 of 10 cases with a gap to explain: every
   large gap right (TUANDROMD's 21 points, RT-IoT2022's 15), every miss at a
   cut-off. H19b is not supported (5 of 8 in the second round, against 90%).
+  It now says *uncertain* when S falls inside the threshold's 90% interval;
+  on a third fresh round (12 cases), its decided calls were right on 2 of 2,
+  with one uncertain call. Only 3 cases had a gap to explain, so H22 is not
+  judged.
 - **Leaked is not the same as inflated.** On TON_IoT, BoT-IoT and X-IIoTID, 16
   cases leak 10-100% of their test rows, yet in 14 of them the leaked rows
   inflate macro-F1 by less than a point, and in two they are the hard rows (E14).
@@ -287,6 +291,7 @@ judged once on four datasets their quantities had never been computed on.
 
 | H19b | The same S and s*, on a second fresh round of five UCI security benchmarks (8 cases, amendment 2026-11-12) | **not supported**: right on 5 of 8 eligible; the three misses sit at a cut-off (S 0.005 below s*; copy-free models keeping 75-78% of the gap against 80%) |
 | H21 | EMBER 2018's 50,000 pre-2018 training files (all benign, found while setting up E15) do not change its results | **supported**: no model moves by half a point (+0.24, -0.06, +0.17, +0.00) |
+| H22 | With an uncertain band (s* refit on the 13 clear cases, +0.0645; band +0.058 to +0.130), on a third fresh round of 12 cases (amendment 2026-11-13) | **not judged**: decided calls right on 2 of 2, one uncertain (was memorised); only 3 of 12 cases had a gap of a point or more |
 
 Each round's predictions were committed and pushed before any of its models
 was trained (`44f56fb` for phase 4, `9151e80` for phase 5); phase 4's E14 ran

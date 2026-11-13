@@ -678,6 +678,48 @@ largest benchmarks the nearest-neighbour search runs on a GPU
 CPU search on every row of seven benchmarks; its first version used float32
 and was wrong on RT-IoT2022, where robust scaling leaves features near 3e5.
 
+## 35. An "uncertain" band, tested on a third fresh round (H22 not judged)
+
+Each H19b miss sat at a cut-off (§32), so the verdict now says when it cannot
+tell. The rule was fixed and pushed before any third-round data was fetched
+(amendment 2026-11-13, `762b1a2`, `2636fcb`):
+
+- *Outcome clarity.* An outcome counts as clear when 0.8 is outside the 90%
+  bootstrap interval of its copy-free / full ratio over the 12 cells. On that
+  test, both YouTube Spam views and both Spambase views were borderline.
+- *Refit.* s\* is refit on the 13 labelled cases with a clear outcome: S
+  separates them, at **+0.0645**.
+- *Band.* S inside s\*'s 90% bootstrap interval, **[+0.058, +0.130]**, is
+  reported as *uncertain*.
+
+The third round is 12 cases:
+- *Benchmarks.* UCI's BHP flooding, Bitcoin Heist and Internet Firewall Data,
+  and five OpenML security datasets: ULB credit-card fraud, the Wuppertal
+  Bleichenbacher timing- and padding-attack captures, IEEE-CIS fraud, and Tan's
+  phishing set.
+- *Not used.* Four UCI candidates failed the stated sourcing rules: two cannot
+  be downloaded, one row-count mismatch, one single-class table.
+- *Predictions.* Every prediction was pushed before any of its models was
+  trained (`5e9bd9c`, `feb873e`, `867f607`, `48ef329`).
+
+**H22 not judged.**
+- *Gap.* Only 3 of the 12 cases had a gap of at least one point.
+- *Decided calls.* Firewall (+19.2 points) and the timing attack without
+  identifiers (+4.9) were both called memorised before training, and both
+  were memorised: 2 of 2 right.
+- *Uncertain call.* The padding attack (S +0.089, inside the band) was
+  memorised.
+
+Two cases at least four is too few to test the 90% rule, so the verdict stays
+open. Strict tally, counting the uncertain call as wrong: 2 of 3.
+
+The round repeats §29's lesson more strongly:
+- *BHP.* Every test row has a near copy in training, so S has nothing to
+  compare against and `explain` says so. The models' gap is zero.
+- *Bitcoin Heist.* It leaks 23% of its test rows, and the gap is below zero.
+
+Across all three rounds, 13 of 39 fresh cases had a gap to explain.
+
 ## Questions for third parties, and what was measured instead
 
 - *How PhiUSIIL's URLSimilarityIndex is computed* (paywalled paper,

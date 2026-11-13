@@ -254,6 +254,7 @@ SHORT_H = {
     "H20": "On near-perfect benchmarks, leakage hides in the rare classes.",
     "H19b": "The same diagnosis, unchanged, on a second fresh round of five benchmarks.",
     "H21": "EMBER's 50,000 pre-2018 training files (all benign) do not change its results.",
+    "H22": "With an \"uncertain\" band, the diagnosis holds on a third fresh round.",
 }
 
 
@@ -318,6 +319,16 @@ def phase4_section(p4: dict) -> str:
     elig5 = {n: v for n, v in fr.items() if v["outcome"] is not None and v.get("round") == 5}
     right5 = sum(v["prediction"] == v["outcome"] for v in elig5.values())
     h19b = next((h for h in p4["hypotheses"] if h["id"] == "H19b"), None)
+    elig6 = {n: v for n, v in fr.items() if v["outcome"] is not None and v.get("round") == 6}
+    dec6 = {n: v for n, v in elig6.items() if v["prediction"] in ("easy", "memorised")}
+    right6 = sum(v["prediction"] == v["outcome"] for v in dec6.values())
+    unc6 = sum(v["prediction"] == "uncertain" for v in elig6.values())
+    n6 = sum(v.get("round") == 6 for v in fr.values())
+    h22 = next((h for h in p4["hypotheses"] if h["id"] == "H22"), None)
+    third = (f" Third round, with an <em>uncertain</em> band (S within the refit threshold's 90% interval) fixed "
+             f"before it: of {n6} cases only {len(elig6)} had a gap of at least one point; the decided calls were right on "
+             f"{right6} of {len(dec6)} and {unc6} came back uncertain, too few to judge, so H22 is "
+             f"<strong>{e(h22['verdict'])}</strong>.") if h22 and n6 else ""
     fresh_rows = "".join(f"""<tr>
   <th scope="row" class="py-2 px-3 font-medium text-left">{e(n)}</th>
   <td class="py-2 px-3 text-right tabular">{fpct(v['leaked_share'])}</td>
@@ -372,7 +383,7 @@ def phase4_section(p4: dict) -> str:
     </div>
   </div>
   {clean_block}
-  <p class="font-body-sm text-body-sm text-on-surface-variant">First round: right on {right} of {len(elig)} judgeable cases; the rule needs four, so H19 is <strong>{e(h19['verdict'])}</strong>. Second round, pre-registered after it: right on {right5} of {len(elig5)}, below the 90% the rule asks, so H19b is <strong>{e(h19b['verdict'] if h19b else 'pending')}</strong>. Every large gap was called right (TUANDROMD, RT-IoT2022); the three misses sit at a cut-off: an S of +0.067 against s* = {s_star:+.3f}, and copy-free models keeping 75–78% of the gap against the 80% that separates easy from memorised. Use <code>leakcheck explain</code> as a first look, and retrain where the verdict matters: <code>leakcheck explain --train train.csv --test test.csv --label y</code>.</p>
+  <p class="font-body-sm text-body-sm text-on-surface-variant">First round: right on {right} of {len(elig)} judgeable cases; the rule needs four, so H19 is <strong>{e(h19['verdict'])}</strong>. Second round, pre-registered after it: right on {right5} of {len(elig5)}, below the 90% the rule asks, so H19b is <strong>{e(h19b['verdict'] if h19b else 'pending')}</strong>. Every large gap was called right (TUANDROMD, RT-IoT2022); the three misses sit at a cut-off: an S of +0.067 against s* = {s_star:+.3f}, and copy-free models keeping 75–78% of the gap against the 80% that separates easy from memorised. {third} Use <code>leakcheck explain</code> as a first look, and retrain where the verdict matters: <code>leakcheck explain --train train.csv --test test.csv --label y</code>.</p>
 </section>
 """
 
@@ -594,6 +605,9 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
     r5 = [v for v in all_judged if v.get("round") == 5]
     r5_right = sum(v["prediction"] == v["outcome"] for v in r5)
     h19b_v = next((h["verdict"] for h in p4.get("hypotheses", []) if h["id"] == "H19b"), "pending")
+    r6_dec = [v for v in all_judged if v.get("round") == 6 and v["prediction"] in ("easy", "memorised")]
+    r6_right = sum(v["prediction"] == v["outcome"] for v in r6_dec)
+    h22_v = next((h["verdict"] for h in p4.get("hypotheses", []) if h["id"] == "H22"), "pending")
     limitations = [
         "A copy is not always a bug: measured. On KDD Cup 99 and NSL-KDD the copied rows are easy (a model trained "
         "without them still gets 97% right, E9); on CSE-CIC-IDS2018 and EMBER they are memorised (E13).",
@@ -605,10 +619,12 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
         "EMBER's feature view: measured. The official 2,381-dimension vectors give the same copies and gaps within "
         "0.4 points (E11).",
         "Provenance: IDS2018 is byte-identical to the official bucket; CIC-IoT2023 matches all 34 published label counts.",
-        f"The cheap diagnosis (H19, H19b): measured on eight dev cases and on {len(all_fr)} fresh ones in two "
+        f"The cheap diagnosis (H19, H19b, H22): measured on eight dev cases and on {len(all_fr)} fresh ones in three "
         f"rounds, every prediction committed before any fresh model was trained. Right on {all_right} of "
-        f"{len(all_judged)} judgeable fresh cases; H19b is {h19b_v} ({r5_right} of {len(r5)} against the 90% "
-        "asked). Every miss sat at a cut-off, so explain reports S beside s* and the retrain decides close cases.",
+        f"{len(all_judged)} judgeable fresh cases (an uncertain call counted wrong); H19b is {h19b_v} ({r5_right} of "
+        f"{len(r5)} against the 90% asked). Every miss sat at a cut-off, so explain now says uncertain inside the "
+        f"threshold's 90% interval; on the third round its decided calls were right on {r6_right} of {len(r6_dec)} "
+        f"(H22 {h22_v}: too few cases with a gap to judge).",
     ]
     lim = "".join(f"<li>{e(x)}</li>" for x in limitations)
 

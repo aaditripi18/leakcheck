@@ -9,9 +9,12 @@ from next to every table.
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:  # scripts.h22_band, when this file is run directly
+    sys.path.insert(0, str(ROOT))
 LEDGER = ROOT / "results" / "ledger.jsonl"
 OUT = ROOT / "docs" / "RESULTS.md"
 SITE_DATA = ROOT / "site" / "data.json"
@@ -1043,8 +1046,58 @@ def h21(runs: dict) -> dict:
     return {"id": "H21", "text": text, "verdict": _verdict(r["h21"]), "evidence": ev}
 
 
+R3_FRESH = ["uci_bhp", "uci_bhp:no_identifiers", "uci_bitcoin_heist", "uci_firewall", "uci_firewall:no_identifiers",
+            "openml_creditcard", "openml_timing_attack", "openml_timing_attack:no_identifiers",
+            "openml_padding_attack", "openml_ieee_fraud", "openml_ieee_fraud:no_identifiers",
+            "openml_phishing_tan"]  # PLAN.md amendment 2026-11-13
+
+
+def h22_rows(runs: dict) -> list[dict]:
+    """Every round-3 case: S, its prediction, eligibility, outcome and outcome clarity."""
+    from scripts.h22_band import clear, keep_interval
+    out = []
+    for n in R3_FRESH:
+        p, e = runs.get(f"h19_prediction:{n}"), _e14(runs, n)
+        row = {"case": n, "S": p["results"]["S"] if p else None, "prediction": p["results"]["prediction"] if p else None,
+               "full_gap": e["full_gap"] if e else None, "outcome": None, "clear": None, "keep": None, "keep_90": None}
+        if e and _h19_outcome(e):
+            ci = keep_interval(e["cells"])
+            row.update(outcome=_h19_outcome(e), keep=e["copy_free_gap"] / e["full_gap"], keep_90=list(ci),
+                       clear=clear(*ci))
+        out.append(row)
+    return out
+
+
+def h22(runs: dict) -> dict:
+    """PLAN.md amendment 2026-11-13: the refit threshold with its uncertain band, on a third fresh round."""
+    text = ("With an uncertain band (the refit threshold's 90% bootstrap interval), S's decided predictions are right "
+            "on >= 90% of the third round's eligible cases with a clear outcome (>= 4 such cases)")
+    band = runs.get("h22_band")
+    rows = h22_rows(runs)
+    if band is None or any(r["prediction"] is None and r["S"] is not None for r in rows) \
+            or any(r["full_gap"] is None for r in rows):
+        done = sum(r["full_gap"] is not None for r in rows)
+        return {"id": "H22", "text": text, "verdict": "pending", "evidence": f"E14 complete on {done}/{len(rows)}"}
+    b = band["results"]
+    elig = [r for r in rows if r["outcome"]]
+    judged = [r for r in elig if r["clear"] and r["prediction"] in ("easy", "memorised")]
+    right = sum(r["prediction"] == r["outcome"] for r in judged)
+    strict = sum(r["prediction"] == r["outcome"] for r in elig)
+    ev = (f"s* = {b['s_star']:+.4f}, uncertain from {b['band'][0]:+.4f} to {b['band'][1]:+.4f}; "
+          f"{len(elig)} of {len(rows)} cases eligible (full gap >= 1 point); right on {right}/{len(judged)} with a clear "
+          f"outcome and a decided prediction: "
+          + "; ".join(f"{r['case']} S {r['S']:+.3f} predicted {r['prediction']}, was {r['outcome']}"
+                      f" ({'clear' if r['clear'] else 'borderline'})" for r in elig)
+          + f". Uncertain on {sum(r['prediction'] == 'uncertain' for r in rows)} case(s), S undefined on "
+          f"{sum(r['S'] is None for r in rows)}, borderline outcomes {sum(r['clear'] is False for r in rows)}; "
+          f"strict tally (uncertain counted wrong) {strict}/{len(elig)}")
+    if len(judged) < 4:
+        return {"id": "H22", "text": text, "verdict": "not judged", "evidence": ev}
+    return {"id": "H22", "text": text, "verdict": _verdict(right >= 0.9 * len(judged)), "evidence": ev}
+
+
 def phase4_hypotheses(runs: dict) -> list[dict]:
-    return [h19(runs), h20(runs), h19b(runs), h21(runs)]
+    return [h19(runs), h20(runs), h19b(runs), h21(runs), h22(runs)]
 
 
 def e14(runs: dict) -> list[str]:
@@ -1070,7 +1123,7 @@ def e14(runs: dict) -> list[str]:
     if thr:
         out += ["", f"**s\\* = {thr['results']['s_star']:+.4f}** ({thr['results']['how']}), "
                     f"ledger `h19_threshold` @ `{thr['git']['commit']}`."]
-    fresh = [n for n in E14_FRESH + P5_FRESH if f"h19_prediction:{n}" in runs]
+    fresh = [n for n in E14_FRESH + P5_FRESH + R3_FRESH if f"h19_prediction:{n}" in runs]
     if fresh:
         out += ["", "| Fresh case | Round | S | Prediction (recorded before E14 ran) | Full gap | Copy-free gap | "
                     "Outcome | Macro-F1 |", "|---|---|--:|---|--:|--:|---|--:|"]
@@ -1080,7 +1133,7 @@ def e14(runs: dict) -> list[str]:
             cells = (f"{pt(e['full_gap'])} | {pt(e['copy_free_gap']) if e['copy_free_gap'] is not None else ''} | "
                      f"{_h19_outcome(e) or 'not eligible'} | {e['macro_f1']:.4f}") if e else "| | running |"
             s = "" if p["S"] is None else format(p["S"], "+.4f")
-            out.append(f"| {n} | {'phase 5' if n in P5_FRESH else 'phase 4'} | {s} | {p['prediction']} | {cells} |")
+            out.append(f"| {n} | {'round 3 (H22)' if n in R3_FRESH else 'phase 5' if n in P5_FRESH else 'phase 4'} | {s} | {p['prediction']} | {cells} |")
     hs = phase4_hypotheses(runs)
     out += [""] + [f"**{h['id']} {h['verdict']}.** {h['evidence']}." for h in hs] + [""]
     return out
@@ -1105,12 +1158,12 @@ def phase4_data(runs: dict) -> dict:
             for n in H19_DEV if f"e14_stat:{n}" in runs}
     thr = runs.get("h19_threshold")
     fresh = {}
-    for n in E14_FRESH + P5_FRESH:
+    for n in E14_FRESH + P5_FRESH + R3_FRESH:
         p, e = runs.get(f"h19_prediction:{n}"), _e14(runs, n)
         if p is None:
             continue
         fresh[n] = {"S": _num(p["results"]["S"]), "prediction": p["results"]["prediction"],
-                    "leaked_share": _num(p["results"]["leaked_share"]), "round": 5 if n in P5_FRESH else 4,
+                    "leaked_share": _num(p["results"]["leaked_share"]), "round": 6 if n in R3_FRESH else 5 if n in P5_FRESH else 4,
                     "outcome": _h19_outcome(e) if e else None,
                     "full_gap": _num(e["full_gap"]) if e else None,
                     "copy_free_gap": _num(e["copy_free_gap"]) if e and e["copy_free_gap"] is not None else None,

@@ -31,8 +31,9 @@ SAMPLE = 20_000
 S_THRESHOLD: float | None = 0.0645156837652115
 S_BAND: tuple[float, float] | None = (0.05801112172141587, 0.13030456204379565)
 THRESHOLD_NOTE = ("The threshold and its uncertain band were fitted on the 13 known cases whose outcome is clear "
-                  "(eight dev datasets and two fresh rounds; H19, H19b). Inside the band S cannot tell; H22 tests "
-                  "the band on a third fresh round (docs/RESULTS.md).")
+                  "(eight dev datasets and two fresh rounds; H19, H19b). On a third fresh round its two decided "
+                  "calls with a clear outcome were right and its one uncertain call was memorised; nine of 12 cases "
+                  "had no gap to explain, so H22 is not judged (docs/RESULTS.md).")
 
 
 def predict(s: float | None) -> str | None:
