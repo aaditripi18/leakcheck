@@ -8,16 +8,24 @@
  },
  "label": "label",
  "excluded_columns": [],
- "near": "exact copies only: nearest-neighbour search over every row is out of reach at this size",
+ "near": {
+  "eps": 0.01,
+  "text_jaccard": null
+ },
  "n_train": 600000,
  "n_test": 200000,
- "n_drop": 18,
- "n_clean_test": 199982,
+ "n_drop": 40304,
+ "n_clean_test": 159696,
  "by_reason": {
-  "cross_exact": 18
+  "cross_exact": 18,
+  "near_tabular": 40286
  },
  "recheck": {
   "L1.cross": {
+   "ok": true,
+   "value": 0
+  },
+  "L2.near": {
    "ok": true,
    "value": 0
   }
@@ -26,7 +34,7 @@
   "full_gap_macro_f1": 0.016396256939326382,
   "source": "E13/E14, 4 models x 3 seeds (ledger e14:/e13_difficulty:ember2018)"
  },
- "seconds": 53,
- "search": "near.nearest (CPU)",
+ "seconds": 2097,
+ "search": "near_torch (GPU shortlist, exact float64 distances)",
  "source_numbering": "rows of EMBER 2018's test files (test_features.jsonl), in file order, unlabelled samples excluded"
 }
