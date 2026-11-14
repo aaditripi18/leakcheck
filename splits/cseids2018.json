@@ -19,16 +19,24 @@
  "excluded_columns": [
   "Label (attack name)"
  ],
- "near": "exact copies only: nearest-neighbour search over every row is out of reach at this size",
+ "near": {
+  "eps": 0.01,
+  "text_jaccard": null
+ },
  "n_train": 12986354,
  "n_test": 3246589,
- "n_drop": 159373,
- "n_clean_test": 3087216,
+ "n_drop": 804090,
+ "n_clean_test": 2442499,
  "by_reason": {
-  "cross_exact": 159373
+  "cross_exact": 159373,
+  "near_tabular": 644717
  },
  "recheck": {
   "L1.cross": {
+   "ok": true,
+   "value": 0
+  },
+  "L2.near": {
    "ok": true,
    "value": 0
   }
@@ -37,8 +45,8 @@
   "full_gap_macro_f1": 0.00852189888951648,
   "source": "E13/E14, 4 models x 3 seeds (ledger e14:/e13_difficulty:cseids2018)"
  },
- "seconds": 886,
- "search": "near.nearest (CPU)",
+ "seconds": 1838,
+ "search": "near_torch (GPU shortlist, exact float64 distances)",
  "source_numbering": "rows of the ten CSVs read in capture order (02-14 ... 03-02-2018), with the header lines repeated inside some files skipped",
  "split_rule": "test rows = sklearn.model_selection.train_test_split(numpy.arange(n), test_size=0.2, random_state=0, stratify=column 'Label')[1], n = rows of the whole dataset numbered as source_numbering says",
  "test_source_written": false

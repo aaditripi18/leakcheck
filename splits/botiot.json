@@ -1,0 +1,44 @@
+{
+ "case": "botiot",
+ "split": "official (the authors' 10-best Training vs Testing files)",
+ "files": {
+  "botiot": {
+   "botiot/UNSW_2018_IoT_Botnet_Final_10_best_Training.csv": "047e577cd9c7f8f61d44ac170114497904c33091bf80d1dd5e682e353a69c15b",
+   "botiot/UNSW_2018_IoT_Botnet_Final_10_best_Testing.csv": "8617de2ac5d6ca4c2f77272c7409253a396f2a9e667c29c8e797ab9f57a1868e"
+  }
+ },
+ "label": "category",
+ "excluded_columns": [
+  "attack (binary)",
+  "subcategory (finer label)"
+ ],
+ "near": {
+  "eps": 0.01,
+  "text_jaccard": null
+ },
+ "n_train": 2934817,
+ "n_test": 733705,
+ "n_drop": 0,
+ "n_clean_test": 733705,
+ "by_reason": {
+  "cross_exact": 0,
+  "near_tabular": 0
+ },
+ "recheck": {
+  "L1.cross": {
+   "ok": true,
+   "value": 0
+  },
+  "L2.near": {
+   "ok": true,
+   "value": 0
+  }
+ },
+ "measured_gap": {
+  "full_gap_macro_f1": 0.0,
+  "source": "E13/E14, 4 models x 3 seeds (ledger e14:/e13_difficulty:botiot)"
+ },
+ "seconds": 501,
+ "search": "near_torch (GPU shortlist, exact float64 distances)",
+ "source_numbering": "rows of UNSW_2018_IoT_Botnet_Final_10_best_Testing.csv, in file order"
+}
