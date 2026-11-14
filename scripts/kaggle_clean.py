@@ -50,7 +50,7 @@ reg = json.loads((work / "data" / "registry.json").read_text(encoding="utf-8"))
 names = {}
 for p in inp.rglob("*"):
     if p.is_file() and work.name not in p.parts:
-        names.setdefault(p.name, p)
+        names.setdefault(p.name[:-4] if p.name.endswith(".bin") else p.name, p)  # <name>.bin: see push_ember
 for f in reg[DATASET]["files"]:
     base = pathlib.PurePosixPath(f["path"]).name
     dst = work / "data" / "raw" / f["path"]
@@ -85,7 +85,9 @@ def push_ember() -> None:
     with tempfile.TemporaryDirectory() as d:
         d = Path(d)
         for p in verify_local("ember2018"):
-            shutil.copy2(p, d / p.name)
+            # Kaggle unpacks an uploaded archive, and the loader checks the archive's SHA-256,
+            # so it goes up as <name>.bin (same bytes); the notebook maps the name back
+            shutil.copy2(p, d / (p.name + ".bin"))
         k._upload(EMBER, d, "EMBER 2018 archive")
     print(f"uploaded {k.USER}/{EMBER}")
 
@@ -119,12 +121,14 @@ def pull(case: str) -> None:
                  r".*(\.json|\.gz|\.txt|\.log)$", check=False)
         dest = ROOT / "results" / "kaggle" / kernel(case)
         dest.mkdir(parents=True, exist_ok=True)
-        for f in Path(d).rglob("*"):
+        (dest / "failed.txt").unlink(missing_ok=True)  # a stale one would read as success
+        slug = case.replace(":", "__")
+        # top level only: a notebook that fails early leaves a copy of the repo in its output, whose
+        # splits/<case>.json (the committed one) must not replace the new result
+        for f in Path(d).iterdir():
             if f.is_file():
-                target = ROOT / "splits" / f.name if f.name.endswith((".drop.txt.gz",)) or (
-                    f.suffix == ".json" and f.name != "kernel-metadata.json") else dest / f.name
-                target.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copy2(f, target)
+                shutil.copy2(f, ROOT / "splits" / f.name if f.name in (slug + ".json", slug + ".drop.txt.gz")
+                             else dest / f.name)
     failed = (dest / "failed.txt").read_text(encoding="utf-8").strip() if (dest / "failed.txt").exists() else "missing"
     print(f"{time.strftime('%H:%M')} {case}: pulled; {'FAILED ' + failed if failed else 'ok'}", flush=True)
 

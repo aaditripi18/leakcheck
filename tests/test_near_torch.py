@@ -34,3 +34,12 @@ def test_same_decisions_and_distances_as_near(scale_spread):
     if scale_spread:
         xtr, _ = near.embed(s)
         assert np.abs(xtr).max() > 1e4                          # the case float32 gets wrong
+
+
+def test_many_small_blocks_give_the_same_answer():
+    """One training block on the device at a time: the shortlists merged across many blocks
+    must give the answer of one large block."""
+    s = _split(np.random.default_rng(11), False)
+    d0, n0 = near_torch.nearest(s, device="cpu", block=10_000, rows=600)
+    d1, n1 = near_torch.nearest(s, device="cpu", block=97, rows=53)
+    assert np.array_equal(d0, d1) and np.array_equal(n0, n1)

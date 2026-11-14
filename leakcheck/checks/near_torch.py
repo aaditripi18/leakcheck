@@ -44,25 +44,28 @@ def nearest(split, test_idx: np.ndarray | None = None, device: str | None = None
         xm = xtr if len(members) == len(xtr) else xtr[members]  # one bucket: no copy
         centre = xm.mean(axis=0)
         kk = min(k, len(members))
-        blocks = []
+        # one training block on the device at a time (a whole bucket can exceed GPU memory:
+        # CSE-CIC-IDS2018 without identifiers); each query chunk's shortlist is kept on the host
+        # between blocks and merged in block order, so the result is the same as holding all blocks
+        best = {}
         for b in range(0, len(members), block):
             t = torch.as_tensor(xm[b:b + block] - centre, dtype=torch.float64, device=device)
-            blocks.append((b, t, (t * t).sum(1)))
-        for r in range(0, len(pos), rows):
-            q = torch.as_tensor(xte[test_idx[pos[r:r + rows]]] - centre, dtype=torch.float64, device=device)
-            qn = (q * q).sum(1, keepdim=True)
-            best_d = best_i = None
-            for b, t, tn in blocks:
-                d2 = qn + tn[None, :] - 2.0 * (q @ t.T)
-                kb = min(kk, t.shape[0])
+            tn = (t * t).sum(1)
+            kb = min(kk, t.shape[0])
+            for r in range(0, len(pos), rows):
+                q = torch.as_tensor(xte[test_idx[pos[r:r + rows]]] - centre, dtype=torch.float64, device=device)
+                d2 = (q * q).sum(1, keepdim=True) + tn[None, :] - 2.0 * (q @ t.T)
                 v, i = torch.topk(d2, kb, dim=1, largest=False)
                 i = i + b
-                if best_d is None:
-                    best_d, best_i = v, i
-                else:
-                    best_d, j = torch.topk(torch.cat([best_d, v], 1), kk, dim=1, largest=False)
-                    best_i = torch.gather(torch.cat([best_i, i], 1), 1, j)
-            cand = best_i.cpu().numpy()
+                if r in best:
+                    bd, bi = (x.to(device) for x in best[r])
+                    v, j = torch.topk(torch.cat([bd, v], 1), kk, dim=1, largest=False)
+                    i = torch.gather(torch.cat([bi, i], 1), 1, j)
+                best[r] = (v.cpu(), i.cpu())
+                del d2, q
+            del t, tn
+        for r in range(0, len(pos), rows):
+            cand = best.pop(r)[1].numpy()
             # exact float64 distances to the shortlist, the formula near.nearest uses
             p = pos[r:r + rows]
             d = np.sqrt(np.sum((xte[test_idx[p]][:, None, :] - xm[cand]) ** 2, axis=2))
