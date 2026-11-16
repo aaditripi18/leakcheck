@@ -50,6 +50,25 @@ def _slog(x: np.ndarray) -> np.ndarray:
         return np.sign(x) * np.log1p(np.abs(x))
 
 
+CHUNK = 1 << 18  # rows per block when a matrix is transformed in place
+
+
+def _matrix(df: pd.DataFrame, cols: list[str], dtype: str) -> np.ndarray:
+    """df[cols].to_numpy(dtype), filled column by column: one copy of the data, not two. Column-major,
+    as to_numpy returns it, so reductions over it (the scaling statistics) add in the same order."""
+    out = np.empty((len(df), len(cols)), dtype=dtype, order="F")
+    for j, c in enumerate(cols):
+        out[:, j] = df[c].to_numpy(dtype=dtype)
+    return out
+
+
+def _slog_inplace(x: np.ndarray) -> np.ndarray:
+    """_slog(x), written into x a block of rows at a time (the same arithmetic, so the same values)."""
+    for a in range(0, len(x), CHUNK):
+        x[a:a + CHUNK] = _slog(x[a:a + CHUNK])
+    return x
+
+
 LARGE = 200_000_000  # train values above which the embedding is stored as float32 (memory)
 
 
@@ -72,8 +91,10 @@ def embed(split: Split) -> tuple[np.ndarray, np.ndarray]:
     cols = numeric_columns(split)
     big = len(split.train) * len(cols) > LARGE
     dtype = "float32" if big else "float64"
-    tr = _slog(split.train[cols].to_numpy(dtype=dtype, copy=True))
-    te = _slog(split.test[cols].to_numpy(dtype=dtype, copy=True))
+    # one matrix per side, transformed in place: CIC-IoT2023's 37M x 46 float32 is 6.8 GB, and
+    # whole-matrix temporaries (abs, log1p, sign, the scaled copy) exceeded a 30 GB Kaggle machine
+    tr = _slog_inplace(_matrix(split.train, cols, dtype))
+    te = _slog_inplace(_matrix(split.test, cols, dtype))
     if big:
         med, iqr, std = _column_stats(tr)
     else:
@@ -88,12 +109,18 @@ def embed(split: Split) -> tuple[np.ndarray, np.ndarray]:
     scale = np.nan_to_num(scale, nan=1.0)
 
     def z(x: np.ndarray) -> np.ndarray:
-        out = (x - med.astype(x.dtype)) / scale.astype(x.dtype)  # stays float32 when x is
-        out[np.isnan(x)] = -MISSING
-        out[np.isposinf(x)] = 2 * MISSING
-        out[np.isneginf(x)] = -2 * MISSING
-        out /= np.sqrt(max(len(cols), 1))
-        return out
+        # in place, a block of rows at a time; the same operations as on the whole matrix
+        m, sc, root = med.astype(x.dtype), scale.astype(x.dtype), np.sqrt(max(len(cols), 1))
+        for a in range(0, len(x), CHUNK):
+            b = x[a:a + CHUNK]
+            nan, pinf, ninf = np.isnan(b), np.isposinf(b), np.isneginf(b)
+            b -= m
+            b /= sc  # stays float32 when x is
+            b[nan] = -MISSING
+            b[pinf] = 2 * MISSING
+            b[ninf] = -2 * MISSING
+            b /= root
+        return x
 
     return z(tr), z(te)
 
