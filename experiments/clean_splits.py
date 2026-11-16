@@ -118,7 +118,7 @@ def make(case: str) -> dict:
            "n_clean_test": len(s.test) - len(drop),
            "by_reason": {k: len(v["test"]) for k, v in res.removed.items()},
            "recheck": check, "measured_gap": gaps(case), "seconds": round(time.time() - t0),
-           "search": "near_torch (GPU shortlist, exact float64 distances)" if gpu else "near.nearest (CPU)",
+           "search": "near_torch (GPU shortlist: certified float32, then float64 for uncertified rows; exact distances)" if gpu else "near.nearest (CPU)",
            "source_numbering": SOURCE.get(case.partition(":")[0], SINGLE_FILE) if src is not None else None}
     if case.partition(":")[0] not in OFFICIAL and src is not None:
         import experiments.e1_audit as e1
