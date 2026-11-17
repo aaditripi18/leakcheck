@@ -2,6 +2,12 @@
 
     python scripts/kaggle_clean.py push-ember          EMBER's archive as a private Kaggle dataset
     python scripts/kaggle_clean.py run cseids2018 ...  code from HEAD, one GPU notebook per case, pulled when done
+    python scripts/kaggle_clean.py run ciciot2023@6    the near search in 6 parts (one notebook each, at most
+                                                       two at a time), then a final notebook that reads them
+
+A case too large for one 12-hour session runs in parts (experiments/near_parts.py): part i of n
+searches every n-th distinct test row and saves the distances; the final notebook mounts the
+parts' outputs, so clean_split and its re-check read the distances and search only what is missing.
 
 Each notebook runs `experiments.clean_splits make <case>` with LEAKCHECK_NEAR=torch (the GPU
 search, validated against near.nearest: tests/test_near_torch.py), so every test row is
@@ -57,26 +63,71 @@ for f in reg[DATASET]["files"]:
     dst.parent.mkdir(parents=True, exist_ok=True)
     os.symlink(names[base], dst)   # the loaders check the SHA-256
 env = {**os.environ, "LEAKCHECK_NEAR": "torch", "PYTHONUNBUFFERED": "1"}
+cache = work / "near_cache"
+if PART is not None:
+    cache.mkdir()
+    env["LEAKCHECK_NEAR_CACHE"] = str(cache)
+    if PART == "final":
+        for p in inp.rglob("*.npz"):
+            shutil.copy2(p, cache / p.name)
+        print("parts read:", sorted(p.name for p in cache.iterdir()), flush=True)
+    else:
+        env["LEAKCHECK_NEAR_PART"] = PART
 r = subprocess.run([sys.executable, "-u", "-m", "experiments.clean_splits", "make", CASE], cwd=work, env=env)
 out = pathlib.Path("/kaggle/working")
+saved = []
+if PART is not None and PART != "final":
+    for p in cache.glob("*.npz"):
+        shutil.copy2(p, out / p.name)
+        saved.append(p.name)
 slug = CASE.replace(":", "__")
 for suffix in (".json", ".drop.txt.gz"):
     f = work / "splits" / (slug + suffix)
     if f.exists():
         shutil.copy2(f, out / f.name)
-(out / "failed.txt").write_text("" if r.returncode == 0 else f"{CASE}: exit {r.returncode}\n", encoding="utf-8")
+ok = r.returncode == 0 and (PART is None or PART == "final" or bool(saved))
+(out / "failed.txt").write_text("" if ok else f"{CASE} {PART}: exit {r.returncode}, saved {saved}\n", encoding="utf-8")
 shutil.rmtree(work)
 print("exit", r.returncode, CASE, flush=True)
 '''
 
 
-def kernel(case: str) -> str:
-    return "leakcheck-clean-" + case.replace(":", "-").replace("_", "-")
+def parse(job: str) -> tuple[str, str | None]:
+    """'case' -> (case, None); 'case@i/n' -> part i of n; 'case@final/n' -> the final notebook."""
+    case, _, part = job.partition("@")
+    return case, part or None
 
 
-def notebook_source(case: str, sha: str) -> str:
-    return (f"# leakcheck clean split {case}, code {sha}\nCASE = {case!r}\nSHA = {sha!r}\nPINS = {k.PINS!r}\n"
-            f"DATASET = {DATASET_OF[case]!r}\n" + NOTEBOOK)
+def expand(job: str) -> list[str]:
+    """'case@n' -> its n parts and the final notebook; anything else as given."""
+    case, part = parse(job)
+    if part is not None and part.isdigit():
+        n = int(part)
+        return [f"{case}@{i}/{n}" for i in range(n)] + [f"{case}@final/{n}"]
+    return [job]
+
+
+def parts_of(job: str) -> list[str]:
+    """The part jobs a final notebook reads (none for any other job)."""
+    case, part = parse(job)
+    if part is None or not part.startswith("final/"):
+        return []
+    n = int(part.split("/")[1])
+    return [f"{case}@{i}/{n}" for i in range(n)]
+
+
+def kernel(job: str) -> str:
+    case, part = parse(job)
+    tail = ("" if part is None else "-final" if part.startswith("final/")
+            else "-p{}of{}".format(*part.split("/")))
+    return "leakcheck-clean-" + case.replace(":", "-").replace("_", "-") + tail
+
+
+def notebook_source(job: str, sha: str) -> str:
+    case, part = parse(job)
+    part = "final" if part and part.startswith("final/") else part
+    return (f"# leakcheck clean split {job}, code {sha}\nCASE = {case!r}\nPART = {part!r}\nSHA = {sha!r}\n"
+            f"PINS = {k.PINS!r}\nDATASET = {DATASET_OF[case]!r}\n" + NOTEBOOK)
 
 
 def push_ember() -> None:
@@ -92,15 +143,19 @@ def push_ember() -> None:
     print(f"uploaded {k.USER}/{EMBER}")
 
 
+def metadata(job: str) -> dict:
+    case = parse(job)[0]
+    return {"id": f"{k.USER}/{kernel(job)}", "title": kernel(job), "code_file": "run.py", "language": "python",
+            "kernel_type": "script", "is_private": True, "enable_gpu": True, "enable_tpu": False,
+            "enable_internet": True, "dataset_sources": [f"{k.USER}/{k.CODE}", *SOURCES[case]],
+            "competition_sources": [], "kernel_sources": [f"{k.USER}/{kernel(p)}" for p in parts_of(job)]}
+
+
 def start(case: str, sha: str) -> bool:
     with tempfile.TemporaryDirectory() as d:
         d = Path(d)
         (d / "run.py").write_text(notebook_source(case, sha), encoding="utf-8")
-        (d / "kernel-metadata.json").write_text(json.dumps({
-            "id": f"{k.USER}/{kernel(case)}", "title": kernel(case), "code_file": "run.py", "language": "python",
-            "kernel_type": "script", "is_private": True, "enable_gpu": True, "enable_tpu": False,
-            "enable_internet": True, "dataset_sources": [f"{k.USER}/{k.CODE}", *SOURCES[case]],
-            "competition_sources": [], "kernel_sources": []}), encoding="utf-8")
+        (d / "kernel-metadata.json").write_text(json.dumps(metadata(case)), encoding="utf-8")
         r = k.kaggle("kernels", "push", "-p", str(d), check=False)
     out = (r.stdout + r.stderr).strip()
     if "successfully pushed" in out:
@@ -115,14 +170,14 @@ def start(case: str, sha: str) -> bool:
     sys.exit(f"{time.strftime('%H:%M')} FAILED to start {case}: {out}")
 
 
-def pull(case: str) -> None:
+def pull(case: str) -> bool:
     with tempfile.TemporaryDirectory() as d:
         k.kaggle("kernels", "output", f"{k.USER}/{kernel(case)}", "-p", d, "--file-pattern",
-                 r".*(\.json|\.gz|\.txt|\.log)$", check=False)
+                 r".*(\.json|\.gz|\.txt|\.log|\.npz)$", check=False)
         dest = ROOT / "results" / "kaggle" / kernel(case)
         dest.mkdir(parents=True, exist_ok=True)
         (dest / "failed.txt").unlink(missing_ok=True)  # a stale one would read as success
-        slug = case.replace(":", "__")
+        slug = parse(case)[0].replace(":", "__")
         # top level only: a notebook that fails early leaves a copy of the repo in its output, whose
         # splits/<case>.json (the committed one) must not replace the new result
         for f in Path(d).iterdir():
@@ -131,13 +186,19 @@ def pull(case: str) -> None:
                              else dest / f.name)
     failed = (dest / "failed.txt").read_text(encoding="utf-8").strip() if (dest / "failed.txt").exists() else "missing"
     print(f"{time.strftime('%H:%M')} {case}: pulled; {'FAILED ' + failed if failed else 'ok'}", flush=True)
+    return not failed
 
 
 def run(cases: list[str]) -> None:
+    cases = [j for c in cases for j in expand(c)]
     sha = k.push_code()
-    pending, running = list(cases), []
+    pending, running, ok = list(cases), [], set()
     while pending or running:
         for c in list(pending):
+            if not set(parts_of(c)) <= ok:      # a final notebook waits for every part it reads
+                if any(p not in pending and p not in running and p not in ok for p in parts_of(c)):
+                    sys.exit(f"{time.strftime('%H:%M')} {c}: a part failed; not starting it")
+                continue
             if start(c, sha):
                 pending.remove(c)
                 running.append(c)
@@ -149,7 +210,8 @@ def run(cases: list[str]) -> None:
                 s = k.kaggle("kernels", "status", f"{k.USER}/{kernel(c)}", check=False).stdout
                 if any(t in s for t in ("COMPLETE", "ERROR", "CANCEL")):
                     running.remove(c)
-                    pull(c)
+                    if pull(c):
+                        ok.add(c)
     print(f"{time.strftime('%H:%M')} all done: {', '.join(cases)}", flush=True)
 
 

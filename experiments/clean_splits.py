@@ -102,6 +102,9 @@ def use_gpu_search() -> bool:
 def make(case: str) -> dict:
     t0 = time.time()
     gpu = use_gpu_search()
+    from experiments import near_parts
+    from leakcheck.checks import near as _near
+    _near.nearest = parts = near_parts.from_env(_near.nearest)
     prep, s, src = split_for(case)
     exact_only = case in EXACT_ONLY and not gpu
     opts = CleanOptions(near_eps=None if exact_only else NEAR_EPS,
@@ -119,6 +122,7 @@ def make(case: str) -> dict:
            "by_reason": {k: len(v["test"]) for k, v in res.removed.items()},
            "recheck": check, "measured_gap": gaps(case), "seconds": round(time.time() - t0),
            "search": "near_torch (GPU shortlist: certified float32, then float64 for uncertified rows; exact distances)" if gpu else "near.nearest (CPU)",
+           **({"near_parts": parts.stats} if hasattr(parts, "stats") else {}),
            "source_numbering": SOURCE.get(case.partition(":")[0], SINGLE_FILE) if src is not None else None}
     if case.partition(":")[0] not in OFFICIAL and src is not None:
         import experiments.e1_audit as e1
