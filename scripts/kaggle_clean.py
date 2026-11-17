@@ -2,6 +2,7 @@
 
     python scripts/kaggle_clean.py push-ember          EMBER's archive as a private Kaggle dataset
     python scripts/kaggle_clean.py run cseids2018 ...  code from HEAD, one GPU notebook per case, pulled when done
+    python scripts/kaggle_clean.py handoff ciciot2023@8   the parts listed in OWNERS, as notebooks for friends
     python scripts/kaggle_clean.py run ciciot2023@6    the near search in 6 parts (one notebook each, at most
                                                        two at a time), then a final notebook that reads them
 
@@ -37,6 +38,13 @@ SOURCES = {"cseids2018": ["solarmainframe/ids-intrusion-csv"],
            "ciciot2023": ["madhavmalhotra/unb-cic-iot-dataset"],
            "ember2018": [f"{k.USER}/{EMBER}"],
            "botiot": [f"{k.USER}/{k.DATA}"]}  # phase 4's private copy of the fresh data (hash-checked)
+# parts run on friends' Kaggle accounts with this code (the notebook is shared back to USER, who
+# needs to share the private code dataset with them); every other job runs on USER's account
+OWNERS = {**{f"ciciot2023@{i}/8": "alien5060707" for i in (2, 3, 4)},
+          **{f"ciciot2023@{i}/8": "moinuddinhasan8" for i in (5, 6, 7)},
+          **{f"cseids2018:no_identifiers@{i}/8": "rohajraj" for i in (0, 1, 2)},
+          **{f"cseids2018:no_identifiers@{i}/8": "alubalub" for i in (3, 4, 5)}}
+HANDOFF = ROOT.parent / "leakcheck_handoff"
 DATASET_OF = {"cseids2018": "cseids2018", "cseids2018:no_identifiers": "cseids2018", "ciciot2023": "ciciot2023",
               "ember2018": "ember2018", "botiot": "botiot"}
 
@@ -123,6 +131,14 @@ def kernel(job: str) -> str:
     return "leakcheck-clean-" + case.replace(":", "-").replace("_", "-") + tail
 
 
+def owner(job: str) -> str:
+    return OWNERS.get(job, k.USER)
+
+
+def ref(job: str) -> str:
+    return f"{owner(job)}/{kernel(job)}"
+
+
 def notebook_source(job: str, sha: str) -> str:
     case, part = parse(job)
     part = "final" if part and part.startswith("final/") else part
@@ -145,10 +161,10 @@ def push_ember() -> None:
 
 def metadata(job: str) -> dict:
     case = parse(job)[0]
-    return {"id": f"{k.USER}/{kernel(job)}", "title": kernel(job), "code_file": "run.py", "language": "python",
+    return {"id": ref(job), "title": kernel(job), "code_file": "run.py", "language": "python",
             "kernel_type": "script", "is_private": True, "enable_gpu": True, "enable_tpu": False,
             "enable_internet": True, "dataset_sources": [f"{k.USER}/{k.CODE}", *SOURCES[case]],
-            "competition_sources": [], "kernel_sources": [f"{k.USER}/{kernel(p)}" for p in parts_of(job)]}
+            "competition_sources": [], "kernel_sources": [ref(p) for p in parts_of(job)]}
 
 
 def start(case: str, sha: str) -> bool:
@@ -172,7 +188,7 @@ def start(case: str, sha: str) -> bool:
 
 def pull(case: str) -> bool:
     with tempfile.TemporaryDirectory() as d:
-        k.kaggle("kernels", "output", f"{k.USER}/{kernel(case)}", "-p", d, "--file-pattern",
+        k.kaggle("kernels", "output", ref(case), "-p", d, "--file-pattern",
                  r".*(\.json|\.gz|\.txt|\.log|\.npz)$", check=False)
         dest = ROOT / "results" / "kaggle" / kernel(case)
         dest.mkdir(parents=True, exist_ok=True)
@@ -189,10 +205,33 @@ def pull(case: str) -> bool:
     return not failed
 
 
+def state(job: str) -> str:
+    out = k.kaggle("kernels", "status", ref(job), check=False).stdout
+    return next((t for t in ("RUNNING", "QUEUED", "COMPLETE", "ERROR", "CANCEL") if t in out), "")
+
+
+def handoff(cases: list[str]) -> None:
+    """Each friend's notebooks, in HANDOFF/<account>/<kernel>/ (run.py, kernel-metadata.json)."""
+    jobs = [j for c in cases for j in expand(c) if owner(j) != k.USER]
+    sha = k.push_code()
+    for j in jobs:
+        d = HANDOFF / owner(j) / kernel(j)
+        d.mkdir(parents=True, exist_ok=True)
+        (d / "run.py").write_text(notebook_source(j, sha), encoding="utf-8")
+        (d / "kernel-metadata.json").write_text(json.dumps(metadata(j), indent=1), encoding="utf-8")
+        print(f"{owner(j)}: {d}")
+
+
 def run(cases: list[str]) -> None:
     cases = [j for c in cases for j in expand(c)]
     sha = k.push_code()
-    pending, running, ok = list(cases), [], set()
+    pending, running, ok, told = list(cases), [], set(), set()
+    for c in cases:
+        # a friend's part is started by the friend; one of ours already running (a restarted runner) is
+        # watched, not pushed again (a push would replace the running version)
+        if owner(c) != k.USER or state(c) in ("RUNNING", "QUEUED"):
+            pending.remove(c)
+            running.append(c)
     while pending or running:
         for c in list(pending):
             if not set(parts_of(c)) <= ok:      # a final notebook waits for every part it reads
@@ -206,16 +245,22 @@ def run(cases: list[str]) -> None:
                 break
         time.sleep(3600 if pending and not running else k.WAIT)
         for c in list(running):
-            if k.kaggle("kernels", "status", f"{k.USER}/{kernel(c)}", check=False).stdout.count("RUNNING") == 0:
-                s = k.kaggle("kernels", "status", f"{k.USER}/{kernel(c)}", check=False).stdout
-                if any(t in s for t in ("COMPLETE", "ERROR", "CANCEL")):
-                    running.remove(c)
-                    if pull(c):
-                        ok.add(c)
+            st = state(c)                       # a friend's notebook not yet pushed or shared: "" (waits)
+            if c in told and st in ("RUNNING", "QUEUED"):
+                told.discard(c)                 # the friend is running it again
+            if st in ("COMPLETE", "ERROR", "CANCEL") and c not in told:
+                running.remove(c)
+                if pull(c):
+                    ok.add(c)
+                elif owner(c) != k.USER:        # the final notebook waits for the friend to run it again
+                    print(f"{time.strftime('%H:%M')} {c} on {owner(c)}'s account FAILED: ask them to run it "
+                          f"again", flush=True)
+                    running.append(c)
+                    told.add(c)
     print(f"{time.strftime('%H:%M')} all done: {', '.join(cases)}", flush=True)
 
 
 if __name__ == "__main__":
     cmd, args = sys.argv[1], sys.argv[2:]
-    {"push-ember": lambda: push_ember(), "run": lambda: run(args),
+    {"push-ember": lambda: push_ember(), "run": lambda: run(args), "handoff": lambda: handoff(args),
      "pull": lambda: [pull(c) for c in args]}.get(cmd, lambda: sys.exit(__doc__))()
