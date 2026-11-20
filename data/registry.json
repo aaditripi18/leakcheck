@@ -1658,5 +1658,107 @@
         "sha256": "e0ce4a8469b5543a720b5488516c5306086cc85844035f4af1980d287804ecaf"
       }
     ]
+  },
+  "wsn_ds": {
+    "description": "WSN-DS: 374,661 LEACH wireless-sensor-network records, 18 features, Attack type label (5 classes)",
+    "source": "Kaggle mirror bassamkasasbeh1/wsnds (file WSN-DS.csv), fetched with the Kaggle CLI 2026-11-20",
+    "provenance": "374,661 rows and the five class counts as published (Almomani et al., J. Sensors 2016); PLAN.md phase 6 sourcing note.",
+    "citation": "I. Almomani, B. Al-Kasasbeh, M. Al-Akhras, WSN-DS: A Dataset for Intrusion Detection Systems in Wireless Sensor Networks, Journal of Sensors 2016, 4731953",
+    "licence": "As published by the authors for research; not redistributed here",
+    "manual_download": true,
+    "files": [
+      {
+        "path": "wsn_ds/wsnds.zip",
+        "sha256": "feba30ee0f9c0a013561cc03a0efafde56aa7651cb53b4b3ba5facc10264327f",
+        "bytes": 5082805,
+        "url": "https://www.kaggle.com/datasets/bassamkasasbeh1/wsnds"
+      }
+    ]
+  },
+  "mqttset": {
+    "description": "MQTTset: the authors' reduced 70/30 split, 231,646 train and 99,290 test MQTT packet records, 33 features, target label (6 classes)",
+    "source": "The authors' Kaggle release cnrieiit/mqttset (Data/FINAL_CSV/train70_reduced.csv, test30_reduced.csv), fetched 2026-11-20",
+    "provenance": "The authors' own files and split (Vaccari et al., Sensors 20(22) 6578, 2020); PLAN.md phase 6 sourcing note.",
+    "citation": "I. Vaccari, G. Chiola, M. Aiello, M. Mongelli, E. Cambiaso, MQTTset, a New Dataset for Machine Learning Techniques on MQTT, Sensors 20(22) (2020) 6578",
+    "licence": "As published by the authors for research; not redistributed here",
+    "manual_download": true,
+    "files": [
+      {
+        "path": "mqttset/Data/FINAL_CSV/train70_reduced.csv.zip",
+        "sha256": "30686f38cee659f6dd87978453228a08a263b2c8e9f92beecf196b4450d93443",
+        "bytes": 5301344,
+        "url": "https://www.kaggle.com/datasets/cnrieiit/mqttset"
+      },
+      {
+        "path": "mqttset/Data/FINAL_CSV/test30_reduced.csv.zip",
+        "sha256": "9a848e9e2d410b087964dc03c501807be06e76b4895966e8bc1991eecbbce582",
+        "bytes": 2303230,
+        "url": "https://www.kaggle.com/datasets/cnrieiit/mqttset"
+      }
+    ]
+  },
+  "malmem2022": {
+    "description": "CIC-MalMem-2022: 58,596 memory-dump records, 55 features; label = malware category (Benign, Ransomware, Spyware, Trojan)",
+    "source": "Kaggle mirror luccagodoy/obfuscated-malware-memory-2022-cic (Obfuscated-MalMem2022.csv), fetched 2026-11-20",
+    "provenance": "58,596 rows; 29,298 Benign and 29,298 Malware, as the UNB page publishes; PLAN.md phase 6 sourcing note.",
+    "citation": "T. Carrier, P. Victor, A. Tekeoglu, A. H. Lashkari, Detecting Obfuscated Malware using Memory Feature Engineering, ICISSP 2022",
+    "licence": "As published by the authors for research; not redistributed here",
+    "manual_download": true,
+    "files": [
+      {
+        "path": "malmem2022/obfuscated-malware-memory-2022-cic.zip",
+        "sha256": "a9b17900e159dec1210df3940d93a94db45d4e58d24ff0fd6103858aa18f6e83",
+        "bytes": 4025038,
+        "url": "https://www.kaggle.com/datasets/luccagodoy/obfuscated-malware-memory-2022-cic"
+      }
+    ]
+  },
+  "ciciov2024": {
+    "description": "CICIoV2024, decimal: 1,408,219 CAN-bus frames (ID and 8 data bytes), specific_class label (6 classes)",
+    "source": "Kaggle mirror pushpakattarde/ciciov2024decimalcsv (six per-class CSVs, concatenated), fetched 2026-11-20",
+    "provenance": "62 of the 63 values in the UNB page's decimal statistics table equal ours to the printed digit; the 63rd is the page's rounding (PLAN.md phase 6 sourcing note).",
+    "citation": "E. C. P. Neto et al., CICIoV2024: Advancing Realistic IDS Approaches against DoS and Spoofing Attack in IoV CAN bus, Internet of Things 26 (2024) 101209",
+    "licence": "As published by the authors for research; not redistributed here",
+    "manual_download": true,
+    "files": [
+      {
+        "path": "ciciov2024/ciciov2024decimalcsv.zip",
+        "sha256": "1970f557b9c2709fbd407f6c01166dc8de4be226cc0b6722141fd3a0b9894c9e",
+        "bytes": 2043162,
+        "url": "https://www.kaggle.com/datasets/pushpakattarde/ciciov2024decimalcsv"
+      }
+    ]
+  },
+  "andmal2020": {
+    "description": "CCCS-CIC-AndMal2020, static features: 357,805 Android apps, 9,504 features, Label (14 malware categories and benign)",
+    "source": "Kaggle mirror dhoogla/cccscicandmal2020 (cicandmal2020-static.parquet), fetched 2026-11-20",
+    "provenance": "All 14 malware categories have the UNB page's counts; benign (162,181) is not in the page's table (PLAN.md phase 6 extension).",
+    "citation": "A. Rahali, A. H. Lashkari, G. Kaur, L. Taheri, F. Gagnon, F. Massicotte, DIDroid: Android Malware Classification and Characterization Using Deep Image Learning, ICCNS 2020",
+    "licence": "As published by the authors for research; not redistributed here",
+    "manual_download": true,
+    "files": [
+      {
+        "path": "andmal2020/cccscicandmal2020.zip",
+        "sha256": "1c6ebf09765a20330360e168757879727736482f4db31f1f038508055b45199e",
+        "bytes": 26145986,
+        "url": "https://www.kaggle.com/datasets/dhoogla/cccscicandmal2020"
+      }
+    ]
+  },
+  "maldroid2020": {
+    "description": "CICMalDroid2020: 11,598 Android apps, 470 system-call and binder frequency features, Class (5 classes)",
+    "source": "Kaggle mirror nazmulahsan1/android-malware-detection-cse-422 (feature_vectors_syscallsbinders_frequency_5_Cat.csv), fetched 2026-11-20",
+    "provenance": "11,598 rows; class counts 1,253 / 2,100 / 3,904 / 2,546 / 1,795 equal the UNB page's Adware, Banking, SMS, Riskware, Benign (PLAN.md phase 6 extension).",
+    "citation": "S. Mahdavifar, A. F. Abdul Kadir, R. Fatemi, D. Alhadidi, A. A. Ghorbani, Dynamic Android Malware Category Classification using Semi-Supervised Deep Learning, IEEE DASC 2020",
+    "licence": "As published by the authors for research; not redistributed here",
+    "manual_download": true,
+    "files": [
+      {
+        "path": "maldroid2020/android-malware-detection-cse-422.zip",
+        "sha256": "db0fd6ec1cedc762d4cf6c1f5089a1edeeb68cac12d4ce44aaf809435f838884",
+        "bytes": 1864548,
+        "url": "https://www.kaggle.com/datasets/nazmulahsan1/android-malware-detection-cse-422"
+      }
+    ]
   }
 }

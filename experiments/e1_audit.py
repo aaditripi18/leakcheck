@@ -274,6 +274,13 @@ def prep_uci5(name: str, label: str, excluded: tuple[str, ...] = (), text: str |
     return prep
 
 
+
+def prep_mqttset(seed: int = SEED) -> Prepared:
+    """Phase 6: the authors' own reduced 70/30 split (official; the same for every seed)."""
+    tr, te = data.load_mqttset("train70"), data.load_mqttset("test30")
+    s = Split(tr, te, "target")
+    return Prepared(views(s), "official (the authors' train70_reduced vs test30_reduced files)", {}, ("mqttset",))
+
 PREP = {
     "kdd99": prep_kdd99, "nslkdd": prep_nslkdd, "unsw_nb15": prep_unsw, "cicids2017": prep_cic,
     "ember2018": prep_ember, "uci_phishing": prep_uci_phishing, "phiusiil": prep_phiusiil, "sms_spam": prep_sms,
@@ -301,6 +308,13 @@ PREP = {
     "openml_ieee_fraud": prep_uci5("openml_ieee_fraud", "isFraud", loader=lambda: data.load_openml("openml_ieee_fraud")),
     "openml_phishing_tan": prep_uci5("openml_phishing_tan", "CLASS_LABEL",
                                      loader=lambda: data.load_openml("openml_phishing_tan")),
+    # phase 6 (PLAN.md amendment 2026-11-20): H23, H24; same split rule where no official split
+    "wsn_ds": prep_uci5("wsn_ds", "Attack type", loader=data.load_wsn_ds),
+    "mqttset": prep_mqttset,
+    "malmem2022": prep_uci5("malmem2022", "category", loader=data.load_malmem2022),
+    "ciciov2024": prep_uci5("ciciov2024", "specific_class", ("label", "category"), loader=data.load_ciciov2024),
+    "andmal2020": prep_uci5("andmal2020", "Label", loader=data.load_andmal2020),
+    "maldroid2020": prep_uci5("maldroid2020", "Class", loader=data.load_maldroid2020),
 }
 
 

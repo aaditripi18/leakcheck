@@ -480,3 +480,61 @@ def load_openml(name: str) -> pd.DataFrame:
         if isinstance(df[c].dtype, pd.CategoricalDtype):
             df[c] = df[c].astype(object).where(df[c].notna(), None)
     return df
+
+
+# --- Phase 6: a fourth fresh round for H23/H24 (PLAN.md amendment 2026-11-20) ---
+
+
+def _zip_csv(path: Path, member: str | None = None, **kw) -> pd.DataFrame:
+    with zipfile.ZipFile(path) as zf:
+        name = member if member is not None else zf.namelist()[0]
+        with zf.open(_zip_member(zf, name)) as f:
+            return pd.read_csv(f, low_memory=False, **kw)
+
+
+def load_wsn_ds() -> pd.DataFrame:
+    """WSN-DS.csv; its column names carry leading spaces in the file, stripped here."""
+    (path,) = verify_local("wsn_ds")
+    df = _zip_csv(path, "WSN-DS.csv")
+    df.columns = [c.strip() for c in df.columns]
+    return df
+
+
+def load_mqttset(part: str) -> pd.DataFrame:
+    """The authors' reduced split: part is 'train70' or 'test30'."""
+    train, test = verify_local("mqttset")
+    return _zip_csv(train if part == "train70" else test)
+
+
+def load_malmem2022() -> pd.DataFrame:
+    """Obfuscated-MalMem2022.csv; `category` (the label) is the part of `Category` before the first '-'."""
+    (path,) = verify_local("malmem2022")
+    df = _zip_csv(path, "Obfuscated-MalMem2022.csv")
+    df["category"] = df["Category"].astype("string").str.split("-").str[0]
+    return df.drop(columns=["Category", "Class"])
+
+
+def load_ciciov2024() -> pd.DataFrame:
+    """The six decimal per-class CSVs, concatenated in name order."""
+    (path,) = verify_local("ciciov2024")
+    with zipfile.ZipFile(path) as zf:
+        frames = [pd.read_csv(zf.open(n)) for n in sorted(zf.namelist()) if n.endswith(".csv")]
+    return pd.concat(frames, ignore_index=True)
+
+
+def load_andmal2020() -> pd.DataFrame:
+    """The static table (cicandmal2020-static.parquet): 9,504 features and Label."""
+    import io
+    (path,) = verify_local("andmal2020")
+    with zipfile.ZipFile(path) as zf:
+        df = pd.read_parquet(io.BytesIO(zf.read(_zip_member(zf, "cicandmal2020-static.parquet"))))
+    df["Label"] = df["Label"].astype("string")
+    return df
+
+
+def load_maldroid2020() -> pd.DataFrame:
+    """feature_vectors_syscallsbinders_frequency_5_Cat.csv; Class codes 1-5 kept as the label."""
+    (path,) = verify_local("maldroid2020")
+    df = _zip_csv(path, "feature_vectors_syscallsbinders_frequency_5_Cat.csv")
+    df["Class"] = df["Class"].astype("string")
+    return df

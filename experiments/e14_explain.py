@@ -28,7 +28,8 @@ from leakcheck.explain import NEAR_EPS, ROUNDS, TEXT_TAU, copies_in_train, leak_
 
 FRESH_PREFIXES = ("ton_", "botiot", "xiiotid", "uci_spambase", "uci_website_phishing", "uci_youtube_spam",
                   "uci_tuandromd", "uci_rt_iot2022",  # phases 4 and 5
-                  "uci_bhp", "uci_bitcoin_heist", "uci_firewall", "openml_")  # round 3 (H22)
+                  "uci_bhp", "uci_bitcoin_heist", "uci_firewall", "openml_",  # round 3 (H22)
+                  "wsn_ds", "mqttset", "malmem2022", "ciciov2024", "andmal2020", "maldroid2020")  # phase 6 (H23, H24)
 
 
 def _hashes(name: str) -> dict:
