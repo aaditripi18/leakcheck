@@ -793,3 +793,19 @@ Each dataset is used only if a copy's per-class row counts equal the page's:
 
 Where a mirror codes the classes as numbers, the counts must match as a set, one class to
 one count. Splits, views, the procedure, H23 and H24 are as above.
+
+*Extension, checked (2026-11-20, before S or any leakage number):*
+- **CCCS-CIC-AndMal2020**: the mirror's static table (`cicandmal2020-static.parquet`, 357,805
+  rows, 9,504 features and `Label`) has 15 classes. All 14 categories in the UNB page's
+  table have exactly the page's count. The 15th is benign, 162,181 rows; the page's table
+  does not list it. Used, with all 15 classes. The dynamic table has no label column, so
+  it is not used.
+- **CICMalDroid2020**: 11,598 rows; `Class` codes 1-5 have 1,253, 2,100, 3,904, 2,546 and
+  1,795 rows: the page's Adware, Banking, SMS malware, Riskware and Benign, in that order.
+  Used.
+- **CIC-Bell-DNS-EXF-2021**: neither feature family matches the page. Stateless gives
+  241,785 benign, 42,683 light and 472,743 heavy; stateful gives 91,784, 11,295 and 159,026;
+  the page gives 641,642, 53,978 and 323,698. **Not used.**
+
+Phase 6 therefore has six datasets: WSN-DS, MQTTset, CIC-MalMem-2022, CICIoV2024 (decimal),
+CCCS-CIC-AndMal2020 and CICMalDroid2020.
