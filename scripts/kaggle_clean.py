@@ -44,12 +44,15 @@ OWNERS = {**{f"ciciot2023@{i}/16": "alien5060707" for i in (0, 1, 2)},
           **{f"ciciot2023@{i}/16": "moinuddinhasan8" for i in (3, 4, 5)},
           **{f"ciciot2023@{i}/16": "rohajraj" for i in (6, 7)},
           **{f"ciciot2023@{i}/16": "alubalub" for i in (8, 9)},
+          "ciciot2023@10/16": "alien5060707", "ciciot2023@11/16": "moinuddinhasan8",
           **{f"cseids2018:no_identifiers@{i}/8": "rohajraj" for i in (0, 1, 2, 6)},
           **{f"cseids2018:no_identifiers@{i}/8": "alubalub" for i in (3, 4, 5, 7)}}
 # assigned by GPU quota left on 2026-11-18 (alien5060707 12h56m, moinuddinhasan8 12h49m, rohajraj 11h03m,
 # alubalub 10h48m) against the T4 benchmark (results/kaggle/leakcheck-gpu-bench): a ciciot2023 sixteenth
 # is at most 3.3 h, a cseids2018:no_identifiers eighth at most 1.1 h; ciciot2023 parts 10-15 and the final
-# notebooks run on USER's account after its weekly quota resets
+# notebooks run on USER's account after its weekly quota resets. 2026-11-20, with p0-p9 done (2.8-2.9 h each):
+# alien5060707 (4h09m left) and moinuddinhasan8 (4h08m) take p10 and p11; rohajraj (3h00m) and alubalub (2h47m)
+# have too little for a 2.9 h part
 HANDOFF = ROOT.parent / "leakcheck_handoff"
 DATASET_OF = {"cseids2018": "cseids2018", "cseids2018:no_identifiers": "cseids2018", "ciciot2023": "ciciot2023",
               "ember2018": "ember2018", "botiot": "botiot"}

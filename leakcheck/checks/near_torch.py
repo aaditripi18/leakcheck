@@ -171,6 +171,7 @@ def nearest(split, test_idx: np.ndarray | None = None, device: str | None = None
         members = tr_groups.get(key)
         if members is None:
             continue
+        n_bucket = len(members)
         if distinct:
             members, xm = _distinct(xtr, members, th)
         else:
@@ -178,7 +179,7 @@ def nearest(split, test_idx: np.ndarray | None = None, device: str | None = None
         nearest.searched += len(members)
         big = progress and len(members) * len(pos) >= PROGRESS_MIN  # buckets worth watching
         if big:
-            _say(f"bucket of {len(members)} training rows ({len(xm)} after repeats are left out) x {len(pos)} test rows")
+            _say(f"bucket of {n_bucket} training rows ({len(members)} after repeats are left out) x {len(pos)} test rows")
         t_bucket = time.time()
         centre = xm.mean(axis=0)
 

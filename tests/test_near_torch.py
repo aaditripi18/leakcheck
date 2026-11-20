@@ -281,7 +281,10 @@ def test_a_large_search_logs_its_progress(monkeypatch, capsys):
     s = _hard("large_norms", np.random.default_rng(4))
     near_torch.nearest(s, device="cpu", block=500, rows=128, progress=3)
     out = capsys.readouterr().out
-    assert "near_torch: bucket of 6000 training rows" in out
+    assert "near_torch: bucket of 6000 training rows (6000 after repeats are left out)" in out
+    d = _hard("duplicates", np.random.default_rng(4))
+    near_torch.nearest(d, device="cpu", block=500, rows=128, progress=3)
+    assert "bucket of 6000 training rows (300 after repeats are left out)" in capsys.readouterr().out
     assert "float32 pass, 500 test rows: training block 3/12 (1500 of 6000 rows)" in out
     assert "not certified by float32: float64 pass" in out and "bucket done in" in out
     near_torch.nearest(s, device="cpu", block=500, rows=128, progress=0)
