@@ -2,6 +2,7 @@
 
     python scripts/kaggle_e14.py push-data              the fresh datasets as a private Kaggle dataset
     python scripts/kaggle_e14.py push-data3             round 3 of H22 (PLAN.md 2026-11-13), likewise
+    python scripts/kaggle_e14.py push-data6             phase 6 (H23, H24; PLAN.md 2026-11-20), likewise
     python scripts/kaggle_e14.py run ton_network ...    code from HEAD, then one notebook per case
                                                        (started as Kaggle allows), pulled when done
     python scripts/kaggle_e14.py pull ton_network ...   new ledger lines into results/ledger.jsonl
@@ -27,10 +28,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 LEDGER = ROOT / "results" / "ledger.jsonl"
 USER = os.environ.get("LEAKCHECK_KAGGLE_USER", "aadityae5545454")
-CODE, DATA, DATA3 = "leakcheck-code", "leakcheck-fresh-data", "leakcheck-round3-data"
+CODE, DATA, DATA3, DATA6 = "leakcheck-code", "leakcheck-fresh-data", "leakcheck-round3-data", "leakcheck-phase6-data"
 FRESH_DATA = ("ton_iot", "botiot", "xiiotid")
 ROUND3_DATA = ("uci_bhp", "uci_bitcoin_heist", "uci_firewall", "openml_creditcard", "openml_timing_attack",
                "openml_padding_attack", "openml_ieee_fraud", "openml_phishing_tan")  # H22, PLAN.md 2026-11-13
+PHASE6_DATA = ("wsn_ds", "mqttset", "malmem2022", "ciciov2024", "andmal2020", "maldroid2020")  # H23/H24, PLAN.md 2026-11-20
 PINS = ["numpy==2.5.4", "pandas==3.0.6", "scikit-learn==1.9.1", "scipy==1.18.1"]
 WAIT = 900
 
@@ -149,7 +151,7 @@ print("exit", r.returncode, CASE, len(lines), "ledger lines", flush=True)
 
 def notebook_source(case: str, sha: str) -> str:
     return (f"# leakcheck E14 full {case}, code {sha}\nCASE = {case!r}\nSHA = {sha!r}\nPINS = {PINS!r}\n"
-            f"FRESH_DATA = {FRESH_DATA + ROUND3_DATA!r}\n" + NOTEBOOK)
+            f"FRESH_DATA = {FRESH_DATA + ROUND3_DATA + PHASE6_DATA!r}\n" + NOTEBOOK)
 
 
 def start(case: str, sha: str) -> bool:
@@ -159,7 +161,7 @@ def start(case: str, sha: str) -> bool:
         (d / "kernel-metadata.json").write_text(json.dumps({
             "id": f"{USER}/{kernel(case)}", "title": kernel(case), "code_file": "run.py", "language": "python",
             "kernel_type": "script", "is_private": True, "enable_gpu": False, "enable_tpu": False,
-            "enable_internet": True, "dataset_sources": [f"{USER}/{CODE}", f"{USER}/{DATA}", f"{USER}/{DATA3}"],
+            "enable_internet": True, "dataset_sources": [f"{USER}/{CODE}", f"{USER}/{DATA}", f"{USER}/{DATA3}", f"{USER}/{DATA6}"],
             "competition_sources": [], "kernel_sources": []}), encoding="utf-8")
         r = kaggle("kernels", "push", "-p", str(d), check=False)
     out = (r.stdout + r.stderr).strip()
@@ -228,6 +230,8 @@ if __name__ == "__main__":
         push_data()
     elif cmd == "push-data3":
         push_data(DATA3, ROUND3_DATA)
+    elif cmd == "push-data6":
+        push_data(DATA6, PHASE6_DATA)
     elif cmd == "run":
         run(args)
     elif cmd == "pull":
