@@ -754,3 +754,42 @@ recorded in the ledger, committed and pushed before E14 trains any model on it.
 
 H19, H20 and H22 keep their verdicts. The README and site show them as recorded, with H23
 and H24 beside them.
+
+**Sourcing note and extension (2026-11-20, before S or any leakage number on phase 6).**
+
+*The five candidates, checked against the authors:*
+- **WSN-DS** (Kaggle mirror, `WSN-DS.csv`): 374,661 rows, and the five class counts
+  (Normal 340,066; Grayhole 14,596; Blackhole 10,049; TDMA 6,638; Flooding 3,312) as
+  published. Used.
+- **MQTTset** (the authors' Kaggle release): `train70_reduced.csv` 231,646 rows and
+  `test30_reduced.csv` 99,290 rows, 34 columns, six `target` classes. The authors' own
+  files and split. Used.
+- **CIC-MalMem-2022** (Kaggle mirror, `Obfuscated-MalMem2022.csv`): 58,596 rows; `Class`
+  29,298 Benign and 29,298 Malware, as published. Category: Benign 29,298, Spyware
+  10,020, Ransomware 9,791, Trojan 9,487. Used.
+- **CICIoV2024, decimal** (Kaggle mirror, six per-class CSVs, concatenated): 1,408,219
+  rows. Of the 63 values in the UNB page's decimal table, 62 equal ours to the printed
+  digit. The 63rd is DATA_3's mean, printed 57.4536383. The column is integer, and its exact
+  mean is 80,907,305 / 1,408,219 = 57.45363824803. No integer column of 1,408,219 rows
+  has a mean that prints as 57.4536383: the nearest possible means are 57.4536382480
+  (ours) and 57.4536389581 (a sum one higher). So the printed digit comes from the
+  page's arithmetic, not from different data. Used.
+- **WUSTL-IIoT-2021** (the authors' download): 1,194,464 rows, 1,107,448 normal and 87,016
+  attack, as published. But the attack shares are 89.99 / 9.47 / 0.30 / 0.24% (DoS 78,305;
+  reconnaissance 8,240; command injection 259; backdoor 212) against the published
+  89.98 / 9.46 / 0.31 / 0.25%. Neither rounding nor truncation gives the last two. By
+  the rule above it is **not used**.
+
+*Extension.* That leaves four datasets. As in round 3, the round is extended once, now,
+before any of the following is read. These are CIC datasets whose UNB pages publish exact
+per-class counts. The rules above apply (no registration form, at most 2,500,000 rows).
+Each dataset is used only if a copy's per-class row counts equal the page's:
+
+| Order | Dataset (year) | Source | Counts on the UNB page | Label |
+|--:|---|---|---|---|
+| 6 | CCCS-CIC-AndMal2020 (2020) | Kaggle mirror dhoogla/cccscicandmal2020 | per category: Adware 47,210; Backdoor 1,538; File Infector 669; No Category 2,296; PUA 2,051; Ransomware 6,202; Riskware 97,349; Scareware 1,556; Trojan 13,559; Trojan-Banker 887; Trojan-Dropper 2,302; Trojan-SMS 3,125; Trojan-Spy 3,540; Zero-day 13,340 | the category |
+| 7 | CICMalDroid2020 (2020) | Kaggle mirror nazmulahsan1/android-malware-detection-cse-422 | Adware 1,253; Banking 2,100; SMS malware 3,904; Riskware 2,546; Benign 1,795 (11,598) | the class |
+| 8 | CIC-Bell-DNS-EXF-2021 (2021) | Kaggle mirror humera11/cicbelldnsexf2021 | 641,642 benign, 53,978 light-attack and 323,698 heavy-attack samples | benign, light attack, heavy attack (one feature family, stateless or stateful: the one whose row counts equal the page's; if neither, not used) |
+
+Where a mirror codes the classes as numbers, the counts must match as a set, one class to
+one count. Splits, views, the procedure, H23 and H24 are as above.
