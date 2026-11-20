@@ -820,3 +820,11 @@ Such a case has no copy-free gap, so its outcome (easy or memorised) is undefine
 is undefined; it is reported, not counted in H23. The first run of ciciov2024 stopped on this
 and recorded nothing. Every case already in the ledger had two or more classes left, so no
 earlier result changes.
+
+**Deviation (2026-11-20, E14 on andmal2020, after its predictions were recorded; no result of it
+exists).** CCCS-CIC-AndMal2020's 9,504 features make E14's float64 feature matrix 21.8 GB, and the
+scaled copy as much again. Two runs were killed for memory (exit -9) before any model finished: a
+Kaggle CPU session (30 GB) and a Kaggle TPU session. Both of its cases (andmal2020 and its
+no_identifiers view) are therefore reported with their S and prediction, and as not run. Neither
+could make H23 judgeable: of the other eight cases, one is eligible, and its prediction is
+uncertain.
