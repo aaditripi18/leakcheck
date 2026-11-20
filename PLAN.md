@@ -696,3 +696,61 @@ HGB above 10,000 rows; that hold-out fails on a class with a single training row
 ransomware family seen once). In those fits only, such rows are left out of training.
 Any earlier fit with such a row would have crashed, so no earlier result changes. The
 first Kaggle run of this case failed on it and recorded nothing.
+
+## Amendment 2026-11-20: phase 6, a fourth fresh round for the claims of H19/H22 and H20 (before any of its data is read)
+
+**Why.** Three rounds left H19, H20 and H22 *not judged*. Each method worked where it
+applied, but too few fresh cases met the rules: across 39 fresh cases, 13 had a gap of a
+point or more, and none was both near-perfect and holding a leaked rare class. Those
+verdicts stay exactly as recorded. Phase 6 tests the same two claims once more, on network
+and IoT benchmarks no step has used, under new numbers, as H17/H18 followed H2.
+
+**Nothing changes in the method.** The statistic S, the refit threshold s* = +0.0645 and
+the uncertain band [+0.0580, +0.1303] (`h22_band`), the outcome-clarity rule, the
+eligibility rule (E14 full-model gap >= 1 point, mean of 12 cells), the outcome rule (easy
+if the copy-free gap is >= 80% of the full gap, else memorised), E14's protocol (seeds 0-2,
+the four models, eps, copy removal, the 300,000-row training cap) and H20's per-class rule
+are used exactly as committed.
+
+**Candidates, in a frozen order** (year of release, then name; no row of any of them has been
+read). A dataset is used only if all of these hold, checked when it is fetched:
+- a copy can be downloaded without a registration form: the authors' own release, or a
+  mirror whose content equals what the authors published (below, per dataset);
+- the table used has at most 2,500,000 rows (E14 and the copy-free search must fit the
+  compute this project has);
+- the label column below exists, with at least two classes.
+
+| Order | Dataset (year) | Source | Check against the authors | Label | Excluded |
+|--:|---|---|---|---|---|
+| 1 | WSN-DS (2016) | Kaggle mirror bassamkasasbeh1/wsnds | 374,661 rows (Almomani et al., J. Sensors 2016); class counts where the paper gives them | `Attack type` | |
+| 2 | MQTTset (2020) | the authors' Kaggle release cnrieiit/mqttset | their own release; the authors' 70/30 split, `train70_reduced.csv` and `test30_reduced.csv`, is the official split | `target` | |
+| 3 | WUSTL-IIoT-2021 (2021) | the authors' download (classes.engineering.wustl.edu/~jain/iiot2) | 1,194,464 rows; 1,107,448 normal, 87,016 attack; attack shares 89.98 / 9.46 / 0.31 / 0.25% (DoS, reconnaissance, command injection, backdoor) to the published two decimals | `Traffic` | `Target` (binary form of the label) |
+| 4 | CIC-MalMem-2022 (2022) | Kaggle mirror luccagodoy/obfuscated-malware-memory-2022-cic | 58,596 rows; 29,298 benign, 29,298 malicious (UNB page) | the malware category: the part of `Category` before the first `-` (Benign, Ransomware, Spyware, Trojan) | `Category`, `Class` |
+| 5 | CICIoV2024, decimal (2024) | Kaggle mirror pushpakattarde/ciciov2024decimalcsv | every column's mean, std, min, quartiles and max equal the UNB page's decimal table to its printed digits | `specific_class` | `label`, `category` |
+
+Listed and **not used**, by the size rule (no row read): TII-SSRC-23 (about 8.7 million
+flows, per the authors' Kaggle table), HIKARI-2021 (a 12.2 GB CSV), CICIoMT2024 and
+CIC-DDoS2019 (millions of rows). CIC-Darknet2020 is not used: the authors publish no count
+to check a copy against.
+
+Splits: the official split where the authors give one (MQTTset); otherwise stratified random
+80/20 by the label, seed 0 (seeds 0-2 in E14), as in every earlier round. Views: as
+distributed, and without identifiers where the L5 identifier check flags columns. A case is
+one dataset in one view. Every case runs; there is no early stop.
+
+**Procedure.** For each case, S and its prediction (easy, memorised or uncertain) are
+recorded in the ledger, committed and pushed before E14 trains any model on it.
+
+- **H23** (H22's claim on a fourth round) Among the phase-6 cases that are eligible, have a
+  clear outcome and get a decided prediction, the prediction is right on at least 90%, with
+  at least 4 such cases. With fewer than 4 it is reported as not judged. Reported beside it
+  either way: the uncertain predictions, the borderline outcomes, and a strict tally that
+  counts every uncertain prediction on an eligible case as wrong.
+- **H24** (H20's claim on a fourth round) H20's rule, unchanged: a case is eligible if its
+  full model's macro-F1 on the whole test set is >= 0.98 (mean of 12 cells) and it has at
+  least one rare class (< 1% of test rows, >= 20 test rows, >= 1 leaked row) and one common
+  class; H24 is supported if every eligible case has >= 10 of 12 supporting cells, with at
+  least 2 eligible; with fewer it is reported as not judged.
+
+H19, H20 and H22 keep their verdicts. The README and site show them as recorded, with H23
+and H24 beside them.
