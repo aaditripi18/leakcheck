@@ -154,13 +154,20 @@ def notebook_source(case: str, sha: str) -> str:
             f"FRESH_DATA = {FRESH_DATA + ROUND3_DATA + PHASE6_DATA!r}\n" + NOTEBOOK)
 
 
+# cases whose E14 needs more memory than a CPU session's 30 GB: CCCS-CIC-AndMal2020's 9,504 features make the
+# models' float64 matrix 21.8 GB and its scaled copy as much again. A TPU session's VM (about 330 GB of RAM) runs
+# the same code on its CPUs; nothing in the protocol changes, only the machine.
+LARGE_MEMORY = ("andmal2020",)
+
+
 def start(case: str, sha: str) -> bool:
+    tpu = case.partition(":")[0] in LARGE_MEMORY
     with tempfile.TemporaryDirectory() as d:
         d = Path(d)
         (d / "run.py").write_text(notebook_source(case, sha), encoding="utf-8")
         (d / "kernel-metadata.json").write_text(json.dumps({
             "id": f"{USER}/{kernel(case)}", "title": kernel(case), "code_file": "run.py", "language": "python",
-            "kernel_type": "script", "is_private": True, "enable_gpu": False, "enable_tpu": False,
+            "kernel_type": "script", "is_private": True, "enable_gpu": False, "enable_tpu": tpu,
             "enable_internet": True, "dataset_sources": [f"{USER}/{CODE}", f"{USER}/{DATA}", f"{USER}/{DATA3}", f"{USER}/{DATA6}"],
             "competition_sources": [], "kernel_sources": []}), encoding="utf-8")
         r = kaggle("kernels", "push", "-p", str(d), check=False)
@@ -168,6 +175,9 @@ def start(case: str, sha: str) -> bool:
     if "successfully pushed" in out:
         print(f"{time.strftime('%H:%M')} started {case}", flush=True)
         return True
+    if "TPU quota" in out or "quota" in out.lower() and tpu:
+        print(f"{time.strftime('%H:%M')} {case}: TPU quota used up; trying again later", flush=True)
+        return False
     if any(t in out for t in ("Maximum batch", "session count", "concurrent", "timed out", "Connection",
                               "Max retries", "503", "502", "getaddrinfo")):
         return False  # no free session, or the network: try again later

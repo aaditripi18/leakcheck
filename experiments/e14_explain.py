@@ -74,11 +74,16 @@ def run_full_seed(name: str, seed: int) -> dict:
     keep, left = copies_in_train(split, leaked) if leaked.any() else (np.ones(len(split.train), bool), 0)
     out["train_rows_removed"], out["leaked_rows_still_near"] = int((~keep).sum()), int(left)
     dedup = with_train(split, split.train[keep], split.test)
+    # a copy-free training set with one class cannot train a classifier (CICIoV2024: every attack row
+    # in training is a copy of a leaked test row; PLAN.md deviation 2026-11-20): no copy-free model
+    one_class = keep.any() and split.train[split.label][keep].nunique() < 2
+    if one_class:
+        out["copy_free_note"] = "the copy-free training set has a single class: no copy-free model"
     for m in MODELS:
         r = {}
         for tag, s in (("full", split), ("copy_free", dedup)):
-            if tag == "copy_free" and (not leaked.any() or not keep.any()):
-                continue  # no leak, or every training row is a copy of a leaked row: nothing to train on
+            if tag == "copy_free" and (not leaked.any() or not keep.any() or one_class):
+                continue  # no leak, every training row is a copy of a leaked row, or one class left: nothing to train
             pred, _ = fit_predict(s, m, seed)
             r[tag] = {"whole": scores(y, pred)["macro_f1"],
                       "without_leaked": scores(y[~leaked], pred[~leaked])["macro_f1"] if (~leaked).any() else None,

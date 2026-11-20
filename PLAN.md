@@ -809,3 +809,14 @@ one count. Splits, views, the procedure, H23 and H24 are as above.
 
 Phase 6 therefore has six datasets: WSN-DS, MQTTset, CIC-MalMem-2022, CICIoV2024 (decimal),
 CCCS-CIC-AndMal2020 and CICMalDroid2020.
+
+**Deviation (2026-11-20, E14 on ciciov2024, after its prediction was recorded and before any of
+its results).** In CICIoV2024 almost every test row is leaked (99.97%), and removing their
+copies from training leaves only BENIGN rows: every attack row in the training set is a copy
+of a leaked test row. A classifier cannot be trained on one class. E14 already skips the
+copy-free model when no training row is left. It now also skips it when the copy-free
+training set holds fewer than two classes. The full models train and are recorded as usual.
+Such a case has no copy-free gap, so its outcome (easy or memorised) is undefined, as when S
+is undefined; it is reported, not counted in H23. The first run of ciciov2024 stopped on this
+and recorded nothing. Every case already in the ledger had two or more classes left, so no
+earlier result changes.
