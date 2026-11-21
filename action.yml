@@ -64,7 +64,8 @@ runs:
       run: |
         report="${RUNNER_TEMP}/leakcheck-report.json"
         set +e
-        # LC_ARGS is split on spaces on purpose: it carries several flags
+        # LC_ARGS is split on spaces on purpose: it carries several flags (never glob-expanded)
+        set -f
         python -m leakcheck scan --train "$LC_TRAIN" --test "$LC_TEST" --label "$LC_LABEL" $LC_ARGS \
           --json "$report" | tee "${RUNNER_TEMP}/leakcheck-report.txt"
         code=${PIPESTATUS[0]}

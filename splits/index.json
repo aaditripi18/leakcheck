@@ -1,4 +1,7 @@
 {
+ "botiot": {
+  "botiot.drop.txt.gz": "2568e5c2a52c3a5485c3ebd83f3566ef1ccc6422258f7ef7eb25c1f387672098"
+ },
  "cicids2017": {
   "cicids2017.drop.txt.gz": "411af29ca60e9b84e76a3079407e366612129b6d41e3f76d968507dc424672de",
   "cicids2017.drop_source.txt.gz": "4d1e9a35e6a1489fe824c678e2d76d26f96911c754010e092a905fdd73ad8d29",
@@ -9,7 +12,7 @@
   "ciciot2023.drop_source.txt.gz": "e755b190ed656d16fb45e732952ff958f9d1a10ed950fa8c3b46a33fd92e5cb9"
  },
  "cseids2018": {
-  "cseids2018.drop.txt.gz": "6a9513ab565663d6c30ca93d18b71f54933dcdee0a42b3fee4e15d8f675de6bd",
+  "cseids2018.drop.txt.gz": "bb911aa3809298de7874c39ba6cf61c3f821e51e0ee242083a802d04d1866aa0",
   "cseids2018.drop_source.txt.gz": "5676aea016fce26fcf7d28d14e85ea0465267e42bbc3f241837657fdbcdeb83d"
  },
  "cseids2018:no_identifiers": {
@@ -27,7 +30,7 @@
   "edgeiiot__no_identifiers.test_source.txt.gz": "84ebcfd00ca44c39b6f5ce8a944007472e0090ea1c06fad41d9652482b383490"
  },
  "ember2018": {
-  "ember2018.drop.txt.gz": "4e6c4410238a13ea4b1432a2252451162353ea90ca630de5cc209e2bb0f85f19",
+  "ember2018.drop.txt.gz": "0beeb8c1a52db3d124f849b0074f0062c77dedd0fb98f0f3163f422e6426c0ee",
   "ember2018.drop_source.txt.gz": "51061ccdb5d45adc72b1e0d8d967df56f6791b4068be57a7ebc22ad3929f5ba1"
  },
  "kdd99": {

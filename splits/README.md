@@ -10,13 +10,14 @@ For each benchmark: which test rows have an exact or near copy in the training s
 
 | Case | Split | Test rows | Dropped | Share | Search | Re-check | Gap (pts) |
 |---|---|--:|--:|--:|---|---|--:|
+| botiot | official (the authors' 10-best Training vs Testing files) | 733,705 | 0 | 0.0% | exact + near | clean | +0.0 |
 | cicids2017 | stratified random 80%/20% by Label, seed 0 | 566,149 | 439,577 | 77.6% | exact + near | clean | -0.2 |
 | ciciot2023 | stratified random 80%/20% by label, seed 0 | 9,337,316 | 4,132,392 | 44.3% | exact only (near pending) | clean | +0.3 |
-| cseids2018 | stratified random 80%/20% by Label, seed 0 | 3,246,589 | 159,373 | 4.9% | exact only (near pending) | clean | +0.9 |
+| cseids2018 | stratified random 80%/20% by Label, seed 0 | 3,246,589 | 804,090 | 24.8% | exact + near | clean | +0.9 |
 | cseids2018:no_identifiers | stratified random 80%/20% by Label, seed 0 | 3,246,589 | 1,307,051 | 40.3% | exact only (near pending) | clean | +11.7 |
 | edgeiiot | stratified random 80%/20% by Attack_type, seed 0 | 443,841 | 200 | 0.0% | exact + near | clean | +0.0 |
 | edgeiiot:no_identifiers | stratified random 80%/20% by Attack_type, seed 0 | 443,841 | 243,554 | 54.9% | exact + near | clean | +0.0 |
-| ember2018 | official temporal (train Jan-Oct 2018, test Nov-Dec 2018); unlabelled samples dropped | 200,000 | 18 | 0.0% | exact only (near pending) | clean | +1.6 |
+| ember2018 | official temporal (train Jan-Oct 2018, test Nov-Dec 2018); unlabelled samples dropped | 200,000 | 40,304 | 20.2% | exact + near | clean | +1.6 |
 | kdd99 | official (kddcup.data vs corrected) | 311,029 | 258,496 | 83.1% | exact + near | clean | +16.1 |
 | nslkdd | official (KDDTrain+ vs KDDTest+) | 22,544 | 7,455 | 33.1% | exact + near | clean | +10.0 |
 | phiusiil | stratified random 80%/20%, seed 0 | 47,159 | 2,090 | 4.4% | exact + near | clean | +0.0 |

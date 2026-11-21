@@ -119,7 +119,12 @@ Everything runs on a laptop CPU. No GPU and no Kaggle quota.
 | 7 | `report.py`, FINDINGS.md, hypotheses verdicts |
 | 8 | Project page: headline table, method, limitations, reproduce-it section; optional browser demo (drop a CSV, scan locally, CSP `connect-src 'none'`) |
 
-## Honest limitations to state up front
+## Caveats stated up front (each one later measured)
+
+*Retitled 2026-11-21; the three caveats below are unchanged from the original plan. Each was
+measured rather than left as a limitation: copies that are easy versus memorised in E9 and E13
+(FINDINGS §25, §30); thresholds swept from eps 0.001 to 0.1 and Jaccard 0.6 to 0.95 in E6 (§22);
+untuned baselines repeated with full training sets and a tuned model in E5/E6 (§22). No verdict changed.*
 
 - An exact duplicate across splits is not always a bug: real traffic does
   repeat. The finding is that a benchmark which rewards memorising repeats does

@@ -58,7 +58,7 @@ package is internal and may change between versions.
 
 ```json
 {
-  "meta": {"version": "0.2.0", "n_train": 150, "n_test": 100, "n_features": 2, "label": "y", "...": "..."},
+  "meta": {"version": "1.0.0", "n_train": 150, "n_test": 100, "n_features": 2, "label": "y", "...": "..."},
   "worst": "high",
   "findings": [
     {"code": "L1.cross", "severity": "high", "value": 1.0,
