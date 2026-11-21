@@ -1710,6 +1710,18 @@
     "text": "With an uncertain band (the refit threshold's 90% bootstrap interval), S's decided predictions are right on >= 90% of the third round's eligible cases with a clear outcome (>= 4 such cases)",
     "verdict": "not judged",
     "evidence": "s* = +0.0645, uncertain from +0.0580 to +0.1303; 3 of 12 cases eligible (full gap >= 1 point); right on 2/2 with a clear outcome and a decided prediction: uci_firewall S -0.295 predicted memorised, was memorised (clear); openml_timing_attack:no_identifiers S -0.119 predicted memorised, was memorised (clear); openml_padding_attack S +0.089 predicted uncertain, was memorised (clear). Uncertain on 1 case(s), S undefined on 2, borderline outcomes 0; strict tally (uncertain counted wrong) 2/3"
+   },
+   {
+    "id": "H23",
+    "text": "H22's rule on a fourth fresh round: S's decided predictions are right on >= 90% of the phase-6 cases that are eligible and have a clear outcome (>= 4 such cases)",
+    "verdict": "not judged",
+    "evidence": "2 of 8 cases eligible (full gap >= 1 point); right on 1/1 with a clear outcome and a decided prediction: ciciov2024 S -0.128 predicted memorised, was memorised (clear); maldroid2020 S +0.090 predicted uncertain, was memorised (clear). Uncertain on 1 case(s), borderline outcomes 0; strict tally (uncertain counted wrong) 1/2. Not run (memory): andmal2020 (predicted easy), andmal2020:no_identifiers (predicted memorised)"
+   },
+   {
+    "id": "H24",
+    "text": "H20's rule on a fourth fresh round: on every phase-6 case with macro-F1 >= 0.98 and a rare and a common class, the rare classes' median per-class gap exceeds the common classes' in >= 10 of 12 cells (>= 2 eligible)",
+    "verdict": "not judged",
+    "evidence": "no case. Eligible 0 of 8; the best macro-F1 is 0.9485. A rare class with leaked rows but macro-F1 below 0.98 (not eligible; rare beat common in): wsn_ds (0.9485, 4/12 cells), wsn_ds:no_identifiers (0.9476, 5/12 cells), mqttset (0.8043, 0/12 cells), mqttset:no_identifiers (0.7779, 0/12 cells)"
    }
   ],
   "dev": {
@@ -2137,10 +2149,117 @@
     "full_gap": 0.002233,
     "copy_free_gap": -6.1e-05,
     "macro_f1": 0.973915
+   },
+   "wsn_ds": {
+    "S": -0.03475,
+    "prediction": "memorised",
+    "leaked_share": 0.348311,
+    "round": 7,
+    "outcome": null,
+    "full_gap": -0.015044,
+    "copy_free_gap": -0.052425,
+    "macro_f1": 0.948467
+   },
+   "wsn_ds:no_identifiers": {
+    "S": -0.0326,
+    "prediction": "memorised",
+    "leaked_share": 0.390736,
+    "round": 7,
+    "outcome": null,
+    "full_gap": -0.008844,
+    "copy_free_gap": -0.046264,
+    "macro_f1": 0.94765
+   },
+   "mqttset": {
+    "S": 0.576187,
+    "prediction": "easy",
+    "leaked_share": 0.803485,
+    "round": 7,
+    "outcome": null,
+    "full_gap": -0.084505,
+    "copy_free_gap": -0.244379,
+    "macro_f1": 0.804278
+   },
+   "mqttset:no_identifiers": {
+    "S": 0.365503,
+    "prediction": "easy",
+    "leaked_share": 0.830084,
+    "round": 7,
+    "outcome": null,
+    "full_gap": -0.040176,
+    "copy_free_gap": -0.290844,
+    "macro_f1": 0.77793
+   },
+   "malmem2022": {
+    "S": 0.038607,
+    "prediction": "memorised",
+    "leaked_share": 0.718003,
+    "round": 7,
+    "outcome": null,
+    "full_gap": 0.009793,
+    "copy_free_gap": -0.024672,
+    "macro_f1": 0.743025
+   },
+   "ciciov2024": {
+    "S": -0.12845,
+    "prediction": "memorised",
+    "leaked_share": 0.999663,
+    "round": 7,
+    "outcome": "memorised",
+    "full_gap": 0.11458,
+    "copy_free_gap": -0.730181,
+    "macro_f1": 0.895568
+   },
+   "ciciov2024:no_identifiers": {
+    "S": -0.1334,
+    "prediction": "memorised",
+    "leaked_share": 0.999627,
+    "round": 7,
+    "outcome": null,
+    "full_gap": 0.007773,
+    "copy_free_gap": null,
+    "macro_f1": 0.871721
+   },
+   "maldroid2020": {
+    "S": 0.090498,
+    "prediction": "uncertain",
+    "leaked_share": 0.393103,
+    "round": 7,
+    "outcome": "memorised",
+    "full_gap": 0.019177,
+    "copy_free_gap": 0.009941,
+    "macro_f1": 0.926817
+   },
+   "andmal2020": {
+    "S": 0.5508,
+    "prediction": "easy",
+    "leaked_share": 2.8e-05,
+    "round": 7,
+    "outcome": null,
+    "full_gap": null,
+    "copy_free_gap": null,
+    "macro_f1": null
+   },
+   "andmal2020:no_identifiers": {
+    "S": -0.113512,
+    "prediction": "memorised",
+    "leaked_share": 0.773704,
+    "round": 7,
+    "outcome": null,
+    "full_gap": null,
+    "copy_free_gap": null,
+    "macro_f1": null
    }
   }
  },
  "clean_splits": [
+  {
+   "case": "botiot",
+   "n_test": 733705,
+   "n_drop": 0,
+   "exact_only": false,
+   "clean": true
+  },
   {
    "case": "cicids2017",
    "n_test": 566149,
@@ -2158,8 +2277,8 @@
   {
    "case": "cseids2018",
    "n_test": 3246589,
-   "n_drop": 159373,
-   "exact_only": true,
+   "n_drop": 804090,
+   "exact_only": false,
    "clean": true
   },
   {
@@ -2186,8 +2305,8 @@
   {
    "case": "ember2018",
    "n_test": 200000,
-   "n_drop": 18,
-   "exact_only": true,
+   "n_drop": 40304,
+   "exact_only": false,
    "clean": true
   },
   {

@@ -255,6 +255,8 @@ SHORT_H = {
     "H19b": "The same diagnosis, unchanged, on a second fresh round of five benchmarks.",
     "H21": "EMBER's 50,000 pre-2018 training files (all benign) do not change its results.",
     "H22": "With an \"uncertain\" band, the diagnosis holds on a third fresh round.",
+    "H23": "The same banded diagnosis, unchanged, on a fourth fresh round chosen for heavy leakage.",
+    "H24": "On that round too, leakage hides in the rare classes of near-perfect benchmarks.",
 }
 
 
@@ -329,6 +331,15 @@ def phase4_section(p4: dict) -> str:
              f"before it: of {n6} cases only {len(elig6)} had a gap of at least one point; the decided calls were right on "
              f"{right6} of {len(dec6)} and {unc6} came back uncertain, too few to judge, so H22 is "
              f"<strong>{e(h22['verdict'])}</strong>.") if h22 and n6 else ""
+    elig7 = {n: v for n, v in fr.items() if v["outcome"] is not None and v.get("round") == 7}
+    dec7 = {n: v for n, v in elig7.items() if v["prediction"] in ("easy", "memorised")}
+    right7 = sum(v["prediction"] == v["outcome"] for v in dec7.values())
+    n7 = sum(v.get("round") == 7 for v in fr.values())
+    ran7 = sum(v.get("round") == 7 and v["full_gap"] is not None for v in fr.values())
+    h23 = next((h for h in p4["hypotheses"] if h["id"] == "H23"), None)
+    third += (f" A fourth round of {n7} cases, chosen for heavy leakage (35% to almost 100% of test rows): of the "
+              f"{ran7} that ran, only {len(elig7)} had a gap of a point or more, and the decided call was right on "
+              f"{right7} of {len(dec7)}, so H23 is <strong>{e(h23['verdict'])}</strong>.") if h23 and n7 else ""
     fresh_rows = "".join(f"""<tr>
   <th scope="row" class="py-2 px-3 font-medium text-left">{e(n)}</th>
   <td class="py-2 px-3 text-right tabular">{fpct(v['leaked_share'])}</td>
@@ -608,6 +619,10 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
     r6_dec = [v for v in all_judged if v.get("round") == 6 and v["prediction"] in ("easy", "memorised")]
     r6_right = sum(v["prediction"] == v["outcome"] for v in r6_dec)
     h22_v = next((h["verdict"] for h in p4.get("hypotheses", []) if h["id"] == "H22"), "pending")
+    h23_v = next((h["verdict"] for h in p4.get("hypotheses", []) if h["id"] == "H23"), "pending")
+    r7_dec = [v for v in all_judged if v.get("round") == 7 and v["prediction"] in ("easy", "memorised")]
+    r7_right = sum(v["prediction"] == v["outcome"] for v in r7_dec)
+    rounds = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five"}.get(len({v.get("round", 4) for v in all_fr.values()}))
     limitations = [
         "A copy is not always a bug: measured. On KDD Cup 99 and NSL-KDD the copied rows are easy (a model trained "
         "without them still gets 97% right, E9); on CSE-CIC-IDS2018 and EMBER they are memorised (E13).",
@@ -619,12 +634,13 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
         "EMBER's feature view: measured. The official 2,381-dimension vectors give the same copies and gaps within "
         "0.4 points (E11).",
         "Provenance: IDS2018 is byte-identical to the official bucket; CIC-IoT2023 matches all 34 published label counts.",
-        f"The cheap diagnosis (H19, H19b, H22): measured on eight dev cases and on {len(all_fr)} fresh ones in three "
+        f"The cheap diagnosis (H19, H19b, H22, H23): measured on eight dev cases and on {len(all_fr)} fresh ones in {rounds} "
         f"rounds, every prediction committed before any fresh model was trained. Right on {all_right} of "
         f"{len(all_judged)} judgeable fresh cases (an uncertain call counted wrong); H19b is {h19b_v} ({r5_right} of "
         f"{len(r5)} against the 90% asked). Every miss sat at a cut-off, so explain now says uncertain inside the "
         f"threshold's 90% interval; on the third round its decided calls were right on {r6_right} of {len(r6_dec)} "
-        f"(H22 {h22_v}: too few cases with a gap to judge).",
+        f"(H22 {h22_v}: too few cases with a gap to judge), and on the fourth on {r7_right} of {len(r7_dec)} "
+        f"(H23 {h23_v}, for the same reason).",
     ]
     lim = "".join(f"<li>{e(x)}</li>" for x in limitations)
 

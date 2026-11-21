@@ -720,6 +720,74 @@ The round repeats §29's lesson more strongly:
 
 Across all three rounds, 13 of 39 fresh cases had a gap to explain.
 
+## 36. A fourth fresh round, built to be judgeable (H23, H24 not judged)
+
+H19, H20 and H22 were not judged because too few fresh cases met their rules.
+Phase 6 asked the same two questions on network, IoT and malware benchmarks
+chosen for heavy leakage, with the method unchanged (s\* = +0.0645, band
+[+0.058, +0.130]). Every step was pushed before the data it depended on was
+read:
+- *Pre-registration* (`84d7b5a`): rules and candidates, before any row was read.
+- *Sourcing* (`6f64281`, `1fe8349`): each copy checked against the authors'
+  published counts or statistics.
+- *Predictions* (`b4e7c52`): S and the call for all 10 cases, before any
+  model was trained.
+
+*Data.* Six datasets passed the sourcing rules:
+- WSN-DS: all five class counts.
+- MQTTset: the authors' own split.
+- CIC-MalMem-2022: 29,298 benign and 29,298 malicious.
+- CICIoV2024: 62 of 63 published statistics match; the 63rd is the page's
+  rounding, since no integer column of that length has the printed mean.
+- CCCS-CIC-AndMal2020: all 14 published category counts.
+- CICMalDroid2020: all five class counts.
+
+Two failed the rules: WUSTL-IIoT-2021 (two class shares differ from the
+authors' table) and CIC-Bell-DNS-EXF-2021 (no feature family matches the
+published counts). With the identifier views, that makes 10 cases.
+
+*Leakage.* These benchmarks leak far more than earlier rounds: 35% to 99.97%
+of test rows, except AndMal2020 as distributed (about 0%, while 77% without
+its `F0` column).
+
+**H23 not judged.**
+- *Gap.* Only 2 of the 8 cases that ran had a gap of at least one point.
+- *Decided call.* CICIoV2024: full gap +11.5 points, its copy-free models fall
+  73 points below. Called memorised before training, and memorised: 1 of 1 right.
+- *Uncertain call.* CICMalDroid2020 (S +0.090, inside the band; +1.9 points)
+  was memorised.
+
+One judgeable case against the four the rule needs. Strict tally, counting
+the uncertain call as wrong: 1 of 2.
+
+**H24 not judged.** No case reached macro-F1 0.98; the best is WSN-DS at
+0.949. Where rare classes did leak, they did not hide the leakage: the rare
+classes' median gap beat the common classes' in 4 and 5 of 12 cells on WSN-DS
+and 0 of 12 on MQTTset. These cases are not eligible, so this is description,
+not a verdict.
+
+*Three deviations*, each written before the result it concerns:
+- *CICIoV2024.* Removing the leaked rows' copies leaves only benign training
+  rows, so no copy-free model can be trained. Such seeds are skipped, the way
+  E14 already skipped an empty copy-free set.
+- *CICIoV2024 without identifiers.* Every seed hit that wall, so its outcome
+  is undefined.
+- *AndMal2020.* E14's float64 matrix for 9,504 features is 21.8 GB, and the
+  scaled copy as much again. A Kaggle CPU session and a TPU session both
+  killed it, so its two cases have predictions but no results.
+
+The round repeats §29's lesson once more, on benchmarks picked because they
+leak:
+- *MQTTset.* 80% of its test rows are leaked, yet the full models score 8.5
+  points *lower* on them.
+- *WSN-DS.* 35% leaked, gap below zero.
+- *CIC-MalMem-2022.* 72% leaked, gap 0.98 points: just under the line.
+
+Across four rounds, 15 of 47 fresh cases that ran had a gap to explain. On
+every one where `explain` made a decided call with a clear outcome since the
+band was added, the call was right (3 of 3: Firewall, the timing attack
+without identifiers, CICIoV2024).
+
 ## Questions for third parties, and what was measured instead
 
 - *How PhiUSIIL's URLSimilarityIndex is computed* (paywalled paper,
