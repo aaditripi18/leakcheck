@@ -1052,11 +1052,11 @@ R3_FRESH = ["uci_bhp", "uci_bhp:no_identifiers", "uci_bitcoin_heist", "uci_firew
             "openml_phishing_tan"]  # PLAN.md amendment 2026-11-13
 
 
-def h22_rows(runs: dict) -> list[dict]:
-    """Every round-3 case: S, its prediction, eligibility, outcome and outcome clarity."""
+def h22_rows(runs: dict, cases: list[str] | None = None) -> list[dict]:
+    """Every case of a round (default: round 3): S, its prediction, eligibility, outcome and outcome clarity."""
     from scripts.h22_band import clear, keep_interval
     out = []
-    for n in R3_FRESH:
+    for n in (R3_FRESH if cases is None else cases):
         p, e = runs.get(f"h19_prediction:{n}"), _e14(runs, n)
         row = {"case": n, "S": p["results"]["S"] if p else None, "prediction": p["results"]["prediction"] if p else None,
                "full_gap": e["full_gap"] if e else None, "outcome": None, "clear": None, "keep": None, "keep_90": None}
@@ -1096,8 +1096,69 @@ def h22(runs: dict) -> dict:
     return {"id": "H22", "text": text, "verdict": _verdict(right >= 0.9 * len(judged)), "evidence": ev}
 
 
+P6_FRESH = ["wsn_ds", "wsn_ds:no_identifiers", "mqttset", "mqttset:no_identifiers", "malmem2022",
+            "ciciov2024", "ciciov2024:no_identifiers", "maldroid2020"]  # PLAN.md amendment 2026-11-20
+P6_NOT_RUN = ["andmal2020", "andmal2020:no_identifiers"]  # E14 killed for memory (PLAN.md deviation 2026-11-20)
+
+
+def h23(runs: dict) -> dict:
+    """PLAN.md amendment 2026-11-20: H22's rule, unchanged, on a fourth fresh round."""
+    text = ("H22's rule on a fourth fresh round: S's decided predictions are right on >= 90% of the phase-6 cases "
+            "that are eligible and have a clear outcome (>= 4 such cases)")
+    band = runs.get("h22_band")
+    rows = h22_rows(runs, P6_FRESH)
+    if band is None or any(r["full_gap"] is None for r in rows):
+        done = sum(r["full_gap"] is not None for r in rows)
+        return {"id": "H23", "text": text, "verdict": "pending", "evidence": f"E14 complete on {done}/{len(rows)}"}
+    elig = [r for r in rows if r["outcome"]]
+    judged = [r for r in elig if r["clear"] and r["prediction"] in ("easy", "memorised")]
+    right = sum(r["prediction"] == r["outcome"] for r in judged)
+    strict = sum(r["prediction"] == r["outcome"] for r in elig)
+    nr = [n for n in P6_NOT_RUN if f"h19_prediction:{n}" in runs]
+    ev = (f"{len(elig)} of {len(rows)} cases eligible (full gap >= 1 point); right on {right}/{len(judged)} with a "
+          f"clear outcome and a decided prediction: "
+          + "; ".join(f"{r['case']} S {r['S']:+.3f} predicted {r['prediction']}, was {r['outcome']}"
+                      f" ({'clear' if r['clear'] else 'borderline'})" for r in elig)
+          + f". Uncertain on {sum(r['prediction'] == 'uncertain' for r in rows)} case(s), borderline outcomes "
+          f"{sum(r['clear'] is False for r in rows)}; strict tally (uncertain counted wrong) {strict}/{len(elig)}"
+          + (f". Not run (memory): " + ", ".join(f"{n} (predicted {runs[f'h19_prediction:{n}']['results']['prediction']})"
+                                                 for n in nr) if nr else ""))
+    if len(judged) < 4:
+        return {"id": "H23", "text": text, "verdict": "not judged", "evidence": ev}
+    return {"id": "H23", "text": text, "verdict": _verdict(right >= 0.9 * len(judged)), "evidence": ev}
+
+
+def h24(runs: dict) -> dict:
+    """PLAN.md amendment 2026-11-20: H20's rule, unchanged, on the phase-6 cases."""
+    text = ("H20's rule on a fourth fresh round: on every phase-6 case with macro-F1 >= 0.98 and a rare and a common "
+            "class, the rare classes' median per-class gap exceeds the common classes' in >= 10 of 12 cells "
+            "(>= 2 eligible)")
+    e = {n: _e14(runs, n) for n in P6_FRESH}
+    if any(v is None for v in e.values()):
+        return {"id": "H24", "text": text, "verdict": "pending",
+                "evidence": f"E14 complete on {sum(v is not None for v in e.values())}/{len(P6_FRESH)}"}
+    rows, near = [], []
+    for n, v in e.items():
+        gaps = [_class_gaps(c) for c in v["cells"]]
+        both = all(r and c for r, c in gaps)
+        sup = sum(_median(r) > _median(c) for r, c in gaps) if both else None
+        if v["macro_f1"] >= 0.98 and both:
+            rows.append((n, v["macro_f1"], sup))
+        elif both:
+            near.append((n, v["macro_f1"], sup))
+    ev = (("; ".join(f"{n} (macro-F1 {f:.4f}): {k}/12 cells" for n, f, k in rows) or "no case")
+          + f". Eligible {len(rows)} of {len(P6_FRESH)}; the best macro-F1 is "
+          + f"{max(v['macro_f1'] for v in e.values()):.4f}")
+    if near:
+        ev += (". A rare class with leaked rows but macro-F1 below 0.98 (not eligible; rare beat common in): "
+               + ", ".join(f"{n} ({f:.4f}, {k}/12 cells)" for n, f, k in near))
+    if len(rows) < 2:
+        return {"id": "H24", "text": text, "verdict": "not judged", "evidence": ev}
+    return {"id": "H24", "text": text, "verdict": _verdict(all(k >= 10 for _, _, k in rows)), "evidence": ev}
+
+
 def phase4_hypotheses(runs: dict) -> list[dict]:
-    return [h19(runs), h20(runs), h19b(runs), h21(runs), h22(runs)]
+    return [h19(runs), h20(runs), h19b(runs), h21(runs), h22(runs), h23(runs), h24(runs)]
 
 
 def e14(runs: dict) -> list[str]:
@@ -1123,7 +1184,7 @@ def e14(runs: dict) -> list[str]:
     if thr:
         out += ["", f"**s\\* = {thr['results']['s_star']:+.4f}** ({thr['results']['how']}), "
                     f"ledger `h19_threshold` @ `{thr['git']['commit']}`."]
-    fresh = [n for n in E14_FRESH + P5_FRESH + R3_FRESH if f"h19_prediction:{n}" in runs]
+    fresh = [n for n in E14_FRESH + P5_FRESH + R3_FRESH + P6_FRESH + P6_NOT_RUN if f"h19_prediction:{n}" in runs]
     if fresh:
         out += ["", "| Fresh case | Round | S | Prediction (recorded before E14 ran) | Full gap | Copy-free gap | "
                     "Outcome | Macro-F1 |", "|---|---|--:|---|--:|--:|---|--:|"]
@@ -1131,9 +1192,9 @@ def e14(runs: dict) -> list[str]:
             p = runs[f"h19_prediction:{n}"]["results"]
             e = _e14(runs, n)
             cells = (f"{pt(e['full_gap'])} | {pt(e['copy_free_gap']) if e['copy_free_gap'] is not None else ''} | "
-                     f"{_h19_outcome(e) or 'not eligible'} | {e['macro_f1']:.4f}") if e else "| | running |"
+                     f"{_h19_outcome(e) or 'not eligible'} | {e['macro_f1']:.4f}") if e else                 ("| | not run (memory) | |" if n in P6_NOT_RUN else "| | running |")
             s = "" if p["S"] is None else format(p["S"], "+.4f")
-            out.append(f"| {n} | {'round 3 (H22)' if n in R3_FRESH else 'phase 5' if n in P5_FRESH else 'phase 4'} | {s} | {p['prediction']} | {cells} |")
+            out.append(f"| {n} | {'phase 6 (H23)' if n in P6_FRESH + P6_NOT_RUN else 'round 3 (H22)' if n in R3_FRESH else 'phase 5' if n in P5_FRESH else 'phase 4'} | {s} | {p['prediction']} | {cells} |")
     hs = phase4_hypotheses(runs)
     out += [""] + [f"**{h['id']} {h['verdict']}.** {h['evidence']}." for h in hs] + [""]
     return out
@@ -1158,12 +1219,12 @@ def phase4_data(runs: dict) -> dict:
             for n in H19_DEV if f"e14_stat:{n}" in runs}
     thr = runs.get("h19_threshold")
     fresh = {}
-    for n in E14_FRESH + P5_FRESH + R3_FRESH:
+    for n in E14_FRESH + P5_FRESH + R3_FRESH + P6_FRESH + P6_NOT_RUN:
         p, e = runs.get(f"h19_prediction:{n}"), _e14(runs, n)
         if p is None:
             continue
         fresh[n] = {"S": _num(p["results"]["S"]), "prediction": p["results"]["prediction"],
-                    "leaked_share": _num(p["results"]["leaked_share"]), "round": 6 if n in R3_FRESH else 5 if n in P5_FRESH else 4,
+                    "leaked_share": _num(p["results"]["leaked_share"]), "round": 7 if n in P6_FRESH + P6_NOT_RUN else 6 if n in R3_FRESH else 5 if n in P5_FRESH else 4,
                     "outcome": _h19_outcome(e) if e else None,
                     "full_gap": _num(e["full_gap"]) if e else None,
                     "copy_free_gap": _num(e["copy_free_gap"]) if e and e["copy_free_gap"] is not None else None,

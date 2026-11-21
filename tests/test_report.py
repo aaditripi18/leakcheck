@@ -33,3 +33,14 @@ def test_report_and_site_data_from_ledger(tmp_path, monkeypatch):
     # the page's numbers equal the generated report's
     kdd = next(r for r in data["retrain"] if r["id"] == "kdd99")
     assert f"{kdd['models']['lr']['gap_no_near'] * 100:+.2f}" in md
+
+
+def test_later_verdicts_from_ledger():
+    """Phases 4-6 as the committed ledger gives them (PLAN.md amendments 2026-11-09 to 2026-11-20)."""
+    report = _load_report()
+    runs = report.latest()
+    got = {h["id"]: h["verdict"] for h in report.phase4_hypotheses(runs)}
+    assert got == {"H19": "not judged", "H20": "not judged", "H19b": "not supported", "H21": "supported",
+                   "H22": "not judged", "H23": "not judged", "H24": "not judged"}
+    h23 = report.h23(runs)
+    assert "right on 1/1" in h23["evidence"] and "Not run (memory): andmal2020" in h23["evidence"]
