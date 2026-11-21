@@ -623,7 +623,7 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
     r7_dec = [v for v in all_judged if v.get("round") == 7 and v["prediction"] in ("easy", "memorised")]
     r7_right = sum(v["prediction"] == v["outcome"] for v in r7_dec)
     rounds = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five"}.get(len({v.get("round", 4) for v in all_fr.values()}))
-    limitations = [
+    caveats = [
         "A copy is not always a bug: measured. On KDD Cup 99 and NSL-KDD the copied rows are easy (a model trained "
         "without them still gets 97% right, E9); on CSE-CIC-IDS2018 and EMBER they are memorised (E13).",
         "The cleaned test set is harder by construction: measured. A random removal of the same size is reported beside "
@@ -642,7 +642,7 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
         f"(H22 {h22_v}: too few cases with a gap to judge), and on the fourth on {r7_right} of {len(r7_dec)} "
         f"(H23 {h23_v}, for the same reason).",
     ]
-    lim = "".join(f"<li>{e(x)}</li>" for x in limitations)
+    lim = "".join(f"<li>{e(x)}</li>" for x in caveats)
 
     commands = [
         "python -m venv .venv",
