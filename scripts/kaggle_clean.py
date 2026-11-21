@@ -54,6 +54,7 @@ OWNERS = {**{f"ciciot2023@{i}/16": "alien5060707" for i in (0, 1, 2)},
 # alien5060707 (4h09m left) and moinuddinhasan8 (4h08m) take p10 and p11; rohajraj (3h00m) and alubalub (2h47m)
 # have too little for a 2.9 h part
 HANDOFF = ROOT.parent / "leakcheck_handoff"
+PULL_RETRY = 60  # seconds between download attempts
 DATASET_OF = {"cseids2018": "cseids2018", "cseids2018:no_identifiers": "cseids2018", "ciciot2023": "ciciot2023",
               "ember2018": "ember2018", "botiot": "botiot"}
 
@@ -195,23 +196,40 @@ def start(case: str, sha: str) -> bool:
     sys.exit(f"{time.strftime('%H:%M')} FAILED to start {case}: {out}")
 
 
-def pull(case: str) -> bool:
-    with tempfile.TemporaryDirectory() as d:
-        k.kaggle("kernels", "output", ref(case), "-p", d, "--file-pattern",
-                 r".*(\.json|\.gz|\.txt|\.log|\.npz)$", check=False)
-        dest = ROOT / "results" / "kaggle" / kernel(case)
-        dest.mkdir(parents=True, exist_ok=True)
-        (dest / "failed.txt").unlink(missing_ok=True)  # a stale one would read as success
-        slug = parse(case)[0].replace(":", "__")
-        # top level only: a notebook that fails early leaves a copy of the repo in its output, whose
-        # splits/<case>.json (the committed one) must not replace the new result
-        for f in Path(d).iterdir():
-            if f.is_file():
-                shutil.copy2(f, ROOT / "splits" / f.name if f.name in (slug + ".json", slug + ".drop.txt.gz")
-                             else dest / f.name)
-    failed = (dest / "failed.txt").read_text(encoding="utf-8").strip() if (dest / "failed.txt").exists() else "missing"
-    print(f"{time.strftime('%H:%M')} {case}: pulled; {'FAILED ' + failed if failed else 'ok'}", flush=True)
-    return not failed
+def _download(case: str, d: Path) -> bool:
+    """The notebook's output into d; True only for a whole download (failed.txt there, no partial file)."""
+    k.kaggle("kernels", "output", ref(case), "-p", str(d), "--file-pattern",
+             r".*(\.json|\.gz|\.txt|\.log|\.npz)$", check=False)
+    files = [f for f in d.iterdir() if f.is_file()]
+    return (d / "failed.txt").exists() and not any(f.name.endswith(".kaggle-partial") for f in files)
+
+
+def pull(case: str, tries: int = 3) -> bool | None:
+    """Copy a finished notebook's output into results/kaggle/<kernel>/ and report whether it succeeded.
+
+    The download goes to a temporary folder first, and is retried: a dropped connection leaves what was
+    pulled before untouched (it once replaced a verified part with a partial file and read as failed)."""
+    dest = ROOT / "results" / "kaggle" / kernel(case)
+    slug = parse(case)[0].replace(":", "__")
+    for attempt in range(tries):
+        with tempfile.TemporaryDirectory() as d:
+            if not _download(case, Path(d)):
+                if attempt + 1 < tries:
+                    time.sleep(PULL_RETRY)
+                continue
+            dest.mkdir(parents=True, exist_ok=True)
+            # top level only: a notebook that fails early leaves a copy of the repo in its output, whose
+            # splits/<case>.json (the committed one) must not replace the new result
+            for f in Path(d).iterdir():
+                if f.is_file():
+                    shutil.copy2(f, ROOT / "splits" / f.name if f.name in (slug + ".json", slug + ".drop.txt.gz")
+                                 else dest / f.name)
+        failed = (dest / "failed.txt").read_text(encoding="utf-8").strip()
+        print(f"{time.strftime('%H:%M')} {case}: pulled; {'FAILED ' + failed if failed else 'ok'}", flush=True)
+        return not failed
+    print(f"{time.strftime('%H:%M')} {case}: download incomplete after {tries} tries; earlier files kept, "
+          f"tried again next round", flush=True)
+    return None
 
 
 def state(job: str) -> str:
@@ -258,8 +276,11 @@ def run(cases: list[str]) -> None:
             if c in told and st in ("RUNNING", "QUEUED"):
                 told.discard(c)                 # the friend is running it again
             if st in ("COMPLETE", "ERROR", "CANCEL") and c not in told:
+                got = pull(c)
+                if got is None:                 # the download broke off: try again next round
+                    continue
                 running.remove(c)
-                if pull(c):
+                if got:
                     ok.add(c)
                 elif owner(c) != k.USER:        # the final notebook waits for the friend to run it again
                     print(f"{time.strftime('%H:%M')} {c} on {owner(c)}'s account FAILED: ask them to run it "

@@ -31,3 +31,47 @@ def test_notebook_pins_the_part():
     src = kc.notebook_source("ciciot2023@5/8", "abc1234")
     assert "PART = '5/8'" in src and "SHA = 'abc1234'" in src and "CASE = 'ciciot2023'" in src
     assert "PART = 'final'" in kc.notebook_source("ciciot2023@final/8", "abc1234")
+
+
+def _fake_output(tmp_path, monkeypatch, outputs):
+    """k.kaggle("kernels", "output", ...) writes outputs.pop(0) (name -> bytes) into its -p folder."""
+    monkeypatch.setattr(kc, "ROOT", tmp_path)
+    monkeypatch.setattr(kc, "PULL_RETRY", 0)
+    (tmp_path / "splits").mkdir(exist_ok=True)
+
+    def kaggle(*args, check=True, timeout=0):
+        d = Path(args[args.index("-p") + 1])
+        for name, data in outputs.pop(0).items():
+            (d / name).write_bytes(data)
+    monkeypatch.setattr(kc.k, "kaggle", kaggle)
+
+
+def test_pull_keeps_earlier_files_when_the_download_breaks_off(tmp_path, monkeypatch):
+    case = "ciciot2023@10/16"
+    dest = tmp_path / "results" / "kaggle" / kc.kernel(case)
+    dest.mkdir(parents=True)
+    (dest / "part.npz").write_bytes(b"verified")
+    (dest / "failed.txt").write_bytes(b"")
+    broken = {"part.npz": b"ver", "part.npz.kaggle-partial": b"x"}
+    _fake_output(tmp_path, monkeypatch, [broken, {}, broken])
+    assert kc.pull(case) is None                       # neither a success nor a failure: retried later
+    assert (dest / "part.npz").read_bytes() == b"verified" and (dest / "failed.txt").exists()
+    assert not (dest / "part.npz.kaggle-partial").exists()
+
+
+def test_pull_retries_then_reports_the_notebooks_result(tmp_path, monkeypatch):
+    case = "ciciot2023@10/16"
+    dest = tmp_path / "results" / "kaggle" / kc.kernel(case)
+    _fake_output(tmp_path, monkeypatch, [{}, {"part.npz": b"new", "failed.txt": b""}])
+    assert kc.pull(case) is True and (dest / "part.npz").read_bytes() == b"new"
+    _fake_output(tmp_path, monkeypatch, [{"failed.txt": b"near search: out of memory"}])
+    assert kc.pull(case) is False
+
+
+def test_pull_sends_the_final_manifest_to_splits(tmp_path, monkeypatch):
+    case = "ciciot2023@final/16"
+    _fake_output(tmp_path, monkeypatch, [{"ciciot2023.json": b"{}", "ciciot2023.drop.txt.gz": b"gz",
+                                          "failed.txt": b""}])
+    assert kc.pull(case) is True
+    assert (tmp_path / "splits" / "ciciot2023.json").read_bytes() == b"{}"
+    assert (tmp_path / "splits" / "ciciot2023.drop.txt.gz").read_bytes() == b"gz"
