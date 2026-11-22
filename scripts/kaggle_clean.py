@@ -55,6 +55,9 @@ OWNERS = {**{f"ciciot2023@{i}/16": "alien5060707" for i in (0, 1, 2)},
 # have too little for a 2.9 h part
 HANDOFF = ROOT.parent / "leakcheck_handoff"
 PULL_RETRY = 60  # seconds between download attempts
+# what a final notebook returns: the manifest and every list (the source-numbered ones too: they were once
+# left behind on Kaggle, and the stale local ones no longer matched the manifest)
+LISTS = (".json", ".drop.txt.gz", ".drop_source.txt.gz", ".test_source.txt.gz")
 DATASET_OF = {"cseids2018": "cseids2018", "cseids2018:no_identifiers": "cseids2018", "ciciot2023": "ciciot2023",
               "ember2018": "ember2018", "botiot": "botiot"}
 
@@ -99,7 +102,7 @@ if PART is not None and PART != "final":
         shutil.copy2(p, out / p.name)
         saved.append(p.name)
 slug = CASE.replace(":", "__")
-for suffix in (".json", ".drop.txt.gz"):
+for suffix in LISTS:
     f = work / "splits" / (slug + suffix)
     if f.exists():
         shutil.copy2(f, out / f.name)
@@ -153,7 +156,7 @@ def notebook_source(job: str, sha: str) -> str:
     case, part = parse(job)
     part = "final" if part and part.startswith("final/") else part
     return (f"# leakcheck clean split {job}, code {sha}\nCASE = {case!r}\nPART = {part!r}\nSHA = {sha!r}\n"
-            f"PINS = {k.PINS!r}\nDATASET = {DATASET_OF[case]!r}\n" + NOTEBOOK)
+            f"PINS = {k.PINS!r}\nDATASET = {DATASET_OF[case]!r}\nLISTS = {LISTS!r}\n" + NOTEBOOK)
 
 
 def push_ember() -> None:
@@ -222,7 +225,7 @@ def pull(case: str, tries: int = 3) -> bool | None:
             # splits/<case>.json (the committed one) must not replace the new result
             for f in Path(d).iterdir():
                 if f.is_file():
-                    shutil.copy2(f, ROOT / "splits" / f.name if f.name in (slug + ".json", slug + ".drop.txt.gz")
+                    shutil.copy2(f, ROOT / "splits" / f.name if f.name in [slug + x for x in LISTS]
                                  else dest / f.name)
         failed = (dest / "failed.txt").read_text(encoding="utf-8").strip()
         print(f"{time.strftime('%H:%M')} {case}: pulled; {'FAILED ' + failed if failed else 'ok'}", flush=True)

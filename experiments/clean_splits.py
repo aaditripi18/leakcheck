@@ -2,6 +2,7 @@
 
     python -m experiments.clean_splits make kdd99 nslkdd ...     writes splits/<case>.json
     python -m experiments.clean_splits write kdd99 --out DIR     writes DIR/train.csv, DIR/test.csv (leaked rows dropped)
+    python -m experiments.clean_splits sources ciciot2023        rebuilds the source-numbered lists from the drop list
 
 The training set is left as published. A test row is dropped if it has an exact copy, or a
 near copy (RMS distance <= 0.01 in leakcheck's scaled space; Jaccard >= 0.8 for text), anywhere
@@ -135,15 +136,40 @@ def make(case: str) -> dict:
     (OUT / f"{slug}.json").write_text(json.dumps(out, indent=1, default=str) + "\n", encoding="utf-8")
     with gzip.open(OUT / f"{slug}.drop.txt.gz", "wt", encoding="utf-8") as f:
         f.write("\n".join(map(str, drop)) + "\n")
-    if src is not None:
-        with gzip.open(OUT / f"{slug}.drop_source.txt.gz", "wt", encoding="utf-8") as f:
-            f.write("\n".join(map(str, sorted(src[drop].tolist()))) + "\n")
-        if case.partition(":")[0] not in OFFICIAL and len(src) <= TEST_ROWS_MAX:
-            with gzip.open(OUT / f"{slug}.test_source.txt.gz", "wt", encoding="utf-8") as f:
-                f.write("\n".join(map(str, sorted(src.tolist()))) + "\n")
+    write_sources(case, drop, src)
     print(f"{case}: drop {len(drop)}/{len(s.test)} test rows, re-check "
           f"{'ok' if all(v['ok'] for v in check.values()) else check}, {out['seconds']} s", flush=True)
     return out
+
+
+def write_sources(case: str, drop, src) -> None:
+    """<case>.drop_source.txt.gz (the dropped rows by position in the original data) and, for a random
+    split small enough, <case>.test_source.txt.gz, from the drop list and the test rows' positions."""
+    if src is None:
+        return
+    slug = case.replace(":", "__")
+    src = np.asarray(src)
+    with gzip.open(OUT / f"{slug}.drop_source.txt.gz", "wt", encoding="utf-8") as f:
+        f.write("\n".join(map(str, sorted(src[np.asarray(drop, dtype=np.int64)].tolist()))) + "\n")
+    if case.partition(":")[0] not in OFFICIAL and len(src) <= TEST_ROWS_MAX:
+        with gzip.open(OUT / f"{slug}.test_source.txt.gz", "wt", encoding="utf-8") as f:
+            f.write("\n".join(map(str, sorted(src.tolist()))) + "\n")
+
+
+def read_drop(case: str) -> np.ndarray:
+    with gzip.open(OUT / f"{case.replace(':', '__')}.drop.txt.gz", "rt", encoding="utf-8") as f:
+        return np.array([int(x) for x in f.read().split()], dtype=np.int64)
+
+
+def sources(case: str) -> None:
+    """Rewrite the source-numbered lists from <case>.drop.txt.gz. A list made on Kaggle (the GPU search)
+    comes back as the manifest and the drop list only; its drop_source must be rebuilt here."""
+    _, s, src = split_for(case)
+    drop = read_drop(case)
+    meta = json.loads((OUT / f"{case.replace(':', '__')}.json").read_text(encoding="utf-8"))
+    assert len(drop) == meta["n_drop"] and len(s.test) == meta["n_test"], f"{case}: drop list and manifest differ"
+    write_sources(case, drop, src)
+    print(f"{case}: drop_source rewritten ({len(drop)} rows)", flush=True)
 
 
 def Split_like(s, res):
@@ -154,8 +180,7 @@ def Split_like(s, res):
 def write(case: str, out_dir: str) -> None:
     prep, s, _ = split_for(case)
     slug = case.replace(":", "__")
-    with gzip.open(OUT / f"{slug}.drop.txt.gz", "rt", encoding="utf-8") as f:
-        drop = np.array([int(x) for x in f.read().split()], dtype=np.int64)
+    drop = read_drop(case)
     keep = np.ones(len(s.test), bool)
     keep[drop] = False
     d = Path(out_dir)
@@ -170,6 +195,9 @@ if __name__ == "__main__":
     if cmd == "make":
         for c in sys.argv[2:]:
             make(c)
+    elif cmd == "sources":
+        for c in sys.argv[2:]:
+            sources(c)
     elif cmd == "write":
         write(sys.argv[2], sys.argv[sys.argv.index("--out") + 1])
     else:

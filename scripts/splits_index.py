@@ -8,8 +8,10 @@ download can be checked.
 """
 from __future__ import annotations
 
+import gzip
 import hashlib
 import json
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -19,6 +21,28 @@ RELEASE = "https://github.com/aaditripi18/leakcheck/releases/download/clean-spli
 
 def sha256(p: Path) -> str:
     return hashlib.sha256(p.read_bytes()).hexdigest()
+
+
+def lines(p: Path) -> int:
+    with gzip.open(p, "rt", encoding="utf-8") as f:
+        return sum(1 for line in f if line.strip())
+
+
+def check_lists(slug: str, d: dict) -> None:
+    """Every published list must agree with its manifest: the drop list and the source-numbered drop list
+    both have n_drop rows (a list made on Kaggle once came back without a new drop_source, and the stale
+    exact-only one would have been published), and test_source has n_test rows where it is written."""
+    want = {f"{slug}.drop.txt.gz": d["n_drop"]}
+    if d.get("source_numbering") is not None:
+        want[f"{slug}.drop_source.txt.gz"] = d["n_drop"]
+    if d.get("test_source_written"):
+        want[f"{slug}.test_source.txt.gz"] = d["n_test"]
+    for name, n in want.items():
+        p = SPLITS / name
+        got = lines(p) if p.exists() else None
+        if got != n:
+            sys.exit(f"{name}: {got} rows, the manifest says {n}; rebuild it "
+                     f"(python -m experiments.clean_splits sources {d['case']})")
 
 
 def main() -> None:
@@ -33,6 +57,7 @@ def main() -> None:
         g = d.get("measured_gap") or {}
         gap = f"{g['full_gap_macro_f1'] * 100:+.1f}" if "full_gap_macro_f1" in g else ""
         rows.append((d["case"], d["split"], d["n_test"], d["n_drop"], near, ok, gap))
+        check_lists(slug, d)
         files[d["case"]] = {f.name: sha256(f) for f in sorted(SPLITS.glob(f"{slug}.*.gz"))}
     (SPLITS / "index.json").write_text(json.dumps(files, indent=1) + "\n", encoding="utf-8")
     out = ["# Clean benchmark splits", "",

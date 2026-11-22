@@ -85,3 +85,11 @@ def test_a_restarted_runner_never_pushes_a_running_or_finished_part_again():
     for st in ("ERROR", "CANCEL", ""):
         assert not kc.watch_only(mine, st)
     assert kc.watch_only("ciciot2023@0/16", "")       # a friend's part: started by the friend
+
+
+def test_the_final_notebook_returns_every_list():
+    src = kc.notebook_source("ciciot2023@final/16", "abc1234")
+    compile(src, "run.py", "exec")
+    ns = {}
+    exec(src.split("\nimport ", 1)[0], ns)                 # the header: CASE, PART, ..., LISTS
+    assert ".drop_source.txt.gz" in ns["LISTS"] and ".test_source.txt.gz" in ns["LISTS"]
