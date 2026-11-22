@@ -10,7 +10,7 @@ into [docs/RESULTS.md](docs/RESULTS.md).
 - `leakcheck explain`: are the leaked rows easy or memorised, judged without
   training a model (neighbour-vote statistic S, threshold s* fixed on eight dev
   cases), with an "uncertain" band inside the threshold's 90% interval.
-- Four pre-registered fresh rounds (47 fresh cases) testing that diagnosis
+- Four pre-registered fresh rounds (49 fresh cases) testing that diagnosis
   (H19, H19b, H22, H23) and rare classes (H20, H24); every prediction committed
   before any model was trained on its case. Phase 3 (current benchmarks, E8–E13)
   and E15 (EMBER's pre-2018 files).
