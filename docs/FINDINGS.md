@@ -659,15 +659,26 @@ published minus 2018 only) is +0.24 (LR), -0.06 (RF), +0.17 (HistGB) and +0.00
 (MLP) macro-F1 points. **H21 supported**: no model moves by half a point. Their
 origin is still undocumented; their effect is measured and negligible.
 
-## 34. Clean benchmark splits for 39 cases
+## 34. Clean benchmark splits for 40 cases
 
 `experiments/clean_splits.py` runs `leakcheck clean` on every benchmark split in
 this study and publishes, per case, which test rows have an exact or near copy
 in training, by row number in the original data, with a re-check of every
-cleaned split (39 of 39 clean) and the measured gap (index:
+cleaned split (40 of 40 clean) and the measured gap (index:
 [splits/README.md](../splits/README.md)). The largest: KDD99 83% of its test
 rows (gap +16.1 points), CIC-IDS2017 78%, RT-IoT2022 85-86% (+3.2 / +14.6),
-TUANDROMD 91% (+21.2), CSE-CIC-IDS2018 without identifiers 40% (+11.7).
+TUANDROMD 91% (+21.2), CSE-CIC-IDS2018 without identifiers 95% (+11.7).
+
+Every list now comes from the full exact and near-copy search. The four largest
+were first published with exact copies only; the near search, on Kaggle GPUs, raised
+CIC-IoT2023 from 44% to 77% of its 9.3M test rows (16 parts), CSE-CIC-IDS2018 from
+5% to 25%, the same without identifiers from 40% to 95% (8 parts), and EMBER 2018
+from 18 rows to 20%. Their gaps are measured on the models' own leak masks (E13/E14)
+and do not change. Two of the 16 CIC-IoT2023 parts were run twice by mistake; both
+reruns reproduced the first runs' arrays exactly. The GPU finals returned the drop
+list but not the list numbered by source row, so those are rebuilt from the drop
+list (`clean_splits sources`), and `splits_index.py` now refuses any list whose
+length differs from its manifest.
 
 Building the lists found and fixed a bug: text near-copy candidates were chosen
 in an unstable order, so on PhiUSIIL the re-check of a cleaned split found one
@@ -751,30 +762,39 @@ of test rows, except AndMal2020 as distributed (about 0%, while 77% without
 its `F0` column).
 
 **H23 not judged.**
-- *Gap.* Only 2 of the 8 cases that ran had a gap of at least one point.
-- *Decided call.* CICIoV2024: full gap +11.5 points, its copy-free models fall
-  73 points below. Called memorised before training, and memorised: 1 of 1 right.
+- *Gap.* Only 3 of the 10 cases had a gap of at least one point.
+- *Decided calls.* CICIoV2024: full gap +11.5 points, its copy-free models fall
+  73 points below. AndMal2020 without `F0`: full gap +29.2 points (+21.8 to
+  +32.1 in all 12 cells), copy-free −1.0. Both were called memorised before
+  training, and both were memorised: 2 of 2 right.
 - *Uncertain call.* CICMalDroid2020 (S +0.090, inside the band; +1.9 points)
   was memorised.
 
-One judgeable case against the four the rule needs. Strict tally, counting
-the uncertain call as wrong: 1 of 2.
+Two judgeable cases against the four the rule needs. Strict tally, counting
+the uncertain call as wrong: 2 of 3.
 
 **H24 not judged.** No case reached macro-F1 0.98; the best is WSN-DS at
-0.949. Where rare classes did leak, they did not hide the leakage: the rare
+0.949 (AndMal2020's 15 classes: 0.647). Where rare classes did leak, they did not hide the leakage: the rare
 classes' median gap beat the common classes' in 4 and 5 of 12 cells on WSN-DS
-and 0 of 12 on MQTTset. These cases are not eligible, so this is description,
+and 0 of 12 on MQTTset and AndMal2020 without `F0`. These cases are not eligible, so this is description,
 not a verdict.
 
-*Three deviations*, each written before the result it concerns:
+*Four deviations*, each written before the result it concerns:
 - *CICIoV2024.* Removing the leaked rows' copies leaves only benign training
   rows, so no copy-free model can be trained. Such seeds are skipped, the way
   E14 already skipped an empty copy-free set.
 - *CICIoV2024 without identifiers.* Every seed hit that wall, so its outcome
   is undefined.
-- *AndMal2020.* E14's float64 matrix for 9,504 features is 21.8 GB, and the
-  scaled copy as much again. A Kaggle CPU session and a TPU session both
-  killed it, so its two cases have predictions but no results.
+- *AndMal2020, first.* E14's float64 matrix for 9,504 features is 21.8 GB.
+  A Kaggle CPU session and a TPU session both killed it about 40 s in, before
+  any model.
+- *AndMal2020, then* (`11ee607`). Its E14 trains on a stratified 50,000-row
+  sample per seed (the test set is whole), the kind of sample E2 and E5
+  already use, and wide test sets are predicted in row blocks (a test pins
+  that every model's predictions are unchanged). The predictions judged are
+  the ones recorded on the full training set; S on each sample is reported
+  beside them (−0.12 to −0.16 on the three seeds without `F0`, the same side
+  of the band).
 
 The round repeats §29's lesson once more, on benchmarks picked because they
 leak:
@@ -783,10 +803,10 @@ leak:
 - *WSN-DS.* 35% leaked, gap below zero.
 - *CIC-MalMem-2022.* 72% leaked, gap 0.98 points: just under the line.
 
-Across four rounds, 15 of 47 fresh cases that ran had a gap to explain. On
-every one where `explain` made a decided call with a clear outcome since the
-band was added, the call was right (3 of 3: Firewall, the timing attack
-without identifiers, CICIoV2024).
+Across four rounds, 16 of 49 fresh cases had a gap to explain. On every one
+where `explain` made a decided call with a clear outcome since the band was
+added, the call was right (4 of 4: Firewall, the timing attack without
+identifiers, CICIoV2024, AndMal2020 without `F0`).
 
 ## Questions for third parties, and what was measured instead
 

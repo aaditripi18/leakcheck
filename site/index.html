@@ -718,15 +718,15 @@
   <td class="py-2 px-3 text-right tabular">0.003%</td>
   <td class="py-2 px-3 text-right tabular">+0.551</td>
   <td class="py-2 px-3">easy</td>
-  <td class="py-2 px-3 text-right tabular"></td>
+  <td class="py-2 px-3 text-right tabular">0.0</td>
   <td class="py-2 px-3">not judged</td>
 </tr><tr>
   <th scope="row" class="py-2 px-3 font-medium text-left">andmal2020:no_identifiers</th>
   <td class="py-2 px-3 text-right tabular">77.4%</td>
   <td class="py-2 px-3 text-right tabular">-0.114</td>
   <td class="py-2 px-3">memorised</td>
-  <td class="py-2 px-3 text-right tabular"></td>
-  <td class="py-2 px-3">not judged</td>
+  <td class="py-2 px-3 text-right tabular">29.2</td>
+  <td class="py-2 px-3">memorised</td>
 </tr></tbody>
         </table>
       </div>
@@ -753,12 +753,12 @@
   <span class="font-body-sm text-body-sm text-on-surface-variant">439,577 of 566,149 test rows</span>
 </div><div class="p-space-sm bg-surface-container-low border border-surface-container-high flex flex-col">
   <span class="font-mono-data-sm text-mono-data-sm text-secondary">ciciot2023</span>
-  <span class="font-mono-data-lg text-[24px] leading-tight text-on-surface font-bold tabular">44%</span>
-  <span class="font-body-sm text-body-sm text-on-surface-variant">4,132,392 of 9,337,316 test rows (exact copies; near pending)</span>
+  <span class="font-mono-data-lg text-[24px] leading-tight text-on-surface font-bold tabular">77%</span>
+  <span class="font-body-sm text-body-sm text-on-surface-variant">7,171,234 of 9,337,316 test rows</span>
 </div></div>
     <p class="font-body-sm text-body-sm text-on-surface-variant">In CI, one step audits a split before results are reported: <code>uses: aaditripi18/leakcheck@main</code> with <code>train</code>, <code>test</code> and <code>label</code>; it writes the report to the run summary, adds <code>explain</code> when rows leak, and fails at the severity you choose.</p>
   </div>
-  <p class="font-body-sm text-body-sm text-on-surface-variant">First round: right on 2 of 2 judgeable cases; the rule needs four, so H19 is <strong>not judged</strong>. Second round, pre-registered after it: right on 5 of 8, below the 90% the rule asks, so H19b is <strong>not supported</strong>. Every large gap was called right (TUANDROMD, RT-IoT2022); the three misses sit at a cut-off: an S of +0.067 against s* = +0.072, and copy-free models keeping 75–78% of the gap against the 80% that separates easy from memorised.  Third round, with an <em>uncertain</em> band (S within the refit threshold's 90% interval) fixed before it: of 12 cases only 3 had a gap of at least one point; the decided calls were right on 2 of 2 and 1 came back uncertain, too few to judge, so H22 is <strong>not judged</strong>. A fourth round of 10 cases, chosen for heavy leakage (35% to almost 100% of test rows): of the 8 that ran, only 2 had a gap of a point or more, and the decided call was right on 1 of 1, so H23 is <strong>not judged</strong>. Use <code>leakcheck explain</code> as a first look, and retrain where the verdict matters: <code>leakcheck explain --train train.csv --test test.csv --label y</code>.</p>
+  <p class="font-body-sm text-body-sm text-on-surface-variant">First round: right on 2 of 2 judgeable cases; the rule needs four, so H19 is <strong>not judged</strong>. Second round, pre-registered after it: right on 5 of 8, below the 90% the rule asks, so H19b is <strong>not supported</strong>. Every large gap was called right (TUANDROMD, RT-IoT2022); the three misses sit at a cut-off: an S of +0.067 against s* = +0.072, and copy-free models keeping 75–78% of the gap against the 80% that separates easy from memorised.  Third round, with an <em>uncertain</em> band (S within the refit threshold's 90% interval) fixed before it: of 12 cases only 3 had a gap of at least one point; the decided calls were right on 2 of 2 and 1 came back uncertain, too few to judge, so H22 is <strong>not judged</strong>. A fourth round of 10 cases, chosen for heavy leakage (most leak 35% to almost 100% of test rows): only 3 had a gap of a point or more, and the decided calls were right on 2 of 2, so H23 is <strong>not judged</strong>. Use <code>leakcheck explain</code> as a first look, and retrain where the verdict matters: <code>leakcheck explain --train train.csv --test test.csv --label y</code>.</p>
 </section>
 
 <section class="flex flex-col gap-space-md">
@@ -978,7 +978,7 @@
     <span class="font-mono-data-md text-mono-data-md font-bold text-on-surface bg-surface-container px-2 py-0.5">H23</span>
     <div class="flex flex-col">
       <span class="font-body-md text-body-md font-medium text-on-surface">The same banded diagnosis, unchanged, on a fourth fresh round chosen for heavy leakage.</span>
-      <span class="font-mono-data-sm text-mono-data-sm text-secondary mt-0.5">2 of 8 cases eligible (full gap &gt;= 1 point); right on 1/1 with a clear outcome and a decided prediction: ciciov2024 S -0.128 predicted memorised, was memorised (clear); maldroid2020 S +0.090 predicted uncertain, was memorised (clear). Uncertain on 1 case(s), borderline outcomes 0; strict tally (uncertain counted wrong) 1/2. Not run (memory): andmal2020 (predicted easy), andmal2020:no_identifiers (predicted memorised)</span>
+      <span class="font-mono-data-sm text-mono-data-sm text-secondary mt-0.5">3 of 10 cases eligible (full gap &gt;= 1 point); right on 2/2 with a clear outcome and a decided prediction: ciciov2024 S -0.128 predicted memorised, was memorised (clear); maldroid2020 S +0.090 predicted uncertain, was memorised (clear); andmal2020:no_identifiers S -0.114 predicted memorised, was memorised (clear). Uncertain on 1 case(s), borderline outcomes 0; strict tally (uncertain counted wrong) 2/3. andmal2020, andmal2020:no_identifiers trained on a 50,000-row sample per seed (PLAN.md deviation 2026-11-23)</span>
     </div>
   </div>
   <div class="self-start md:self-center shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 font-mono-data-sm text-mono-data-sm font-semibold bg-surface-container-high text-secondary border border-outline-variant">NOT JUDGED</span></div>
@@ -987,7 +987,7 @@
     <span class="font-mono-data-md text-mono-data-md font-bold text-on-surface bg-surface-container px-2 py-0.5">H24</span>
     <div class="flex flex-col">
       <span class="font-body-md text-body-md font-medium text-on-surface">On that round too, leakage hides in the rare classes of near-perfect benchmarks.</span>
-      <span class="font-mono-data-sm text-mono-data-sm text-secondary mt-0.5">no case. Eligible 0 of 8; the best macro-F1 is 0.9485. A rare class with leaked rows but macro-F1 below 0.98 (not eligible; rare beat common in): wsn_ds (0.9485, 4/12 cells), wsn_ds:no_identifiers (0.9476, 5/12 cells), mqttset (0.8043, 0/12 cells), mqttset:no_identifiers (0.7779, 0/12 cells)</span>
+      <span class="font-mono-data-sm text-mono-data-sm text-secondary mt-0.5">no case. Eligible 0 of 10; the best macro-F1 is 0.9485. A rare class with leaked rows but macro-F1 below 0.98 (not eligible; rare beat common in): wsn_ds (0.9485, 4/12 cells), wsn_ds:no_identifiers (0.9476, 5/12 cells), mqttset (0.8043, 0/12 cells), mqttset:no_identifiers (0.7779, 0/12 cells), andmal2020:no_identifiers (0.6473, 0/12 cells)</span>
     </div>
   </div>
   <div class="self-start md:self-center shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 font-mono-data-sm text-mono-data-sm font-semibold bg-surface-container-high text-secondary border border-outline-variant">NOT JUDGED</span></div>
@@ -1139,7 +1139,7 @@ python scripts/report.py</pre>
   <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">11</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">Scope</span></div>
   <h2 class="font-headline-md text-headline-md text-on-surface mt-1">Every caveat, measured</h2>
 </div>
-  <ul class="grid grid-cols-1 md:grid-cols-2 gap-x-space-xl gap-y-space-xs font-body-sm text-body-sm text-on-surface-variant list-disc pl-4"><li>A copy is not always a bug: measured. On KDD Cup 99 and NSL-KDD the copied rows are easy (a model trained without them still gets 97% right, E9); on CSE-CIC-IDS2018 and EMBER they are memorised (E13).</li><li>The cleaned test set is harder by construction: measured. A random removal of the same size is reported beside every gap (up to 1.5 points, against 15–17 on KDD Cup 99, E10).</li><li>Near-copy thresholds: measured. Every gap is recomputed from eps 0.001 to 0.1 and Jaccard 0.6 to 0.95 (E6).</li><li>Untuned baselines: measured. Every gap is repeated with full training sets, a tuned model and a paired bootstrap (E5/E6); the two largest current benchmarks are scored on a 200,000-row test sample.</li><li>EMBER&#x27;s feature view: measured. The official 2,381-dimension vectors give the same copies and gaps within 0.4 points (E11).</li><li>Provenance: IDS2018 is byte-identical to the official bucket; CIC-IoT2023 matches all 34 published label counts.</li><li>The cheap diagnosis (H19, H19b, H22, H23): measured on eight dev cases and on 49 fresh ones in four rounds, every prediction committed before any fresh model was trained. Right on 10 of 15 judgeable fresh cases (an uncertain call counted wrong); H19b is not supported (5 of 8 against the 90% asked). Every miss sat at a cut-off, so explain now says uncertain inside the threshold&#x27;s 90% interval; on the third round its decided calls were right on 2 of 2 (H22 not judged: too few cases with a gap to judge), and on the fourth on 1 of 1 (H23 not judged, for the same reason).</li></ul>
+  <ul class="grid grid-cols-1 md:grid-cols-2 gap-x-space-xl gap-y-space-xs font-body-sm text-body-sm text-on-surface-variant list-disc pl-4"><li>A copy is not always a bug: measured. On KDD Cup 99 and NSL-KDD the copied rows are easy (a model trained without them still gets 97% right, E9); on CSE-CIC-IDS2018 and EMBER they are memorised (E13).</li><li>The cleaned test set is harder by construction: measured. A random removal of the same size is reported beside every gap (up to 1.5 points, against 15–17 on KDD Cup 99, E10).</li><li>Near-copy thresholds: measured. Every gap is recomputed from eps 0.001 to 0.1 and Jaccard 0.6 to 0.95 (E6).</li><li>Untuned baselines: measured. Every gap is repeated with full training sets, a tuned model and a paired bootstrap (E5/E6); the two largest current benchmarks are scored on a 200,000-row test sample.</li><li>EMBER&#x27;s feature view: measured. The official 2,381-dimension vectors give the same copies and gaps within 0.4 points (E11).</li><li>Provenance: IDS2018 is byte-identical to the official bucket; CIC-IoT2023 matches all 34 published label counts.</li><li>The cheap diagnosis (H19, H19b, H22, H23): measured on eight dev cases and on 49 fresh ones in four rounds, every prediction committed before any fresh model was trained. Right on 11 of 16 judgeable fresh cases (an uncertain call counted wrong); H19b is not supported (5 of 8 against the 90% asked). Every miss sat at a cut-off, so explain now says uncertain inside the threshold&#x27;s 90% interval; on the third round its decided calls were right on 2 of 2 (H22 not judged: too few cases with a gap to judge), and on the fourth on 2 of 2 (H23 not judged, for the same reason).</li></ul>
 </section>
 
 </article>
@@ -1161,7 +1161,7 @@ python scripts/report.py</pre>
   </div>
   <div class="max-w-[1100px] mx-auto px-margin-mobile md:px-gutter mt-space-lg pt-space-md border-t border-surface-container-highest flex flex-col sm:flex-row gap-space-xs justify-between text-on-surface-variant font-mono-data-sm text-mono-data-sm">
     <span>Every number on this site is generated from <code>results/ledger.jsonl</code>.</span>
-    <span>Generated 2026-11-20</span>
+    <span>Generated 2026-11-22</span>
   </div>
 </footer>
 <script src="assets/site.js"></script>

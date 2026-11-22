@@ -43,4 +43,6 @@ def test_later_verdicts_from_ledger():
     assert got == {"H19": "not judged", "H20": "not judged", "H19b": "not supported", "H21": "supported",
                    "H22": "not judged", "H23": "not judged", "H24": "not judged"}
     h23 = report.h23(runs)
-    assert "right on 1/1" in h23["evidence"] and "Not run (memory): andmal2020" in h23["evidence"]
+    assert "right on 2/2" in h23["evidence"] and "Not run" not in h23["evidence"]
+    assert "andmal2020:no_identifiers S -0.114 predicted memorised, was memorised" in h23["evidence"]
+    assert "50,000-row sample per seed" in h23["evidence"]

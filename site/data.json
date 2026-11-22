@@ -1715,13 +1715,13 @@
     "id": "H23",
     "text": "H22's rule on a fourth fresh round: S's decided predictions are right on >= 90% of the phase-6 cases that are eligible and have a clear outcome (>= 4 such cases)",
     "verdict": "not judged",
-    "evidence": "2 of 8 cases eligible (full gap >= 1 point); right on 1/1 with a clear outcome and a decided prediction: ciciov2024 S -0.128 predicted memorised, was memorised (clear); maldroid2020 S +0.090 predicted uncertain, was memorised (clear). Uncertain on 1 case(s), borderline outcomes 0; strict tally (uncertain counted wrong) 1/2. Not run (memory): andmal2020 (predicted easy), andmal2020:no_identifiers (predicted memorised)"
+    "evidence": "3 of 10 cases eligible (full gap >= 1 point); right on 2/2 with a clear outcome and a decided prediction: ciciov2024 S -0.128 predicted memorised, was memorised (clear); maldroid2020 S +0.090 predicted uncertain, was memorised (clear); andmal2020:no_identifiers S -0.114 predicted memorised, was memorised (clear). Uncertain on 1 case(s), borderline outcomes 0; strict tally (uncertain counted wrong) 2/3. andmal2020, andmal2020:no_identifiers trained on a 50,000-row sample per seed (PLAN.md deviation 2026-11-23)"
    },
    {
     "id": "H24",
     "text": "H20's rule on a fourth fresh round: on every phase-6 case with macro-F1 >= 0.98 and a rare and a common class, the rare classes' median per-class gap exceeds the common classes' in >= 10 of 12 cells (>= 2 eligible)",
     "verdict": "not judged",
-    "evidence": "no case. Eligible 0 of 8; the best macro-F1 is 0.9485. A rare class with leaked rows but macro-F1 below 0.98 (not eligible; rare beat common in): wsn_ds (0.9485, 4/12 cells), wsn_ds:no_identifiers (0.9476, 5/12 cells), mqttset (0.8043, 0/12 cells), mqttset:no_identifiers (0.7779, 0/12 cells)"
+    "evidence": "no case. Eligible 0 of 10; the best macro-F1 is 0.9485. A rare class with leaked rows but macro-F1 below 0.98 (not eligible; rare beat common in): wsn_ds (0.9485, 4/12 cells), wsn_ds:no_identifiers (0.9476, 5/12 cells), mqttset (0.8043, 0/12 cells), mqttset:no_identifiers (0.7779, 0/12 cells), andmal2020:no_identifiers (0.6473, 0/12 cells)"
    }
   ],
   "dev": {
@@ -2236,19 +2236,19 @@
     "leaked_share": 2.8e-05,
     "round": 7,
     "outcome": null,
-    "full_gap": null,
+    "full_gap": 0.0,
     "copy_free_gap": null,
-    "macro_f1": null
+    "macro_f1": 0.647037
    },
    "andmal2020:no_identifiers": {
     "S": -0.113512,
     "prediction": "memorised",
     "leaked_share": 0.773704,
     "round": 7,
-    "outcome": null,
-    "full_gap": null,
-    "copy_free_gap": null,
-    "macro_f1": null
+    "outcome": "memorised",
+    "full_gap": 0.292422,
+    "copy_free_gap": -0.009566,
+    "macro_f1": 0.647325
    }
   }
  },
@@ -2270,8 +2270,8 @@
   {
    "case": "ciciot2023",
    "n_test": 9337316,
-   "n_drop": 4132392,
-   "exact_only": true,
+   "n_drop": 7171234,
+   "exact_only": false,
    "clean": true
   },
   {
@@ -2284,8 +2284,8 @@
   {
    "case": "cseids2018:no_identifiers",
    "n_test": 3246589,
-   "n_drop": 1307051,
-   "exact_only": true,
+   "n_drop": 3081430,
+   "exact_only": false,
    "clean": true
   },
   {

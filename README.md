@@ -45,15 +45,15 @@ for each hypothesis were committed before the runs they govern.
   It now says *uncertain* when S falls inside the threshold's 90% interval;
   on a third fresh round (12 cases), its decided calls were right on 2 of 2,
   with one uncertain call. Only 3 cases had a gap to explain, so H22 is not
-  judged. A fourth round (H23), chosen for heavy leakage, gave one decided call
-  with a clear outcome, also right (CICIoV2024), and again too few gaps to
-  judge. Since the band was added, every decided call with a clear outcome has
-  been right: 3 of 3.
+  judged. A fourth round (H23), chosen for heavy leakage, gave two decided calls
+  with a clear outcome, both right (CICIoV2024 and AndMal2020 without its app
+  hash, both memorised), and again too few gaps to judge. Since the band was
+  added, every decided call with a clear outcome has been right: 4 of 4.
 - **Leaked is not the same as inflated.** On TON_IoT, BoT-IoT and X-IIoTID, 16
   cases leak 10-100% of their test rows, yet in 14 of them the leaked rows
   inflate macro-F1 by less than a point, and in two they are the hard rows (E14).
   The fourth round says it more sharply: MQTTset leaks 80% of its test rows and
-  the models score 8.5 points *lower* on them; across four rounds, 15 of 47
+  the models score 8.5 points *lower* on them; across four rounds, 16 of 49
   fresh cases had a gap of a point or more.
 - **Today's benchmarks hide their copies behind identifiers.** A timestamp or a
   flow ID makes every row unique, so an exact-duplicate check sees nothing;
@@ -160,11 +160,13 @@ tabular with 20k sampled test rows in 59 s; L2 text on 160k URLs in 16 s.
 
 ### Clean benchmark splits, ready to use
 
-For 39 benchmark cases studied here, [splits/README.md](splits/README.md) lists
+For 40 benchmark cases studied here, [splits/README.md](splits/README.md) lists
 which test rows copy the training set, by row number in the original data, so
-they can be dropped without running leakcheck. Every cleaned split was
-re-checked on every row. KDD99 loses 83% of its test set this way, CIC-IDS2017
-78%, NSL-KDD 33%. `python -m experiments.clean_splits write kdd99 --out DIR`
+they can be dropped without running leakcheck. Every list comes from the full
+exact and near-copy search, including the 47M-row CIC-IoT2023 (run on GPUs in
+16 parts), and every cleaned split was re-checked on every row. KDD99 loses 83%
+of its test set this way, CIC-IoT2023 77%, CIC-IDS2017 78%, CSE-CIC-IDS2018 25%
+(95% without its identifier columns), NSL-KDD 33%. `python -m experiments.clean_splits write kdd99 --out DIR`
 rebuilds the clean files from the pinned data.
 
 ### In CI
@@ -298,7 +300,7 @@ judged once on four datasets their quantities had never been computed on.
 | H19b | The same S and s*, on a second fresh round of five UCI security benchmarks (8 cases, amendment 2026-11-12) | **not supported**: right on 5 of 8 eligible; the three misses sit at a cut-off (S 0.005 below s*; copy-free models keeping 75-78% of the gap against 80%) |
 | H21 | EMBER 2018's 50,000 pre-2018 training files (all benign, found while setting up E15) do not change its results | **supported**: no model moves by half a point (+0.24, -0.06, +0.17, +0.00) |
 | H22 | With an uncertain band (s* refit on the 13 clear cases, +0.0645; band +0.058 to +0.130), on a third fresh round of 12 cases (amendment 2026-11-13) | **not judged**: decided calls right on 2 of 2, one uncertain (was memorised); only 3 of 12 cases had a gap of a point or more |
-| H23 | H22's rule, unchanged, on a fourth fresh round of 10 cases from network, IoT and malware benchmarks (amendment 2026-11-20) | **not judged**: the one decided call with a clear outcome was right (CICIoV2024, memorised); one uncertain call (was memorised); only 2 of the 8 cases that ran had a gap of a point or more; AndMal2020's two cases did not fit in memory |
+| H23 | H22's rule, unchanged, on a fourth fresh round of 10 cases from network, IoT and malware benchmarks (amendment 2026-11-20) | **not judged**: both decided calls with a clear outcome were right (CICIoV2024 and AndMal2020 without identifiers, memorised); one uncertain call (was memorised); only 3 of 10 cases had a gap of a point or more; AndMal2020 trained on a 50,000-row sample per seed (deviation 2026-11-23) |
 | H24 | H20's rule, unchanged, on the same round | **not judged**: no case reached macro-F1 0.98 (best 0.949) |
 
 Each round's predictions were committed and pushed before any of its models

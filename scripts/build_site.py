@@ -337,8 +337,9 @@ def phase4_section(p4: dict) -> str:
     n7 = sum(v.get("round") == 7 for v in fr.values())
     ran7 = sum(v.get("round") == 7 and v["full_gap"] is not None for v in fr.values())
     h23 = next((h for h in p4["hypotheses"] if h["id"] == "H23"), None)
-    third += (f" A fourth round of {n7} cases, chosen for heavy leakage (35% to almost 100% of test rows): of the "
-              f"{ran7} that ran, only {len(elig7)} had a gap of a point or more, and the decided call was right on "
+    ran = "" if ran7 == n7 else f"of the {ran7} that ran, "
+    third += (f" A fourth round of {n7} cases, chosen for heavy leakage (most leak 35% to almost 100% of test rows): "
+              f"{ran}only {len(elig7)} had a gap of a point or more, and the decided calls were right on "
               f"{right7} of {len(dec7)}, so H23 is <strong>{e(h23['verdict'])}</strong>.") if h23 and n7 else ""
     fresh_rows = "".join(f"""<tr>
   <th scope="row" class="py-2 px-3 font-medium text-left">{e(n)}</th>

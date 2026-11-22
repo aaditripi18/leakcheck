@@ -1097,8 +1097,11 @@ def h22(runs: dict) -> dict:
 
 
 P6_FRESH = ["wsn_ds", "wsn_ds:no_identifiers", "mqttset", "mqttset:no_identifiers", "malmem2022",
-            "ciciov2024", "ciciov2024:no_identifiers", "maldroid2020"]  # PLAN.md amendment 2026-11-20
-P6_NOT_RUN = ["andmal2020", "andmal2020:no_identifiers"]  # E14 killed for memory (PLAN.md deviation 2026-11-20)
+            "ciciov2024", "ciciov2024:no_identifiers", "maldroid2020",
+            "andmal2020", "andmal2020:no_identifiers"]  # PLAN.md amendment 2026-11-20
+# AndMal2020's E14 trains on a 50,000-row sample per seed (PLAN.md deviation 2026-11-23, replacing "not run")
+P6_SAMPLED = {"andmal2020": 50_000, "andmal2020:no_identifiers": 50_000}
+P6_NOT_RUN: list[str] = []
 
 
 def h23(runs: dict) -> dict:
@@ -1121,6 +1124,8 @@ def h23(runs: dict) -> dict:
                       f" ({'clear' if r['clear'] else 'borderline'})" for r in elig)
           + f". Uncertain on {sum(r['prediction'] == 'uncertain' for r in rows)} case(s), borderline outcomes "
           f"{sum(r['clear'] is False for r in rows)}; strict tally (uncertain counted wrong) {strict}/{len(elig)}"
+          + (". " + ", ".join(P6_SAMPLED) + f" trained on a {min(P6_SAMPLED.values()):,}-row sample per seed "
+             "(PLAN.md deviation 2026-11-23)" if any(_e14(runs, n) for n in P6_SAMPLED) else "")
           + (f". Not run (memory): " + ", ".join(f"{n} (predicted {runs[f'h19_prediction:{n}']['results']['prediction']})"
                                                  for n in nr) if nr else ""))
     if len(judged) < 4:

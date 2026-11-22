@@ -178,16 +178,24 @@
  "excluded_columns": [
   "label (attack name)"
  ],
- "near": "exact copies only: nearest-neighbour search over every row is out of reach at this size",
+ "near": {
+  "eps": 0.01,
+  "text_jaccard": null
+ },
  "n_train": 37349263,
  "n_test": 9337316,
- "n_drop": 4132392,
- "n_clean_test": 5204924,
+ "n_drop": 7171234,
+ "n_clean_test": 2166082,
  "by_reason": {
-  "cross_exact": 4132392
+  "cross_exact": 4132392,
+  "near_tabular": 3038842
  },
  "recheck": {
   "L1.cross": {
+   "ok": true,
+   "value": 0
+  },
+  "L2.near": {
    "ok": true,
    "value": 0
   }
@@ -196,8 +204,15 @@
   "full_gap_macro_f1": 0.002989232564094363,
   "source": "E13/E14, 4 models x 3 seeds (ledger e14:/e13_difficulty:ciciot2023)"
  },
- "seconds": 695,
- "search": "near.nearest (CPU)",
+ "seconds": 1102,
+ "search": "near_torch (GPU shortlist: certified float32, then float64 for uncertified rows; exact distances)",
+ "near_parts": {
+  "searches": 2,
+  "rows": 11503398,
+  "unique_rows": 8858110,
+  "from_cache": 8858110,
+  "computed": 0
+ },
  "source_numbering": "rows of the 169 part-*.csv files read in registry order",
  "split_rule": "test rows = sklearn.model_selection.train_test_split(numpy.arange(n), test_size=0.2, random_state=0, stratify=column 'label')[1], n = rows of the whole dataset numbered as source_numbering says",
  "test_source_written": false
