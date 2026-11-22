@@ -249,14 +249,22 @@ def handoff(cases: list[str]) -> None:
         print(f"{owner(j)}: {d}")
 
 
+def watch_only(job: str, st: str) -> bool:
+    """Whether a restarted runner watches (and pulls) this job instead of pushing it.
+
+    A friend's part is started by the friend. One of ours that is running, queued or complete is never
+    pushed again: a push starts a new version, which replaces a running one and re-runs a finished one
+    (a restart once re-ran two finished 2.9 h parts). Only a job that never ran, failed or was cancelled
+    is pushed."""
+    return owner(job) != k.USER or st in ("RUNNING", "QUEUED", "COMPLETE")
+
+
 def run(cases: list[str]) -> None:
     cases = [j for c in cases for j in expand(c)]
     sha = k.push_code()
     pending, running, ok, told = list(cases), [], set(), set()
     for c in cases:
-        # a friend's part is started by the friend; one of ours already running (a restarted runner) is
-        # watched, not pushed again (a push would replace the running version)
-        if owner(c) != k.USER or state(c) in ("RUNNING", "QUEUED"):
+        if watch_only(c, state(c)):
             pending.remove(c)
             running.append(c)
     while pending or running:

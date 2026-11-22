@@ -75,3 +75,13 @@ def test_pull_sends_the_final_manifest_to_splits(tmp_path, monkeypatch):
     assert kc.pull(case) is True
     assert (tmp_path / "splits" / "ciciot2023.json").read_bytes() == b"{}"
     assert (tmp_path / "splits" / "ciciot2023.drop.txt.gz").read_bytes() == b"gz"
+
+
+def test_a_restarted_runner_never_pushes_a_running_or_finished_part_again():
+    mine = "ciciot2023@12/16"
+    assert kc.owner(mine) == kc.k.USER
+    for st in ("RUNNING", "QUEUED", "COMPLETE"):
+        assert kc.watch_only(mine, st)
+    for st in ("ERROR", "CANCEL", ""):
+        assert not kc.watch_only(mine, st)
+    assert kc.watch_only("ciciot2023@0/16", "")       # a friend's part: started by the friend
