@@ -87,3 +87,21 @@ def test_rf_with_text_and_missing_values():
     for m in MODELS:
         pred = build(m, X, "url", 0).fit(X, train["label"]).predict(Xt)
         assert len(pred) == len(test)
+
+
+@pytest.mark.parametrize("model", e2.MODELS)
+def test_blocked_prediction_is_the_same_prediction(model, monkeypatch):
+    """predict_blocks (used only for very wide, long test sets: AndMal2020) gives exactly
+    pipe.predict's labels for every model, with sparse, integer, mostly-zero features as there."""
+    rng = np.random.default_rng(0)
+    cols = [f"f{i}" for i in range(60)]
+    def frame(n):
+        x = (rng.random((n, 60)) < 0.05) * rng.integers(1, 30, (n, 60))
+        y = np.where(x[:, :5].sum(1) > 0, "malware", np.where(x[:, 5] > 0, "adware", "benign"))
+        return pd.DataFrame(x.astype("int8"), columns=cols).assign(Label=pd.array(y, dtype="string"))
+    s = Split(frame(3000), frame(1000), "Label")
+    pipe = e2.build(model, s.train[s.features], None, 0).fit(s.train[s.features], s.y_train)
+    whole = pipe.predict(s.test[s.features])
+    monkeypatch.setattr(e2, "PREDICT_CELLS", 6000)      # 1,000 x 60 cells: 10 rows per block
+    blocked = e2.predict_blocks(pipe, s.test[s.features])
+    assert len(blocked) == len(whole) and (blocked == whole).all()

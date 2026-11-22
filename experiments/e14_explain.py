@@ -65,13 +65,27 @@ def _per_class(y, pred, mask) -> dict:
     return out
 
 
+# Training rows per seed where the full pipeline does not fit in a 30 GB session (PLAN.md deviation
+# 2026-11-23): CCCS-CIC-AndMal2020's 286,244 x 9,504 training matrix is 21.7 GB in float64, before any copy.
+TRAIN_CAP = {"andmal2020": 50_000}
+
+
+def train_cap(name: str) -> int:
+    from experiments.e2_retrain import MAX_TRAIN
+    return TRAIN_CAP.get(name.partition(":")[0], MAX_TRAIN)
+
+
 def run_full_seed(name: str, seed: int) -> dict:
-    split = subsample(original_split(name, seed), seed)
+    split = subsample(original_split(name, seed), seed, cap=train_cap(name))
     leaked = leak_masks(split)["near"]
     y = split.y_test
-    out = {"dataset": name, "seed": seed, "n_test": int(len(y)), "n_leaked": int(leaked.sum()),
-           "leaked_share": float(leaked.mean()), "models": {}}
+    out = {"dataset": name, "seed": seed, "n_train": int(len(split.train)), "n_test": int(len(y)),
+           "n_leaked": int(leaked.sum()), "leaked_share": float(leaked.mean()), "models": {}}
     keep, left = copies_in_train(split, leaked) if leaked.any() else (np.ones(len(split.train), bool), 0)
+    if name.partition(":")[0] in TRAIN_CAP:
+        # S on the training sample the models see (reported beside the recorded prediction, never replacing it)
+        out["S_on_this_sample"] = (statistic(split, leaked, keep, seed=seed)["S"]
+                                   if leaked.any() and keep.any() else None)
     out["train_rows_removed"], out["leaked_rows_still_near"] = int((~keep).sum()), int(left)
     dedup = with_train(split, split.train[keep], split.test)
     # a copy-free training set with one class cannot train a classifier (CICIoV2024: every attack row

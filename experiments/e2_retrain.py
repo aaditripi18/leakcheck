@@ -76,7 +76,20 @@ def fit_predict(split: Split, model: str, seed: int) -> tuple[np.ndarray, float]
             Xtr, ytr = Xtr[~single], np.asarray(ytr)[~single]
     t0 = time.time()
     pipe = build(model, Xtr, split.text, seed).fit(Xtr, ytr)
-    return pipe.predict(Xte), time.time() - t0
+    return predict_blocks(pipe, Xte), time.time() - t0
+
+
+PREDICT_CELLS = 200_000_000  # above this many test cells (rows x columns), predict in row blocks
+
+
+def predict_blocks(pipe, X: pd.DataFrame) -> np.ndarray:
+    """pipe.predict(X), in row blocks when X is very wide and long (CCCS-CIC-AndMal2020: 71,561 x 9,504,
+    whose float64 transforms alone take tens of GB). Every model predicts each row on its own, so the
+    result is the same (tests/test_e2.py); no earlier case is that large, so every earlier fit is unchanged."""
+    if X.shape[0] * max(X.shape[1], 1) <= PREDICT_CELLS:
+        return pipe.predict(X)
+    rows = max(1, PREDICT_CELLS // max(X.shape[1], 1) // 10)
+    return np.concatenate([pipe.predict(X.iloc[i:i + rows]) for i in range(0, len(X), rows)])
 
 
 # --- chronological splits -------------------------------------------------------------

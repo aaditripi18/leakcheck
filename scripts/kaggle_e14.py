@@ -154,10 +154,10 @@ def notebook_source(case: str, sha: str) -> str:
             f"FRESH_DATA = {FRESH_DATA + ROUND3_DATA + PHASE6_DATA!r}\n" + NOTEBOOK)
 
 
-# cases whose E14 needs more memory than a CPU session's 30 GB: CCCS-CIC-AndMal2020's 9,504 features make the
-# models' float64 matrix 21.8 GB and its scaled copy as much again. A TPU session's VM (about 330 GB of RAM) runs
-# the same code on its CPUs; nothing in the protocol changes, only the machine.
-LARGE_MEMORY = ("andmal2020",)
+# cases run on a TPU session's VM for its memory. Empty: CCCS-CIC-AndMal2020, the one case that needed it, was
+# killed on both machines, and now trains on a 50,000-row sample per seed (experiments/e14_explain.TRAIN_CAP,
+# PLAN.md deviation 2026-11-23), which fits a CPU session's 30 GB.
+LARGE_MEMORY: tuple[str, ...] = ()
 
 
 def start(case: str, sha: str) -> bool:

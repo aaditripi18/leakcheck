@@ -833,3 +833,17 @@ Kaggle CPU session (30 GB) and a Kaggle TPU session. Both of its cases (andmal20
 no_identifiers view) are therefore reported with their S and prediction, and as not run. Neither
 could make H23 judgeable: of the other eight cases, one is eligible, and its prediction is
 uncertain.
+
+**Deviation (2026-11-23, E14 on andmal2020, replacing "not run"; no result of it exists).** Both
+cases now run, on a stratified sample of **50,000 training rows per seed** (the test set is
+unchanged, 71,561 rows), the same kind of per-seed sample E2 and E5 already use for training sets
+too large to fit (300,000 rows; 2M for E5's largest). The cause of the earlier kills, estimated from the arrays' sizes (both died about 40 s in, before
+any model): the near-copy search embeds the 286,244 training rows in float64 (21.7 GB) next to the test side and
+the data's copies, about 41 GB against the session's 30; the models' transforms need several
+float64 copies more. At 50,000 rows the estimate is about 17 GB. "Leaked" keeps its meaning: a test row
+with a copy among the training rows the model sees. The recorded predictions (S on the full training
+set, `h19_prediction:andmal2020` and `:no_identifiers`) stay as they are and are the ones judged;
+S on each seed's sample is reported beside them (`S_on_this_sample`), never in their place. Test rows
+are predicted in blocks of rows, which gives every model's prediction unchanged (a test pins it for
+lr, rf, hgb and mlp) and applies to no earlier case (more than 200M test cells). H23's eligibility
+and its rule are unchanged; with these two cases H23 still cannot reach its minimum, as before.
