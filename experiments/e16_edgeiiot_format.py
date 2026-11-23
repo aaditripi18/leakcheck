@@ -7,7 +7,8 @@ use different protocols. This measures it. Part 1 reads the CSV's raw text: for 
 features, the values written in normal rows and in attack rows, and how many they share. Part 2
 reads every value that parses as a number as that number (so the text "0" and "0.0" are the same
 value), then repeats leakcheck's single-feature check (L5) and E2's four baselines on the
-same splits, seeds and views as E2, scored on the whole test set and without the leaked rows.
+same splits, seeds and views as E2, scored on the whole test set and without the leaked rows,
+and compares exact copies and label conflicts (L1, L3) before and after, on the first seed.
 """
 from __future__ import annotations
 
@@ -75,13 +76,29 @@ def single_features(split: Split) -> list:
     return [(t["feature"], round(float(t["balanced_acc"]), 6)) for t in f.details["top"][:5]]
 
 
+COPY_CODES = ("L1.cross", "L3.conflict", "L3.cross_contradict")
+
+
+def copies(split: Split) -> dict:
+    """Exact copies and label conflicts: rows that differ only in how a number is written count as different
+    before reading numbers as numbers and as the same after."""
+    rep = scan(split, checks=("L1", "L3"))
+    return {c: float(rep.get(c).value) for c in COPY_CODES}
+
+
 def run_view(name: str) -> dict:
     out = {"per_seed": []}
     for seed in SEEDS:
         t0 = time.time()
-        s = normalised(original_split(name, seed))
+        raw = original_split(name, seed)
         if seed == SEEDS[0]:
+            out["copies_raw"] = copies(raw)
+        s = normalised(raw)
+        del raw
+        if seed == SEEDS[0]:
+            out["copies_normalised"] = copies(s)
             out["single_features_normalised"] = single_features(s)
+            print(f"   {name}: copies raw {out['copies_raw']} normalised {out['copies_normalised']}", flush=True)
         s = subsample(s, seed)
         leaked = leak_masks(s)["near"]
         y = s.y_test
