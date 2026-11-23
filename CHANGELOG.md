@@ -5,6 +5,16 @@ release may change check thresholds and report fields. Experiments and their
 decision rules are pre-registered in [PLAN.md](PLAN.md); results are generated
 into [docs/RESULTS.md](docs/RESULTS.md).
 
+## Write-up, 2026-11-23 (package unchanged from 1.0.0)
+
+- E16: why every model is perfect on Edge-IIoTset. Normal rows write an empty
+  value as `0`, attack rows as `0.0`, in five columns that also hold text. Read as
+  numbers, the best single feature is 95.0% and the baselines score 0.92–0.998.
+  FINDINGS §24 had guessed "different protocols"; it now gives the measured cause.
+  H12's verdict is unchanged.
+- RESULTS: KDD99's near-copy and single-feature cells in the Tavallaee table come
+  from E1's audit of the same split instead of reading "not run".
+
 ## 1.0.0 — 2026-11-21
 
 - `leakcheck explain`: are the leaked rows easy or memorised, judged without

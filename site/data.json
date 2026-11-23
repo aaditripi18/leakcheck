@@ -9,6 +9,7 @@
   "e13_difficulty:ember2018_official @ be9ffcb",
   "e13_difficulty:kdd99 @ be9ffcb",
   "e13_difficulty:nslkdd @ be9ffcb",
+  "e16_edgeiiot_format @ 7f8a174",
   "e1_audit:cicids2017 @ 6780929",
   "e1_audit:ciciot2023 @ cdf9b4f",
   "e1_audit:cseids2018 @ f8c3a34",
@@ -1258,6 +1259,16 @@
     "source": {
      "ledger": "e1_audit:edgeiiot",
      "commit": "0aadc6f"
+    },
+    "as_numbers": {
+     "best_single_feature": "tcp.dstport",
+     "best_single_feature_bacc": 0.949815,
+     "macro_f1_min": 0.921064,
+     "macro_f1_max": 0.997965,
+     "source": {
+      "ledger": "e16_edgeiiot_format",
+      "commit": "7f8a174"
+     }
     }
    },
    {
@@ -1323,7 +1334,7 @@
     "id": "H12",
     "text": "Some current benchmark has a single feature at >= 95% balanced accuracy",
     "verdict": "supported",
-    "evidence": "Edge-IIoTset (2022) 100.00%, CSE-CIC-IDS2018 90.91%, CIC-IoT2023 99.08%"
+    "evidence": "Edge-IIoTset (2022) 100.00%, CSE-CIC-IDS2018 90.91%, CIC-IoT2023 99.08% (Edge-IIoTset's 100% is how zero is written: \"0\" in normal rows, \"0.0\" in attack rows; read as numbers its best single feature is tcp.dstport 94.98%, E16)"
    },
    {
     "id": "H13",

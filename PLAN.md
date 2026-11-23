@@ -847,3 +847,13 @@ S on each seed's sample is reported beside them (`S_on_this_sample`), never in t
 are predicted in blocks of rows, which gives every model's prediction unchanged (a test pins it for
 lr, rf, hgb and mlp) and applies to no earlier case (more than 200M test cells). H23's eligibility
 and its rule are unchanged; with these two cases H23 still cannot reach its minimum, as before.
+
+## Amendment 2026-11-23: E16, Edge-IIoTset's perfect single features (descriptive, no hypothesis)
+
+FINDINGS §24 explained Edge-IIoTset's five perfect single features as different protocols and
+said "not verified further". E16 (`experiments/e16_edgeiiot_format.py`, committed at 6ed0735 and
+7f8a174 before its run) measures it: the raw CSV text of those five columns by class, and with
+every value that parses as a number read as that number, leakcheck's L1, L3 and L5 checks (seed 0)
+and E2's four baselines on E2's splits, seeds and both views. It tests no hypothesis and changes
+no verdict: H12 is judged on the files as distributed. It was added after phase 3's results, so
+it is reported as post hoc.

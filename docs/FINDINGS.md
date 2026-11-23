@@ -448,7 +448,7 @@ without the columns leakcheck's own identifier check flags.
 
 | Dataset | Exact test copies, as distributed | Without identifiers | Near copies (without identifiers) | Best single feature |
 |---|--:|--:|--:|---|
-| Edge-IIoTset | 0.04% | 16.2% | 38.4% | `dns.qry.name.len` 100% |
+| Edge-IIoTset | 0.04% | 16.2% | 38.4% | `dns.qry.name.len` 100% (how zero is written; §24) |
 | CSE-CIC-IDS2018 | 4.9% | 40.3% | 54.9% | `Dst Port` 90.9% |
 | CIC-IoT2023 | 44.3% | (no identifier column) | 32.8% | `Weight` 99.1% |
 
@@ -462,14 +462,32 @@ those columns repeat heavily. IDS2018 also has 13.1% of its test rows in groups
 whose identical features carry different labels. CIC-IoT2023 ships no
 identifier columns, and 44% of its test set is copied as distributed.
 
-## 24. Edge-IIoTset: every model is perfect, before and after
+## 24. Edge-IIoTset: every model is perfect, because of how zero is written
 
 On Edge-IIoTset's binary task all four E2 models score macro-F1 1.000 on every
-seed, on the full test set and with the copies removed, in both views: five
-single features separate attack from normal traffic perfectly (MQTT fields and
-`dns.qry.name.len`, consistent with the attack captures and the normal sensor traffic using
-different protocols; not verified further). There is no score left for leakage to inflate; like
-PhiUSIIL (section 19), it cannot rank models.
+seed, on the full test set and with the copies removed, in both views. Five
+single features each separate attack from normal traffic perfectly (MQTT fields and
+`dns.qry.name.len`). E16 (RESULTS.md) measured why, and it is not the protocols.
+In the distributed CSV every normal row writes an empty value as `0` and every
+attack row writes it as `0.0`; in those five columns the two classes share no
+value at all (`mqtt.protoname`: `0` or `MQTT` in all 1,615,643 normal rows, `0.0` in
+all 603,558 attack rows). The columns also hold text (`MQTT`, hex payloads, and NTP
+host names in `dns.qry.name.len`), so a reader keeps them as text and `0` and `0.0`
+stay two different categories. The models read the file's formatting.
+
+Read as numbers (`0` and `0.0` the same value), no single feature separates the
+classes: the best is `tcp.dstport` at 95.0% balanced accuracy. Exact test copies do
+not change (0.04% as distributed, 16.24% without identifiers), but without identifiers
+0.60% of rows now sit in groups of identical features with different labels, which
+the formatting had kept apart. The four baselines, on the same splits and seeds
+(means over three seeds): 0.972-0.998 macro-F1 as distributed and 0.976-0.997 without identifiers (random
+forest lowest, 0.968 on one seed and 0.955 without the leaked rows; gradient boosting
+0.921 on one seed as distributed). High, but no longer perfect, and the models now differ.
+
+H12's verdict stands as recorded: it is judged on the file as distributed, where
+`dns.qry.name.len` does reach 100%. What that 100% measures is the formatting. A
+paper reporting near-perfect scores on this file should say how it read these five
+columns.
 
 ## 25. E9: the copies are easy, not memorised (H13 not supported; E13, §30, qualifies this)
 

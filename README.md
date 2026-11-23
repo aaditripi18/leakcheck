@@ -256,13 +256,23 @@ counts equal the published tables (16,232,943 and 46,686,579 rows).
 
 | Dataset | Test rows | Exact copies of train, as distributed | ... without identifier columns | Best single feature |
 |---|--:|--:|--:|---|
-| Edge-IIoTset (2022) | 443,841 | 0.04% | **16.2%** (38.4% near) | `dns.qry.name.len` 100% |
+| Edge-IIoTset (2022) | 443,841 | 0.04% | **16.2%** (38.4% near) | `dns.qry.name.len` 100% (how zero is written; see below) |
 | CSE-CIC-IDS2018 | 3,246,589 | 4.9% | **40.3%** (54.9% near; 13.1% contradicted) | `Dst Port` 90.9% |
 | CIC-IoT2023 | 9,337,316 | **44.3%** (32.8% near) | (no identifier columns) | `Weight` 99.1% |
 
 The "without identifiers" view drops the columns leakcheck's own identifier
 check flags; it was added after the first of these runs and is reported as post
 hoc. The pre-registered view is the first column.
+
+**Edge-IIoTset's perfect scores come from how zero is written** (E16). Every
+model scores 1.000 on it, and five columns each separate attack from normal on
+their own. In the distributed CSV, normal rows write an empty value as `0` and
+attack rows write it as `0.0`; those five columns also hold text, so `0` and
+`0.0` stay two different values and the classes share none. Read as numbers, no
+column separates them (best: `tcp.dstport`, 95.0%), and the four baselines score
+0.92-0.998 macro-F1 instead of 1.000, with random forest lowest. H12's verdict is
+judged on the file as distributed and stands; what its 100% measures is the
+formatting. Details in [docs/FINDINGS.md](docs/FINDINGS.md) §24.
 
 **The caveats, measured** (phase 3b): each statement this README used to make
 as a caveat now has an experiment.
@@ -281,7 +291,7 @@ as a caveat now has an experiment.
 |---|---|---|
 | H10 | At least 2 of the 3 current benchmarks have >= 5% exact copies, as distributed | **not supported**: 1 of 3 (IDS2018 4.91%, just under) |
 | H11 | On every current benchmark with >= 5% exact copies, removing leaked rows costs some model >= 1 point (interval above 0) | **not supported**: only CIC-IoT2023 qualifies; its largest gap is 0.98 points (LR, interval above 0 in 3 of 3 seeds) |
-| H12 | Some current benchmark has a single feature at >= 95% | **supported**: Edge-IIoTset 100%, CIC-IoT2023 99.1% |
+| H12 | Some current benchmark has a single feature at >= 95% | **supported**: Edge-IIoTset 100%, CIC-IoT2023 99.1% (Edge-IIoTset's 100% is a formatting artefact, E16; read as numbers its best is 95.0%) |
 | H13 | KDD99 and NSL-KDD memorise more copied rows than UCI Phishing | **not supported**: 0.0% and 0.3% vs 3.3% |
 | H14 | Wherever copies cost >= 1 point, random removal costs < 0.5 | **not supported**: 9 of 23 cells (NSL-KDD, UNSW-NB15, UCI Phishing LR at 1.5) |
 | H16 | With every attack type seen in training, CIC-IDS2017's time split costs <= 2 points | **supported**: 0.5-1.5 |
@@ -358,6 +368,7 @@ python -m experiments.e2_retrain edgeiiot edgeiiot:no_identifiers cseids2018 cse
 python -m experiments.e9_controls kdd99 nslkdd unsw_nb15 cicids2017 uci_phishing phiusiil sms_spam ember2018 edgeiiot
 python -m experiments.e12_cic_within
 python -m experiments.e5_predictions edgeiiot cseids2018 ciciot2023 && python -m experiments.e6_analysis
+python -m experiments.e16_edgeiiot_format            # Edge-IIoTset with numbers read as numbers
 
 # phase 4: easy or memorised (one process per case keeps memory flat)
 python -m experiments.e14_explain stat kdd99         # ... and each of the 14 E13 datasets

@@ -606,6 +606,16 @@ def site_data(runs: dict) -> dict:
                          "label counts equal the published table" if src0.get("matches_published") else
                          "the authors' own release"),
             "source": ref(f"e1_audit:{n}")})
+    e16r = runs.get("e16_edgeiiot_format")
+    for x in phase3["datasets"]:
+        if x["id"] == "edgeiiot" and e16r:
+            r16 = e16r["results"]
+            f1 = [m["whole"] for v in ("edgeiiot", "edgeiiot:no_identifiers") for ps in r16[v]["per_seed"]
+                  for m in ps["models"].values()]
+            f, b = r16["edgeiiot"]["single_features_normalised"][0]
+            x["as_numbers"] = {"best_single_feature": f, "best_single_feature_bacc": _num(b),
+                               "macro_f1_min": _num(min(f1)), "macro_f1_max": _num(max(f1)),
+                               "source": ref("e16_edgeiiot_format")}
     e9 = {n: runs[f"e9_controls:{n}"]["results"]["summary"] for n in E9_ORDER if f"e9_controls:{n}" in runs}
     if e9:
         phase3["e9_e10"] = {n: {m: {k: _num(v[k]) for k in ("leakage_gap", "random_gap", "memorised_share",
@@ -725,6 +735,56 @@ def e9_e10(runs: dict) -> list[str]:
     return out
 
 
+def _e16_note(runs: dict) -> str:
+    """H12 is judged on the files as distributed; E16 says what Edge-IIoTset's 100% measures."""
+    d = runs.get("e16_edgeiiot_format")
+    if d is None:
+        return ""
+    f, b = d["results"]["edgeiiot"]["single_features_normalised"][0]
+    return (f" (Edge-IIoTset's 100% is how zero is written: \"0\" in normal rows, \"0.0\" in attack rows; "
+            f"read as numbers its best single feature is {f} {pct(b)}, E16)")
+
+
+def e16(runs: dict) -> list[str]:
+    """E16 (descriptive): Edge-IIoTset's perfect single features, raw text and numbers read as numbers."""
+    d = runs.get("e16_edgeiiot_format")
+    if d is None:
+        return []
+    r = d["results"]
+    out = ["## E16: Edge-IIoTset, numbers read as numbers", "", src(d), "",
+           "Raw CSV text of the five features that each separate attack from normal perfectly:", "",
+           "| Feature | Normal rows: most common values | Attack rows: values | Values shared |", "|---|---|---|--:|"]
+    for f, v in r["raw_values"].items():
+        top = lambda lab: ", ".join(f"`{k}` {n:,}" for k, n in v[lab]["top"])  # noqa: E731
+        out.append(f"| `{f}` | {top('0')} ({v['0']['distinct']} distinct) | {top('1')} ({v['1']['distinct']} distinct) "
+                   f"| {v['shared_values']} |")
+    out += ["", "With every value that parses as a number read as that number (`0` and `0.0` the same value):", "",
+            "| View | Best single features (seed 0) | Exact test copies, raw / numbers | Rows in label conflicts "
+            "(L3.conflict), raw / numbers | Test copies with another label (L3.cross_contradict), raw / numbers |",
+            "|---|---|---|---|---|"]
+    for view in [k for k in r if k != "raw_values"]:
+        v = r[view]
+        sf = ", ".join(f"`{f}` {pct(b)}" for f, b in v["single_features_normalised"][:3])
+        cr, cn = v["copies_raw"], v["copies_normalised"]
+        out.append(f"| {view} | {sf} | {pct(cr['L1.cross'])} / {pct(cn['L1.cross'])} | "
+                   f"{pct(cr['L3.conflict'])} / {pct(cn['L3.conflict'])} | "
+                   f"{pct(cr['L3.cross_contradict'])} / {pct(cn['L3.cross_contradict'])} |")
+    out += ["", "E2's baselines on the same splits with numbers read as numbers (macro-F1, mean over seeds; "
+                "whole test set / without the leaked rows):", "",
+            "| View | " + " | ".join(r[next(k for k in r if k != 'raw_values')]["per_seed"][0]["models"]) + " |",
+            "|---|" + "---|" * len(r[next(k for k in r if k != 'raw_values')]["per_seed"][0]["models"])]
+    for view in [k for k in r if k != "raw_values"]:
+        ps = r[view]["per_seed"]
+        cells = []
+        for m in ps[0]["models"]:
+            w = sum(p["models"][m]["whole"] for p in ps) / len(ps)
+            wo = sum(p["models"][m]["without_leaked"] for p in ps) / len(ps)
+            lo = min(p["models"][m]["whole"] for p in ps)
+            cells.append(f"{w:.4f} / {wo:.4f} (min {lo:.4f})")
+        out.append(f"| {view} ({len(ps)} seeds) | " + " | ".join(cells) + " |")
+    return out + [""]
+
+
 def e12(runs: dict) -> list[str]:
     d = runs.get("e12_cic_within")
     if d is None:
@@ -753,7 +813,7 @@ def phase3_hypotheses(runs: dict) -> list[dict]:
         best = {n: v["f"]["L5.shortcut"]["value"] for n, v in e1v.items() if "L5.shortcut" in v["f"]}
         hs.append({"id": "H12", "text": "Some current benchmark has a single feature at >= 95% balanced accuracy",
                    "verdict": _verdict(any(x >= 0.95 for x in best.values())),
-                   "evidence": ", ".join(f"{PHASE3_NAMES[n]} {pct(x)}" for n, x in best.items())})
+                   "evidence": ", ".join(f"{PHASE3_NAMES[n]} {pct(x)}" for n, x in best.items()) + _e16_note(runs)})
     hs.append(h11(runs))
     e9 = {n: runs[f"e9_controls:{n}"]["results"]["summary"] for n in E9_ORDER if f"e9_controls:{n}" in runs}
     if all(n in e9 for n in ("kdd99", "nslkdd", "uci_phishing")):
@@ -1283,6 +1343,7 @@ def main() -> None:
     lines += e12(runs)
     lines += e11(runs)
     lines += e13(runs)
+    lines += e16(runs)
     lines += e14(runs)
     lines += e2_stats(runs)
     lines += e6(runs)

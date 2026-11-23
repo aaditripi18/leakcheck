@@ -297,7 +297,7 @@
   <td class="py-space-sm px-space-md text-right tabular">443,841</td>
   <td class="py-space-sm px-space-md text-right tabular">0.04%</td>
   <td class="py-space-sm px-space-md text-right tabular text-primary font-semibold">16.2%</td>
-  <td class="py-space-sm px-space-md text-right tabular">dns.qry.name.len 100.0%</td>
+  <td class="py-space-sm px-space-md text-right tabular">dns.qry.name.len 100.0%<span class="block text-secondary">how zero is written; as numbers tcp.dstport 95.0%</span></td>
 </tr><tr>
   <th scope="row" class="py-space-sm px-space-md font-medium text-left">CSE-CIC-IDS2018</th>
   <td class="py-space-sm px-space-md text-right tabular">3,246,589</td>
@@ -313,7 +313,7 @@
 </tr></tbody>
     </table>
   </div>
-  <p class="font-body-sm text-body-sm text-on-surface-variant">A timestamp, flow ID or port makes nearly every row unique, so a duplicate check on the files as shipped sees little. Without the columns leakcheck's identifier check flags (a view added after the first run), the repeats show. Edge-IIoTset (2022): the authors' own release. CSE-CIC-IDS2018: byte-identical to the official S3 objects; label counts equal the published table. CIC-IoT2023: label counts equal the published table.</p>
+  <p class="font-body-sm text-body-sm text-on-surface-variant">A timestamp, flow ID or port makes nearly every row unique, so a duplicate check on the files as shipped sees little. Without the columns leakcheck's identifier check flags (a view added after the first run), the repeats show. Edge-IIoTset (2022)'s perfect scores come from how zero is written: normal rows write an empty value as "0", attack rows as "0.0", in columns that also hold text, so the two classes share no value there. Read as numbers, the best single feature is tcp.dstport at 95.0% and the baselines score 0.92–0.998 macro-F1 instead of 1.000 (E16). Edge-IIoTset (2022): the authors' own release. CSE-CIC-IDS2018: byte-identical to the official S3 objects; label counts equal the published table. CIC-IoT2023: label counts equal the published table.</p>
   <div class="grid grid-cols-1 md:grid-cols-3 gap-space-md"><div class="p-space-md bg-surface-container-low border border-surface-container-high flex flex-col gap-space-xs">
   <span class="sec-label text-on-surface-variant">Easy on KDD99, memorised on IDS2018</span>
   <span class="font-mono-data-lg text-[32px] leading-tight text-on-surface font-bold tabular">+11.7 → -17.8 pts</span>
@@ -870,7 +870,7 @@
     <span class="font-mono-data-md text-mono-data-md font-bold text-on-surface bg-surface-container px-2 py-0.5">H12</span>
     <div class="flex flex-col">
       <span class="font-body-md text-body-md font-medium text-on-surface">Some current benchmark has a single feature at &gt;= 95% balanced accuracy</span>
-      <span class="font-mono-data-sm text-mono-data-sm text-secondary mt-0.5">Edge-IIoTset (2022) 100.00%, CSE-CIC-IDS2018 90.91%, CIC-IoT2023 99.08%</span>
+      <span class="font-mono-data-sm text-mono-data-sm text-secondary mt-0.5">Edge-IIoTset (2022) 100.00%, CSE-CIC-IDS2018 90.91%, CIC-IoT2023 99.08% (Edge-IIoTset&#x27;s 100% is how zero is written: &quot;0&quot; in normal rows, &quot;0.0&quot; in attack rows; read as numbers its best single feature is tcp.dstport 94.98%, E16)</span>
     </div>
   </div>
   <div class="self-start md:self-center shrink-0"><span class="inline-flex items-center px-2.5 py-0.5 font-mono-data-sm text-mono-data-sm font-semibold bg-success/10 text-success border border-success/30">SUPPORTED</span></div>
@@ -1129,7 +1129,7 @@ python -m experiments.e4_ablation phiusiil cicids2017
 python scripts/report.py</pre>
     <div class="mt-space-md pt-space-sm border-t border-[#2f312f] flex flex-col md:flex-row md:items-center justify-between gap-1 font-mono-data-sm text-mono-data-sm text-[#8c8c88]">
       <span>Every run appends a line to an append-only ledger; this page is generated from it.</span>
-      <span class="text-white font-medium">40 ledger lines behind this page</span>
+      <span class="text-white font-medium">41 ledger lines behind this page</span>
     </div>
   </div>
 </section>
@@ -1161,7 +1161,7 @@ python scripts/report.py</pre>
   </div>
   <div class="max-w-[1100px] mx-auto px-margin-mobile md:px-gutter mt-space-lg pt-space-md border-t border-surface-container-highest flex flex-col sm:flex-row gap-space-xs justify-between text-on-surface-variant font-mono-data-sm text-mono-data-sm">
     <span>Every number on this site is generated from <code>results/ledger.jsonl</code>.</span>
-    <span>Generated 2026-11-22</span>
+    <span>Generated 2026-11-23</span>
   </div>
 </footer>
 <script src="assets/site.js"></script>

@@ -97,7 +97,7 @@ KDD99 L1.cross by class: normal 12.69% of 60,593, attack 81.83% of 250,436
 |---|---|---|---|
 | H10 | At least 2 of the 3 current benchmarks have >= 5% exact test copies (as distributed) | **not supported** | 1 of 3: Edge-IIoTset (2022) 0.04%, CSE-CIC-IDS2018 4.91%, CIC-IoT2023 44.26% |
 | H11 | On every current benchmark with >= 5% exact copies, removing leaked rows costs some model >= 1 point (bootstrap interval above 0 in >= 2 of 3 seeds) | **not supported** | CIC-IoT2023: largest gap lr +0.98 (interval above 0 in 3/3 seeds); 0 model(s) meet the rule. Below 5% exact copies, not counted: Edge-IIoTset (2022), CSE-CIC-IDS2018 |
-| H12 | Some current benchmark has a single feature at >= 95% balanced accuracy | **supported** | Edge-IIoTset (2022) 100.00%, CSE-CIC-IDS2018 90.91%, CIC-IoT2023 99.08% |
+| H12 | Some current benchmark has a single feature at >= 95% balanced accuracy | **supported** | Edge-IIoTset (2022) 100.00%, CSE-CIC-IDS2018 90.91%, CIC-IoT2023 99.08% (Edge-IIoTset's 100% is how zero is written: "0" in normal rows, "0.0" in attack rows; read as numbers its best single feature is tcp.dstport 94.98%, E16) |
 | H13 | More leaked rows are memorised on KDD Cup 99 and NSL-KDD than on UCI Phishing | **not supported** | kdd99 0.00%, nslkdd 0.31%, uci_phishing 3.28% (mean over the four models) |
 | H14 | Wherever the leakage gap is >= 1 point, the random-removal gap is < 0.5 | **not supported** | 14 of 23 (dataset, model) cells; exceptions: nslkdd/lr +0.58, nslkdd/rf +0.67, nslkdd/hgb +0.61, nslkdd/mlp +0.50, unsw_nb15/lr +0.67, unsw_nb15/rf +0.59, unsw_nb15/hgb +0.58, unsw_nb15/mlp +0.54, uci_phishing/lr +1.51 |
 | H15 | EMBER's conclusions hold on the official 2,381-dimension vectors (exact-copy rate and E2 gap within 1 point) | **supported** | exact copies 0.01% (leakcheck's view) vs 0.01% (official); E2 gap (no_near) lr +2.39 vs +2.03, rf +1.47 vs +1.54, hgb +1.30 vs +1.18, mlp +1.38 vs +1.19; largest difference 0.36 points |
@@ -412,6 +412,34 @@ Same splits, seeds (0-2), models and copy removal as E9. *Gap* = macro-F1 on the
 | ember2018_official | fresh | 26.90% | +1.48 | -0.18 | 0.9282 / 0.9428 | 0/12 | 6/12 |
 
 Ledger lines: `e13_difficulty:kdd99` @ `be9ffcb`, `e13_difficulty:nslkdd` @ `be9ffcb`, `e13_difficulty:unsw_nb15` @ `be9ffcb`, `e13_difficulty:cicids2017` @ `be9ffcb`, `e13_difficulty:ember2018` @ `be9ffcb`, `e13_difficulty:uci_phishing` @ `68eb06d`, `e13_difficulty:phiusiil` @ `be9ffcb`, `e13_difficulty:sms_spam` @ `be9ffcb`, `e13_difficulty:edgeiiot` @ `be9ffcb`, `e13_difficulty:edgeiiot:no_identifiers` @ `be9ffcb`, `e13_difficulty:cseids2018` @ `be9ffcb`, `e13_difficulty:cseids2018:no_identifiers` @ `be9ffcb`, `e13_difficulty:ciciot2023` @ `be9ffcb`, `e13_difficulty:ember2018_official` @ `be9ffcb`
+
+## E16: Edge-IIoTset, numbers read as numbers
+
+_ledger: `e16_edgeiiot_format` @ `7f8a174`, 2026-11-23T07:40:47+00:00_
+
+Raw CSV text of the five features that each separate attack from normal perfectly:
+
+| Feature | Normal rows: most common values | Attack rows: values | Values shared |
+|---|---|---|--:|
+| `dns.qry.name.len` | `0` 1,613,798, `0.debian.pool.ntp.org` 454, `3.debian.pool.ntp.org` 450 (8 distinct) | `0.0` 603,331, `1.0` 227 (2 distinct) | 0 |
+| `mqtt.conack.flags` | `0` 1,532,586, `0x00000000` 83,017, `1574358` 9 (12 distinct) | `0.0` 603,558 (1 distinct) | 0 |
+| `mqtt.msg` | `0` 1,532,627, `32332e36332037342e35330d0a` 6,598, `32332e30362037332e35300d0a` 4,364 (135 distinct) | `0.0` 603,558 (1 distinct) | 0 |
+| `mqtt.protoname` | `0` 1,532,608, `MQTT` 83,035 (2 distinct) | `0.0` 603,558 (1 distinct) | 0 |
+| `mqtt.topic` | `0` 1,532,627, `Temperature_and_Humidity` 83,016 (2 distinct) | `0.0` 603,558 (1 distinct) | 0 |
+
+With every value that parses as a number read as that number (`0` and `0.0` the same value):
+
+| View | Best single features (seed 0) | Exact test copies, raw / numbers | Rows in label conflicts (L3.conflict), raw / numbers | Test copies with another label (L3.cross_contradict), raw / numbers |
+|---|---|---|---|---|
+| edgeiiot | `tcp.dstport` 94.98%, `tcp.srcport` 83.29%, `tcp.seq` 83.19% | 0.04% / 0.04% | 0.00% / 0.00% | 0.00% / 0.00% |
+| edgeiiot:no_identifiers | `tcp.dstport` 94.98%, `tcp.srcport` 83.29%, `tcp.seq` 83.19% | 16.24% / 16.24% | 0.00% / 0.60% | 0.00% / 0.00% |
+
+E2's baselines on the same splits with numbers read as numbers (macro-F1, mean over seeds; whole test set / without the leaked rows):
+
+| View | lr | rf | hgb | mlp |
+|---|---|---|---|---|
+| edgeiiot (3 seeds) | 0.9979 / 0.9979 (min 0.9979) | 0.9979 / 0.9979 (min 0.9979) | 0.9723 / 0.9723 (min 0.9211) | 0.9979 / 0.9979 (min 0.9979) |
+| edgeiiot:no_identifiers (3 seeds) | 0.9969 / 0.9994 (min 0.9967) | 0.9759 / 0.9667 (min 0.9681) | 0.9946 / 0.9957 (min 0.9932) | 0.9973 / 0.9999 (min 0.9973) |
 
 ## E14: telling easy leaks from memorised ones without training a model
 

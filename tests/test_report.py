@@ -57,3 +57,20 @@ def test_kdd99_table_has_no_unmeasured_cell():
     e1 = runs["e1_audit:kdd99"]["results"]["views"]["all"]["findings"]
     assert runs["e0_kdd"]["results"]["kdd99_leakcheck"]["L1.cross"]["n_hit"] == e1["L1.cross"]["n_hit"]  # same task
     assert "| L2.near | 14.80% (x1.37 of train baseline) [high] (E1) |" in md
+
+
+def test_e16_explains_edge_iiotset_without_changing_h12():
+    """E16: Edge-IIoTset's 100% single feature is how zero is written; H12 stays judged on the files as distributed."""
+    report = _load_report()
+    runs = report.latest()
+    r = runs["e16_edgeiiot_format"]["results"]
+    assert all(v["shared_values"] == 0 for v in r["raw_values"].values())
+    assert r["edgeiiot"]["single_features_normalised"][0][1] < 0.95
+    md = "\n".join(report.e16(runs))
+    assert "## E16" in md and "| 0 |" in md
+    p3 = report.site_data(runs)["phase3"]
+    h12 = next(h for h in p3["hypotheses"] if h["id"] == "H12")
+    assert h12["verdict"] == "supported" and "how zero is written" in h12["evidence"]
+    edge = next(x for x in p3["datasets"] if x["id"] == "edgeiiot")
+    assert edge["best_single_feature_bacc"] == 1.0 and edge["as_numbers"]["best_single_feature_bacc"] < 0.95
+    assert 0.9 < edge["as_numbers"]["macro_f1_min"] < edge["as_numbers"]["macro_f1_max"] < 1.0

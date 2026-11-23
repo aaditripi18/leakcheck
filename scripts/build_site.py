@@ -564,8 +564,15 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
   <td class="py-space-sm px-space-md text-right tabular">{x['n_test']:,}</td>
   <td class="py-space-sm px-space-md text-right tabular{' text-primary font-semibold' if x['exact_as_distributed'] >= 0.05 else ''}">{fpct(x['exact_as_distributed'])}</td>
   <td class="py-space-sm px-space-md text-right tabular{' text-primary font-semibold' if (x['exact_no_identifiers'] or 0) >= 0.05 else ''}">{fpct(x['exact_no_identifiers']) if x['exact_no_identifiers'] is not None else 'no identifier columns'}</td>
-  <td class="py-space-sm px-space-md text-right tabular">{e(x['best_single_feature'])} {fpct(x['best_single_feature_bacc'])}</td>
+  <td class="py-space-sm px-space-md text-right tabular">{e(x['best_single_feature'])} {fpct(x['best_single_feature_bacc'])}{'<span class="block text-secondary">how zero is written; as numbers ' + e(x['as_numbers']['best_single_feature']) + ' ' + fpct(x['as_numbers']['best_single_feature_bacc']) + '</span>' if x.get('as_numbers') else ''}</td>
 </tr>""" for x in p3["datasets"])
+    p3_format = "".join(
+        f" {e(x['name'])}'s perfect scores come from how zero is written: normal rows write an empty value as "
+        f"\"0\", attack rows as \"0.0\", in columns that also hold text, so the two classes share no value there. "
+        f"Read as numbers, the best single feature is {e(x['as_numbers']['best_single_feature'])} at "
+        f"{fpct(x['as_numbers']['best_single_feature_bacc'])} and the baselines score "
+        f"{x['as_numbers']['macro_f1_min']:.2f}–{x['as_numbers']['macro_f1_max']:.3f} macro-F1 instead of 1.000 (E16)."
+        for x in p3["datasets"] if x.get("as_numbers"))
     p3_verified = " ".join(f"{x['name']}: {x['verified']}." for x in p3["datasets"])
     nsl = p3e["nslkdd"]
     p3_cards_data = [
@@ -776,7 +783,7 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
       <tbody class="divide-y divide-surface-container-high">{p3_rows}</tbody>
     </table>
   </div>
-  <p class="font-body-sm text-body-sm text-on-surface-variant">A timestamp, flow ID or port makes nearly every row unique, so a duplicate check on the files as shipped sees little. Without the columns leakcheck's identifier check flags (a view added after the first run), the repeats show. {p3_verified}</p>
+  <p class="font-body-sm text-body-sm text-on-surface-variant">A timestamp, flow ID or port makes nearly every row unique, so a duplicate check on the files as shipped sees little. Without the columns leakcheck's identifier check flags (a view added after the first run), the repeats show.{p3_format} {p3_verified}</p>
   <div class="grid grid-cols-1 md:grid-cols-3 gap-space-md">{p3_cards}</div>
 </section>
 
