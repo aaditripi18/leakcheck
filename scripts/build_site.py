@@ -20,6 +20,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 SITE = ROOT / "site"
+from leakcheck import __version__  # noqa: E402  (the header shows the released version)
 REPO_URL = "https://github.com/aaditripi18/leakcheck"  # links to code, findings and provenance
 
 CSP = ("default-src 'none'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; "
@@ -115,18 +116,20 @@ def nav(active: str) -> str:
   <div class="h-14 max-w-[1100px] mx-auto px-margin-mobile md:px-gutter flex items-center justify-between gap-space-md">
     <div class="flex items-center gap-space-sm">
       <a class="font-mono-data-lg text-mono-data-lg text-on-surface tracking-tight font-medium hover:text-primary transition-colors" href="index.html">leakcheck</a>
-      <span class="hidden sm:inline-flex items-center border border-outline-variant px-space-xs py-0.5 bg-surface-container-low sec-label text-on-surface-variant">v0.2</span>
+      <span class="hidden sm:inline-flex items-center border border-outline-variant px-space-xs py-0.5 bg-surface-container-low sec-label text-on-surface-variant">v{e(__version__)}</span>
     </div>
     <nav class="hidden md:flex items-center gap-space-lg" aria-label="Main">{"".join(items)}</nav>
     <div class="flex items-center gap-space-sm">
-      <a class="md:hidden inline-block py-2 px-1 font-mono-data-sm text-mono-data-sm text-on-surface-variant hover:text-on-surface" href="{"index.html" if active == "scanner" else "scan.html"}">{"Report" if active == "scanner" else "Scanner"}</a>
       <button type="button" data-theme-toggle aria-label="Toggle dark mode" class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors">
         <span class="dark:hidden">{icon("moon", "text-[18px]")}</span><span class="hidden dark:inline">{icon("sun", "text-[18px]")}</span>
       </button>
     </div>
   </div>
+  <div class="md:hidden max-w-[1100px] mx-auto px-margin-mobile">
+    <nav class="flex items-center gap-space-lg h-10 overflow-x-auto whitespace-nowrap [scrollbar-width:none] [mask-image:linear-gradient(90deg,#000_85%,transparent)]" aria-label="Main, small screens">{"".join(items)}</nav>
+  </div>
 </header>
-<main id="main" class="w-full pt-14">
+<main id="main" class="w-full pt-24 md:pt-14">
 """
 
 
@@ -158,7 +161,7 @@ def footer(generated: str) -> str:
 
 def sec_head(num: str, kicker: str, title: str, anchor: str | None = None, level: str = "h2") -> str:
     a = f' id="{anchor}"' if anchor else ""
-    return f"""<div{a} class="scroll-mt-20">
+    return f"""<div{a} class="scroll-mt-28 md:scroll-mt-20">
   <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">{num}</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">{e(kicker)}</span></div>
   <{level} class="font-headline-md text-headline-md text-on-surface mt-1">{e(title)}</{level}>
 </div>"""
@@ -304,7 +307,7 @@ def short_evidence(h: dict, d: dict) -> str:
     return h["evidence"]
 
 
-NUM_WORDS = {3: "Three", 4: "Four", 5: "Five", 6: "Six"}
+NUM_WORDS = {2: "Two", 3: "Three", 4: "Four", 5: "Five", 6: "Six", 7: "Seven", 8: "Eight", 9: "Nine"}
 
 
 def phase4_section(p4: dict) -> str:
@@ -351,6 +354,11 @@ def phase4_section(p4: dict) -> str:
 </tr>""" for n, v in fr.items())
     right = sum(v["prediction"] == v["outcome"] for v in elig.values())
     h19 = next(h for h in p4["hypotheses"] if h["id"] == "H19")
+    per_round = {r: sum(v.get("round", 4) == r for v in fr.values()) for r in (4, 5, 6, 7)}
+    what = {4: "IoT cases", 5: "from five UCI security benchmarks", 6: "from UCI and OpenML security and fraud sets",
+            7: "chosen for heavy leakage"}
+    rounds = [f"{per_round[r]} {what[r]}" for r in (4, 5, 6, 7) if per_round[r]]
+    rounds_txt = ", ".join(rounds[:-1]) + (", then " if len(rounds) > 1 else "") + rounds[-1]
     cs = p4.get("_clean_splits", [])
     clean_block = ""
     if cs:
@@ -374,9 +382,9 @@ def phase4_section(p4: dict) -> str:
   <div class="p-space-md bg-surface-container border border-surface-container-high">
     <p class="font-body-lg text-body-lg text-on-surface font-medium">Copies inflate a score only when a model needed them. <code>leakcheck explain</code> removes each leaked row's training copies and asks whether its nearest remaining neighbour still has the right label. If it does, the leaked rows are easy; if not, a model could only get them right by memorising the copy.</p>
   </div>
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
-    <div class="lg:col-span-5 flex flex-col gap-space-xs">
-      <p class="font-body-sm text-body-sm text-on-surface-variant">S on the eight dev cases (neighbour-vote accuracy on the leaked rows minus on the rest) beside what retraining found (E13). The threshold s* = {s_star:+.3f} is the midpoint between the two groups.</p>
+  <div class="flex flex-col gap-space-lg">
+    <div class="flex flex-col gap-space-xs max-w-2xl">
+      <p class="font-body-sm text-body-sm text-on-surface-variant">S on the {NUM_WORDS.get(len(dev), str(len(dev))).lower()} dev cases (neighbour-vote accuracy on the leaked rows minus on the rest) beside what retraining found (E13). The threshold s* = {s_star:+.3f} is the midpoint between the two groups.</p>
       <div class="border border-surface-container-high bg-surface overflow-x-auto">
         <table class="w-full text-left border-collapse font-mono-data-sm text-mono-data-sm text-on-surface">
           <thead><tr class="bg-surface-container-low border-b border-on-surface sec-label text-secondary"><th scope="col" class="py-2 px-3">Dev case</th><th scope="col" class="py-2 px-3 text-right">S</th><th scope="col" class="py-2 px-3">Retraining found</th></tr></thead>
@@ -384,8 +392,8 @@ def phase4_section(p4: dict) -> str:
         </table>
       </div>
     </div>
-    <div class="lg:col-span-7 flex flex-col gap-space-xs">
-      <p class="font-body-sm text-body-sm text-on-surface-variant">On 27 fresh cases in two rounds (19 IoT cases, then 8 from five UCI security benchmarks), each prediction was committed before any model was trained on them. A case is judged only if its leakage gap is at least one point.</p>
+    <div class="flex flex-col gap-space-xs">
+      <p class="font-body-sm text-body-sm text-on-surface-variant">On {len(fr)} fresh cases in {NUM_WORDS.get(len(rounds), str(len(rounds))).lower()} rounds ({rounds_txt}), each prediction was committed before any model was trained on them. A case is judged only if its leakage gap is at least one point.</p>
       <div class="border border-surface-container-high bg-surface overflow-x-auto" tabindex="0" role="region" aria-label="Fresh cases, scrolls sideways">
         <table class="w-full text-left border-collapse font-mono-data-sm text-mono-data-sm text-on-surface min-w-[620px]">
           <thead><tr class="bg-surface-container-low border-b border-on-surface sec-label text-secondary"><th scope="col" class="py-2 px-3">Fresh case</th><th scope="col" class="py-2 px-3 text-right">Leaked</th><th scope="col" class="py-2 px-3 text-right">S</th><th scope="col" class="py-2 px-3">Predicted</th><th scope="col" class="py-2 px-3 text-right">Gap (pts)</th><th scope="col" class="py-2 px-3">Retraining found</th></tr></thead>
@@ -594,7 +602,8 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
   <span class="font-mono-data-lg text-[32px] leading-tight text-on-surface font-bold tabular">{e(v)}</span>
   <span class="font-body-sm text-body-sm text-on-surface-variant">{e(b)}</span>
 </div>""" for t, v, b in p3_cards_data)
-    finding_cards = "".join(f"""<div class="p-space-lg bg-surface-container-low border border-surface-container-high flex flex-col justify-between">
+    # an odd last card spans the row rather than sitting beside a hole
+    finding_cards = "".join(f"""<div class="p-space-lg bg-surface-container-low border border-surface-container-high flex flex-col justify-between{' md:col-span-2' if i == len(findings) - 1 and len(findings) % 2 else ''}">
   <div class="flex flex-col gap-space-xs">
     <span class="font-mono-data-sm text-mono-data-sm text-primary font-semibold">FINDING {i + 1:02d}</span>
     <h3 class="font-headline-sm text-headline-sm text-on-surface">{e(t)}</h3>
@@ -705,8 +714,8 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
 </header>
 
 <section aria-label="Summary" class="grid grid-cols-1 md:grid-cols-3 bg-surface-container-low border-y border-surface-container-high py-space-sm divide-y md:divide-y-0 md:divide-x divide-surface-container-high">
-  <div class="py-space-xs md:py-0 px-space-md flex flex-col justify-center"><span class="font-mono-data-md text-mono-data-md text-on-surface font-medium">{d['summary']['datasets']} benchmarks audited</span><span class="font-mono-data-sm text-mono-data-sm text-secondary tabular">{d['summary']['rows_audited']:,} rows</span></div>
-  <div class="py-space-xs md:py-0 px-space-md flex flex-col justify-center"><span class="font-mono-data-md text-mono-data-md text-primary font-semibold">{d['summary']['datasets_with_5pct_exact_copies']} of {d['summary']['datasets']} leak ≥ 5% of their test set</span><span class="font-mono-data-sm text-mono-data-sm text-secondary">exact copies of training rows</span></div>
+  <div class="py-space-xs md:py-0 px-space-md flex flex-col justify-center"><span class="font-mono-data-md text-mono-data-md text-on-surface font-medium">{d['summary']['all_datasets']} benchmarks audited</span><span class="font-mono-data-sm text-mono-data-sm text-secondary tabular">{d['summary']['all_rows']:,} rows; {d['summary']['datasets']} retrained with {len(d['summary']['models'])} models</span></div>
+  <div class="py-space-xs md:py-0 px-space-md flex flex-col justify-center"><span class="font-mono-data-md text-mono-data-md text-primary font-semibold">{d['summary']['all_with_5pct_exact_copies']} of {d['summary']['all_datasets']} leak ≥ 5% of their test set</span><span class="font-mono-data-sm text-mono-data-sm text-secondary">exact copies of training rows</span></div>
   <div class="py-space-xs md:py-0 px-space-md flex flex-col justify-center"><span class="font-mono-data-md text-mono-data-md text-on-surface font-medium">{syn_err} errors on {syn['configurations']} planted-leak tests</span><span class="font-mono-data-sm text-mono-data-sm text-secondary">synthetic validation</span></div>
 </section>
 
@@ -822,7 +831,7 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
 </section>
 
 <section class="flex flex-col gap-space-md" aria-labelledby="reproduce-title">
-  <div id="reproduce" class="scroll-mt-20">
+  <div id="reproduce" class="scroll-mt-28 md:scroll-mt-20">
     <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">10</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">Reproduce</span></div>
     <h2 id="reproduce-title" class="font-headline-md text-headline-md text-on-surface mt-1">Reproduce every number</h2>
   </div>
@@ -842,7 +851,7 @@ def build_index(d: dict, ex: dict, generated: str) -> str:
 
 <section class="flex flex-col gap-space-md pt-space-md border-t border-surface-container-high">
   {sec_head("11", "Scope", "Every caveat, measured", level="h2")}
-  <ul class="grid grid-cols-1 md:grid-cols-2 gap-x-space-xl gap-y-space-xs font-body-sm text-body-sm text-on-surface-variant list-disc pl-4">{lim}</ul>
+  <ul class="md:columns-2 gap-x-space-xl font-body-sm text-body-sm text-on-surface-variant list-disc pl-4 [&>li]:break-inside-avoid [&>li]:mb-space-xs">{lim}</ul>
 </section>
 
 </article>

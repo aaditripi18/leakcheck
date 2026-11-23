@@ -20,18 +20,20 @@
   <div class="h-14 max-w-[1100px] mx-auto px-margin-mobile md:px-gutter flex items-center justify-between gap-space-md">
     <div class="flex items-center gap-space-sm">
       <a class="font-mono-data-lg text-mono-data-lg text-on-surface tracking-tight font-medium hover:text-primary transition-colors" href="index.html">leakcheck</a>
-      <span class="hidden sm:inline-flex items-center border border-outline-variant px-space-xs py-0.5 bg-surface-container-low sec-label text-on-surface-variant">v0.2</span>
+      <span class="hidden sm:inline-flex items-center border border-outline-variant px-space-xs py-0.5 bg-surface-container-low sec-label text-on-surface-variant">v1.0.0</span>
     </div>
     <nav class="hidden md:flex items-center gap-space-lg" aria-label="Main"><a class="font-mono-data-sm text-mono-data-sm transition-colors text-on-surface-variant hover:text-on-surface" href="index.html#audit">Results</a><a class="font-mono-data-sm text-mono-data-sm transition-colors text-on-surface-variant hover:text-on-surface" href="index.html#hypotheses">Hypotheses</a><a class="font-mono-data-sm text-mono-data-sm transition-colors text-on-surface-variant hover:text-on-surface" href="same-copying.html">Writing</a><a class="font-mono-data-sm text-mono-data-sm transition-colors text-on-surface-variant hover:text-on-surface" href="scan.html">Scanner</a><a class="font-mono-data-sm text-mono-data-sm transition-colors text-on-surface-variant hover:text-on-surface" href="index.html#reproduce">Reproduce</a><a class="font-mono-data-sm text-mono-data-sm text-on-surface-variant hover:text-on-surface inline-flex items-center gap-0.5" href="https://github.com/aaditripi18/leakcheck" rel="noopener noreferrer">GitHub<svg class="icon text-[12px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></nav>
     <div class="flex items-center gap-space-sm">
-      <a class="md:hidden inline-block py-2 px-1 font-mono-data-sm text-mono-data-sm text-on-surface-variant hover:text-on-surface" href="scan.html">Scanner</a>
       <button type="button" data-theme-toggle aria-label="Toggle dark mode" class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors">
         <span class="dark:hidden"><svg class="icon text-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg></span><span class="hidden dark:inline"><svg class="icon text-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg></span>
       </button>
     </div>
   </div>
+  <div class="md:hidden max-w-[1100px] mx-auto px-margin-mobile">
+    <nav class="flex items-center gap-space-lg h-10 overflow-x-auto whitespace-nowrap [scrollbar-width:none] [mask-image:linear-gradient(90deg,#000_85%,transparent)]" aria-label="Main, small screens"><a class="font-mono-data-sm text-mono-data-sm transition-colors text-on-surface-variant hover:text-on-surface" href="index.html#audit">Results</a><a class="font-mono-data-sm text-mono-data-sm transition-colors text-on-surface-variant hover:text-on-surface" href="index.html#hypotheses">Hypotheses</a><a class="font-mono-data-sm text-mono-data-sm transition-colors text-on-surface-variant hover:text-on-surface" href="same-copying.html">Writing</a><a class="font-mono-data-sm text-mono-data-sm transition-colors text-on-surface-variant hover:text-on-surface" href="scan.html">Scanner</a><a class="font-mono-data-sm text-mono-data-sm transition-colors text-on-surface-variant hover:text-on-surface" href="index.html#reproduce">Reproduce</a><a class="font-mono-data-sm text-mono-data-sm text-on-surface-variant hover:text-on-surface inline-flex items-center gap-0.5" href="https://github.com/aaditripi18/leakcheck" rel="noopener noreferrer">GitHub<svg class="icon text-[12px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg></a></nav>
+  </div>
 </header>
-<main id="main" class="w-full pt-14">
+<main id="main" class="w-full pt-24 md:pt-14">
 
 <article class="max-w-[1100px] mx-auto px-margin-mobile md:px-gutter py-space-xl flex flex-col gap-space-2xl">
 
@@ -64,14 +66,14 @@
 </header>
 
 <section aria-label="Summary" class="grid grid-cols-1 md:grid-cols-3 bg-surface-container-low border-y border-surface-container-high py-space-sm divide-y md:divide-y-0 md:divide-x divide-surface-container-high">
-  <div class="py-space-xs md:py-0 px-space-md flex flex-col justify-center"><span class="font-mono-data-md text-mono-data-md text-on-surface font-medium">8 benchmarks audited</span><span class="font-mono-data-sm text-mono-data-sm text-secondary tabular">9,498,817 rows</span></div>
-  <div class="py-space-xs md:py-0 px-space-md flex flex-col justify-center"><span class="font-mono-data-md text-mono-data-md text-primary font-semibold">5 of 8 leak ≥ 5% of their test set</span><span class="font-mono-data-sm text-mono-data-sm text-secondary">exact copies of training rows</span></div>
+  <div class="py-space-xs md:py-0 px-space-md flex flex-col justify-center"><span class="font-mono-data-md text-mono-data-md text-on-surface font-medium">11 benchmarks audited</span><span class="font-mono-data-sm text-mono-data-sm text-secondary tabular">74,637,540 rows; 8 retrained with 4 models</span></div>
+  <div class="py-space-xs md:py-0 px-space-md flex flex-col justify-center"><span class="font-mono-data-md text-mono-data-md text-primary font-semibold">6 of 11 leak ≥ 5% of their test set</span><span class="font-mono-data-sm text-mono-data-sm text-secondary">exact copies of training rows</span></div>
   <div class="py-space-xs md:py-0 px-space-md flex flex-col justify-center"><span class="font-mono-data-md text-mono-data-md text-on-surface font-medium">0 errors on 720 planted-leak tests</span><span class="font-mono-data-sm text-mono-data-sm text-secondary">synthetic validation</span></div>
 </section>
 
 <section class="grid grid-cols-1 lg:grid-cols-12 gap-space-xl">
   <div class="lg:col-span-5 flex flex-col gap-space-md">
-    <div class="scroll-mt-20">
+    <div class="scroll-mt-28 md:scroll-mt-20">
   <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">01</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">The problem</span></div>
   <h2 class="font-headline-md text-headline-md text-on-surface mt-1">A high score can be a lookup, not a detector</h2>
 </div>
@@ -85,7 +87,7 @@
     </div>
   </div>
   <div class="lg:col-span-7 flex flex-col gap-space-md">
-    <div class="scroll-mt-20">
+    <div class="scroll-mt-28 md:scroll-mt-20">
   <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">02</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">What it checks</span></div>
   <h2 class="font-headline-md text-headline-md text-on-surface mt-1">Six checks on every split</h2>
 </div>
@@ -114,7 +116,7 @@
 
 <section class="flex flex-col gap-space-md">
   <div class="flex flex-col md:flex-row md:items-end justify-between border-b border-surface-container-high pb-space-sm gap-2">
-    <div id="audit" class="scroll-mt-20">
+    <div id="audit" class="scroll-mt-28 md:scroll-mt-20">
   <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">03</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">The audit</span></div>
   <h2 class="font-headline-md text-headline-md text-on-surface mt-1">Eight benchmarks, one audit</h2>
 </div>
@@ -199,7 +201,7 @@
 </section>
 
 <section class="flex flex-col gap-space-md">
-  <div class="scroll-mt-20">
+  <div class="scroll-mt-28 md:scroll-mt-20">
   <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">04</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">What the leakage is worth</span></div>
   <h2 class="font-headline-md text-headline-md text-on-surface mt-1">Same copying, very different damage</h2>
 </div>
@@ -277,7 +279,7 @@
 
 <section class="flex flex-col gap-space-md">
   <div class="flex flex-col md:flex-row md:items-end justify-between border-b border-surface-container-high pb-space-sm gap-2">
-    <div id="current" class="scroll-mt-20">
+    <div id="current" class="scroll-mt-28 md:scroll-mt-20">
   <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">05</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">The benchmarks in use now</span></div>
   <h2 class="font-headline-md text-headline-md text-on-surface mt-1">Current benchmarks hide their copies</h2>
 </div>
@@ -330,15 +332,15 @@
 </section>
 
 <section class="flex flex-col gap-space-md">
-  <div id="explain" class="scroll-mt-20">
+  <div id="explain" class="scroll-mt-28 md:scroll-mt-20">
   <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">06</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">Diagnose a leak</span></div>
   <h2 class="font-headline-md text-headline-md text-on-surface mt-1">Easy or memorised, without training a model</h2>
 </div>
   <div class="p-space-md bg-surface-container border border-surface-container-high">
     <p class="font-body-lg text-body-lg text-on-surface font-medium">Copies inflate a score only when a model needed them. <code>leakcheck explain</code> removes each leaked row's training copies and asks whether its nearest remaining neighbour still has the right label. If it does, the leaked rows are easy; if not, a model could only get them right by memorising the copy.</p>
   </div>
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg items-start">
-    <div class="lg:col-span-5 flex flex-col gap-space-xs">
+  <div class="flex flex-col gap-space-lg">
+    <div class="flex flex-col gap-space-xs max-w-2xl">
       <p class="font-body-sm text-body-sm text-on-surface-variant">S on the eight dev cases (neighbour-vote accuracy on the leaked rows minus on the rest) beside what retraining found (E13). The threshold s* = +0.072 is the midpoint between the two groups.</p>
       <div class="border border-surface-container-high bg-surface overflow-x-auto">
         <table class="w-full text-left border-collapse font-mono-data-sm text-mono-data-sm text-on-surface">
@@ -379,8 +381,8 @@
         </table>
       </div>
     </div>
-    <div class="lg:col-span-7 flex flex-col gap-space-xs">
-      <p class="font-body-sm text-body-sm text-on-surface-variant">On 27 fresh cases in two rounds (19 IoT cases, then 8 from five UCI security benchmarks), each prediction was committed before any model was trained on them. A case is judged only if its leakage gap is at least one point.</p>
+    <div class="flex flex-col gap-space-xs">
+      <p class="font-body-sm text-body-sm text-on-surface-variant">On 49 fresh cases in four rounds (19 IoT cases, 8 from five UCI security benchmarks, 12 from UCI and OpenML security and fraud sets, then 10 chosen for heavy leakage), each prediction was committed before any model was trained on them. A case is judged only if its leakage gap is at least one point.</p>
       <div class="border border-surface-container-high bg-surface overflow-x-auto" tabindex="0" role="region" aria-label="Fresh cases, scrolls sideways">
         <table class="w-full text-left border-collapse font-mono-data-sm text-mono-data-sm text-on-surface min-w-[620px]">
           <thead><tr class="bg-surface-container-low border-b border-on-surface sec-label text-secondary"><th scope="col" class="py-2 px-3">Fresh case</th><th scope="col" class="py-2 px-3 text-right">Leaked</th><th scope="col" class="py-2 px-3 text-right">S</th><th scope="col" class="py-2 px-3">Predicted</th><th scope="col" class="py-2 px-3 text-right">Gap (pts)</th><th scope="col" class="py-2 px-3">Retraining found</th></tr></thead>
@@ -762,7 +764,7 @@
 </section>
 
 <section class="flex flex-col gap-space-md">
-  <div id="hypotheses" class="scroll-mt-20">
+  <div id="hypotheses" class="scroll-mt-28 md:scroll-mt-20">
   <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">07</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">Pre-registered</span></div>
   <h2 class="font-headline-md text-headline-md text-on-surface mt-1">25 hypotheses, decided by rules fixed before the runs</h2>
 </div>
@@ -996,7 +998,7 @@
 </section>
 
 <section class="flex flex-col gap-space-md">
-  <div class="scroll-mt-20">
+  <div class="scroll-mt-28 md:scroll-mt-20">
   <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">08</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">What we learned</span></div>
   <h2 class="font-headline-md text-headline-md text-on-surface mt-1">Five findings</h2>
 </div>
@@ -1028,7 +1030,7 @@
     <p class="font-body-md text-body-md text-on-surface-variant mt-2">On CIC-IDS2017 the baselines score 97.1–99.9% macro-F1 on a random split, and 46.2–56.5% when trained on earlier capture days and tested on the last ones, whose attack types (PortScan, DDoS) never appear in training. Split by time within each attack type instead, the cost is 0.5–1.5 points: the collapse was the unseen attacks, not time.</p>
   </div>
   <div class="mt-space-md pt-space-xs border-t border-surface-container-high font-mono-data-sm text-mono-data-sm text-secondary">Gradient boosting: random split 99.9% → later days 46.2%</div>
-</div><div class="p-space-lg bg-surface-container-low border border-surface-container-high flex flex-col justify-between">
+</div><div class="p-space-lg bg-surface-container-low border border-surface-container-high flex flex-col justify-between md:col-span-2">
   <div class="flex flex-col gap-space-xs">
     <span class="font-mono-data-sm text-mono-data-sm text-primary font-semibold">FINDING 05</span>
     <h3 class="font-headline-sm text-headline-sm text-on-surface">Leaked is not the same as inflated.</h3>
@@ -1039,7 +1041,7 @@
 </section>
 
 <section class="flex flex-col gap-space-md">
-  <div class="scroll-mt-20">
+  <div class="scroll-mt-28 md:scroll-mt-20">
   <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">09</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">Validation</span></div>
   <h2 class="font-headline-md text-headline-md text-on-surface mt-1">Checked against the literature</h2>
 </div>
@@ -1094,7 +1096,7 @@
 </section>
 
 <section class="flex flex-col gap-space-md" aria-labelledby="reproduce-title">
-  <div id="reproduce" class="scroll-mt-20">
+  <div id="reproduce" class="scroll-mt-28 md:scroll-mt-20">
     <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">10</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">Reproduce</span></div>
     <h2 id="reproduce-title" class="font-headline-md text-headline-md text-on-surface mt-1">Reproduce every number</h2>
   </div>
@@ -1135,11 +1137,11 @@ python scripts/report.py</pre>
 </section>
 
 <section class="flex flex-col gap-space-md pt-space-md border-t border-surface-container-high">
-  <div class="scroll-mt-20">
+  <div class="scroll-mt-28 md:scroll-mt-20">
   <div class="flex items-center gap-space-xs"><span class="sec-label text-primary">11</span><span class="w-1.5 h-1.5 bg-outline-variant"></span><span class="sec-label text-on-surface-variant">Scope</span></div>
   <h2 class="font-headline-md text-headline-md text-on-surface mt-1">Every caveat, measured</h2>
 </div>
-  <ul class="grid grid-cols-1 md:grid-cols-2 gap-x-space-xl gap-y-space-xs font-body-sm text-body-sm text-on-surface-variant list-disc pl-4"><li>A copy is not always a bug: measured. On KDD Cup 99 and NSL-KDD the copied rows are easy (a model trained without them still gets 97% right, E9); on CSE-CIC-IDS2018 and EMBER they are memorised (E13).</li><li>The cleaned test set is harder by construction: measured. A random removal of the same size is reported beside every gap (up to 1.5 points, against 15–17 on KDD Cup 99, E10).</li><li>Near-copy thresholds: measured. Every gap is recomputed from eps 0.001 to 0.1 and Jaccard 0.6 to 0.95 (E6).</li><li>Untuned baselines: measured. Every gap is repeated with full training sets, a tuned model and a paired bootstrap (E5/E6); the two largest current benchmarks are scored on a 200,000-row test sample.</li><li>EMBER&#x27;s feature view: measured. The official 2,381-dimension vectors give the same copies and gaps within 0.4 points (E11).</li><li>Provenance: IDS2018 is byte-identical to the official bucket; CIC-IoT2023 matches all 34 published label counts.</li><li>The cheap diagnosis (H19, H19b, H22, H23): measured on eight dev cases and on 49 fresh ones in four rounds, every prediction committed before any fresh model was trained. Right on 11 of 16 judgeable fresh cases (an uncertain call counted wrong); H19b is not supported (5 of 8 against the 90% asked). Every miss sat at a cut-off, so explain now says uncertain inside the threshold&#x27;s 90% interval; on the third round its decided calls were right on 2 of 2 (H22 not judged: too few cases with a gap to judge), and on the fourth on 2 of 2 (H23 not judged, for the same reason).</li></ul>
+  <ul class="md:columns-2 gap-x-space-xl font-body-sm text-body-sm text-on-surface-variant list-disc pl-4 [&>li]:break-inside-avoid [&>li]:mb-space-xs"><li>A copy is not always a bug: measured. On KDD Cup 99 and NSL-KDD the copied rows are easy (a model trained without them still gets 97% right, E9); on CSE-CIC-IDS2018 and EMBER they are memorised (E13).</li><li>The cleaned test set is harder by construction: measured. A random removal of the same size is reported beside every gap (up to 1.5 points, against 15–17 on KDD Cup 99, E10).</li><li>Near-copy thresholds: measured. Every gap is recomputed from eps 0.001 to 0.1 and Jaccard 0.6 to 0.95 (E6).</li><li>Untuned baselines: measured. Every gap is repeated with full training sets, a tuned model and a paired bootstrap (E5/E6); the two largest current benchmarks are scored on a 200,000-row test sample.</li><li>EMBER&#x27;s feature view: measured. The official 2,381-dimension vectors give the same copies and gaps within 0.4 points (E11).</li><li>Provenance: IDS2018 is byte-identical to the official bucket; CIC-IoT2023 matches all 34 published label counts.</li><li>The cheap diagnosis (H19, H19b, H22, H23): measured on eight dev cases and on 49 fresh ones in four rounds, every prediction committed before any fresh model was trained. Right on 11 of 16 judgeable fresh cases (an uncertain call counted wrong); H19b is not supported (5 of 8 against the 90% asked). Every miss sat at a cut-off, so explain now says uncertain inside the threshold&#x27;s 90% interval; on the third round its decided calls were right on 2 of 2 (H22 not judged: too few cases with a gap to judge), and on the fourth on 2 of 2 (H23 not judged, for the same reason).</li></ul>
 </section>
 
 </article>

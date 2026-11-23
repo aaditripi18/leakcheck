@@ -53,7 +53,10 @@
    "hgb",
    "mlp"
   ],
-  "seeds": 5
+  "seeds": 5,
+  "all_datasets": 11,
+  "all_rows": 74637540,
+  "all_with_5pct_exact_copies": 6
  },
  "checks": [
   {

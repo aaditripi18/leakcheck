@@ -641,7 +641,12 @@ def site_data(runs: dict) -> dict:
         "ledger_lines": sorted(set(used)),
         "summary": {"datasets": len(audit), "rows_audited": rows,
                     "datasets_with_5pct_exact_copies": sum((a["exact_copies"] or 0) >= 0.05 for a in audit),
-                    "models": list(MODELS), "seeds": 5},
+                    "models": list(MODELS), "seeds": 5,
+                    # the whole audit: the 8 retrained benchmarks plus phase 3's, each as distributed
+                    "all_datasets": len(audit) + len(phase3["datasets"]),
+                    "all_rows": rows + sum(x["rows"] for x in phase3["datasets"]),
+                    "all_with_5pct_exact_copies": sum((a["exact_copies"] or 0) >= 0.05 for a in audit)
+                    + sum((x["exact_as_distributed"] or 0) >= 0.05 for x in phase3["datasets"])},
         "checks": CHECKS, "hypotheses": hypotheses(runs) + phase2_hypotheses(runs), "audit": audit, "retrain": retrain,
         "ablation": ablation, "validation": validation, "phase3": phase3, "phase4": phase4_data(runs),
         "clean_splits": clean_splits_data(),
