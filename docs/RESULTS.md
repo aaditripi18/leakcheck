@@ -69,11 +69,13 @@ leakcheck findings on the binary attack/normal task (features only, label column
 | L1.within_train | 78.05% [info] | 0.01% [info] |
 | L1.within_test | 75.17% [info] | 0.25% [info] |
 | L1.cross | 68.36% (212,612 rows) [high] | 2.95% (664 rows) [medium] |
-| L2.near | not run | 30.13% (x0.60 of train baseline) [high] |
+| L2.near | 14.80% (x1.37 of train baseline) [high] (E1) | 30.13% (x0.60 of train baseline) [high] |
 | L3.conflict | 0.44% (22,781 rows) [low] | 0.14% (210 rows) [low] |
 | L3.ceiling | 98.17% [medium] | 99.76% [low] |
 | L3.cross_contradict | 1.05% (3,279 rows) [high] | 0.21% (47 rows) [medium] |
-| L5.shortcut | not run | 83.01% [ok] |
+| L5.shortcut | 93.80% [medium] (E1) | 83.01% [ok] |
+
+(E1): E0b ran only L1 and L3 on KDD99; these cells are E1's audit of the same split and features (`e1_audit:kdd99`, same L1.cross).
 
 KDD99 L1.cross by class: normal 12.69% of 60,593, attack 81.83% of 250,436
 

@@ -46,3 +46,14 @@ def test_later_verdicts_from_ledger():
     assert "right on 2/2" in h23["evidence"] and "Not run" not in h23["evidence"]
     assert "andmal2020:no_identifiers S -0.114 predicted memorised, was memorised" in h23["evidence"]
     assert "50,000-row sample per seed" in h23["evidence"]
+
+
+def test_kdd99_table_has_no_unmeasured_cell():
+    """E0b ran L1 and L3 on KDD99; its L2.near and L5.shortcut cells come from E1 on the same split."""
+    report = _load_report()
+    runs = report.latest()
+    md = "\n".join(report.e0_kdd(runs["e0_kdd"], runs.get("e1_audit:kdd99")))
+    assert "not run" not in md
+    e1 = runs["e1_audit:kdd99"]["results"]["views"]["all"]["findings"]
+    assert runs["e0_kdd"]["results"]["kdd99_leakcheck"]["L1.cross"]["n_hit"] == e1["L1.cross"]["n_hit"]  # same task
+    assert "| L2.near | 14.80% (x1.37 of train baseline) [high] (E1) |" in md
