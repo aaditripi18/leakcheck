@@ -1,0 +1,51 @@
+{
+ "code": "cdf33ec",
+ "device": "Tesla T4",
+ "torch": "2.11.0+cu130",
+ "step": {
+  "d77_old_cdist_f32": 109262156.7400611,
+  "d77_new_matmul_f32": 2961830522.1463046,
+  "d77_float64": 813064149.0857052,
+  "d46_old_cdist_f32": 110918070.59124681,
+  "d46_new_matmul_f32": 3015466748.2903857,
+  "d46_float64": 1004336053.7844287
+ },
+ "search": {
+  "d77_certified_f32": {
+   "seconds": 186.6625256538391,
+   "pairs": 114857850000,
+   "pairs_per_s": 615323561.0504968,
+   "redone_share": 0.79724
+  },
+  "d77_float64_only": {
+   "seconds": 167.34758305549622,
+   "pairs": 114857850000,
+   "pairs_per_s": 686343046.6271542,
+   "redone_share": 1.0
+  },
+  "d77_equal": true,
+  "d46_certified_f32": {
+   "seconds": 123.3071551322937,
+   "pairs": 114942650000,
+   "pairs_per_s": 932165289.813721,
+   "redone_share": 0.5365
+  },
+  "d46_float64_only": {
+   "seconds": 130.2093780040741,
+   "pairs": 114942650000,
+   "pairs_per_s": 882752469.6140057,
+   "redone_share": 1.0
+  },
+  "d46_equal": true
+ },
+ "hours_per_part": {
+  "cseids2018:no_identifiers | 8 parts | redone 0.57": 0.7198642995698697,
+  "cseids2018:no_identifiers | 8 parts | redone 1.0": 1.0683773326673895,
+  "cseids2018:no_identifiers | 16 parts | redone 0.57": 0.3599321497849349,
+  "cseids2018:no_identifiers | 16 parts | redone 1.0": 0.5341886663336948,
+  "ciciot2023 (upper bound) | 8 parts | redone 0.57": 4.59981101233582,
+  "ciciot2023 (upper bound) | 8 parts | redone 1.0": 6.617084013232597,
+  "ciciot2023 (upper bound) | 16 parts | redone 0.57": 2.29990550616791,
+  "ciciot2023 (upper bound) | 16 parts | redone 1.0": 3.3085420066162987
+ }
+}
