@@ -65,3 +65,9 @@
   .sec-label { @apply font-label-caps text-label-caps uppercase; }
   .dropzone.is-over { @apply border-primary bg-primary/5; }
 }
+
+/* readers who ask for less motion get no smooth scrolling or transitions */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}

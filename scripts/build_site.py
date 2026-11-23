@@ -84,6 +84,7 @@ def head(title: str, description: str) -> str:
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="{CSP}">
 <meta name="referrer" content="no-referrer">
+<meta name="color-scheme" content="light dark">
 <title>{e(title)}</title>
 <meta name="description" content="{e(description)}">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' fill='%23111110'/%3E%3Crect x='3' y='3' width='4' height='10' fill='%23d97706'/%3E%3Crect x='9' y='3' width='4' height='10' fill='%23f9f9f6'/%3E%3C/svg%3E">
@@ -307,6 +308,9 @@ def short_evidence(h: dict, d: dict) -> str:
     return h["evidence"]
 
 
+# dataset ids as their publishers write them, where that differs from the id
+DISPLAY = {"uci_tuandromd": "TUANDROMD", "uci_rt_iot2022": "RT-IoT2022", "uci_spambase": "Spambase",
+           "uci_website_phishing": "Website Phishing", "uci_youtube_spam": "YouTube Spam"}
 NUM_WORDS = {2: "Two", 3: "Three", 4: "Four", 5: "Five", 6: "Six", 7: "Seven", 8: "Eight", 9: "Nine"}
 
 
@@ -354,6 +358,24 @@ def phase4_section(p4: dict) -> str:
 </tr>""" for n, v in fr.items())
     right = sum(v["prediction"] == v["outcome"] for v in elig.values())
     h19 = next(h for h in p4["hypotheses"] if h["id"] == "H19")
+    # round 5's misses, described from the data: each sits at one of the two cut-offs
+    keep = p4.get("easy_keep", 0.8)
+    miss5 = [v for v in elig5.values() if v["prediction"] != v["outcome"]]
+    s_miss = sorted({round(v["S"], 3) for v in miss5 if v["outcome"] == "easy"})
+    kept = sorted(v["copy_free_gap"] / v["full_gap"] for v in miss5 if v["outcome"] == "memorised")
+    big = max((v["full_gap"] for v in miss5), default=0)
+    big_right = sorted({DISPLAY.get(n.split(":")[0], n.split(":")[0]) for n, v in elig5.items()
+                        if v["prediction"] == v["outcome"] and v["full_gap"] > big})
+    cut = []
+    if s_miss:
+        cut.append(("an S of " if len(s_miss) == 1 else "S of ") + ", ".join(f"{x:+.3f}" for x in s_miss)
+                   + f" against s* = {s_star:+.3f}")
+    if kept:
+        span = f"{kept[0] * 100:.0f}%" if round(kept[0] * 100) == round(kept[-1] * 100) else             f"{kept[0] * 100:.0f}–{kept[-1] * 100:.0f}%"
+        cut.append(f"copy-free models keeping {span} of the gap against the {keep * 100:.0f}% that separates easy from memorised")
+    misses_txt = ((f"Every large gap was called right ({', '.join(big_right)}); " if big_right else "")
+                  + (f"the {NUM_WORDS.get(len(miss5), str(len(miss5))).lower()} misses sit at a cut-off: "
+                     + ", and ".join(cut) + "." if miss5 else ""))
     per_round = {r: sum(v.get("round", 4) == r for v in fr.values()) for r in (4, 5, 6, 7)}
     what = {4: "IoT cases", 5: "from five UCI security benchmarks", 6: "from UCI and OpenML security and fraud sets",
             7: "chosen for heavy leakage"}
@@ -403,7 +425,7 @@ def phase4_section(p4: dict) -> str:
     </div>
   </div>
   {clean_block}
-  <p class="font-body-sm text-body-sm text-on-surface-variant">First round: right on {right} of {len(elig)} judgeable cases; the rule needs four, so H19 is <strong>{e(h19['verdict'])}</strong>. Second round, pre-registered after it: right on {right5} of {len(elig5)}, below the 90% the rule asks, so H19b is <strong>{e(h19b['verdict'] if h19b else 'pending')}</strong>. Every large gap was called right (TUANDROMD, RT-IoT2022); the three misses sit at a cut-off: an S of +0.067 against s* = {s_star:+.3f}, and copy-free models keeping 75–78% of the gap against the 80% that separates easy from memorised. {third} Use <code>leakcheck explain</code> as a first look, and retrain where the verdict matters: <code>leakcheck explain --train train.csv --test test.csv --label y</code>.</p>
+  <p class="font-body-sm text-body-sm text-on-surface-variant">First round: right on {right} of {len(elig)} judgeable cases; the rule needs four, so H19 is <strong>{e(h19['verdict'])}</strong>. Second round, pre-registered after it: right on {right5} of {len(elig5)}, below the 90% the rule asks, so H19b is <strong>{e(h19b['verdict'] if h19b else 'pending')}</strong>. {misses_txt}{third} Use <code>leakcheck explain</code> as a first look, and retrain where the verdict matters: <code>leakcheck explain --train train.csv --test test.csv --label y</code>.</p>
 </section>
 """
 

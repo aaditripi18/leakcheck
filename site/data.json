@@ -1773,6 +1773,7 @@
    }
   },
   "s_star": 0.072112,
+  "easy_keep": 0.8,
   "fresh": {
    "ton_network": {
     "S": 0.014541,

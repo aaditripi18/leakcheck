@@ -905,7 +905,7 @@ def _e13(runs: dict, name: str) -> dict | None:
     return {"cells": cells, "leaked_share": sum(s["leaked_share"] for s in ps) / len(ps),
             "full_gap": sum(c["full"]["gap"] for c in cells) / len(cells),
             "copy_free_gap": sum(c["copy_free"]["gap"] for c in cells) / len(cells),
-            "h17": sum(c["copy_free"]["gap"] >= 0.8 * c["full"]["gap"] for c in cells),
+            "h17": sum(c["copy_free"]["gap"] >= EASY_KEEP * c["full"]["gap"] for c in cells),
             "h18": sum(c["copy_free"]["acc_leaked"] > c["copy_free"]["acc_rest"] for c in cells),
             "commit": d["git"]["commit"]}
 
@@ -987,10 +987,14 @@ def _e14(runs: dict, name: str) -> dict | None:
             "macro_f1": sum(c["full"]["whole"] for c in cells) / len(cells), "commit": d["git"]["commit"]}
 
 
+# H17/H19's outcome rule (PLAN.md): leaked rows are easy if copy-free models keep this share of the gap
+EASY_KEEP = 0.8
+
+
 def _h19_outcome(e: dict) -> str | None:
     if e["full_gap"] < 0.01 or e["copy_free_gap"] is None:
         return None
-    return "easy" if e["copy_free_gap"] >= 0.8 * e["full_gap"] else "memorised"
+    return "easy" if e["copy_free_gap"] >= EASY_KEEP * e["full_gap"] else "memorised"
 
 
 def h19(runs: dict) -> dict:
@@ -1309,7 +1313,7 @@ def phase4_data(runs: dict) -> dict:
                     "copy_free_gap": _num(e["copy_free_gap"]) if e and e["copy_free_gap"] is not None else None,
                     "macro_f1": _num(e["macro_f1"]) if e else None}
     return {"hypotheses": phase4_hypotheses(runs), "dev": stat,
-            "s_star": _num(thr["results"]["s_star"]) if thr else None, "fresh": fresh}
+            "s_star": _num(thr["results"]["s_star"]) if thr else None, "easy_keep": EASY_KEEP, "fresh": fresh}
 
 
 def phase4_hypotheses_md(runs: dict) -> list[str]:
